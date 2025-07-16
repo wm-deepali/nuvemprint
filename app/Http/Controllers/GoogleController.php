@@ -42,7 +42,7 @@ class GoogleController extends Controller
                 return redirect()->route('first.details');
             }
             Auth::guard('customer')->login($user);
-        	return redirect()->route('user.dashboard');
+        	return redirect()->route('account-dashboard');
      
         } else {
       
