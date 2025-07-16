@@ -1,0 +1,109 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SiteController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\GoogleController;
+
+/*
+|--------------------------------------------------------------------------
+| Site Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register site routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| not contains the middleware group. Now create something great!
+|
+*/
+
+Route::get('/artisan', function () {
+    \Artisan::call('cache:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('route:clear');
+    // \Artisan::call('optimize');
+    dd('cleared');
+});
+Route::get("/pass", function () {
+    echo Hash::make("Empire@123#$");
+});
+Route::get('/stl', function () {
+    \Artisan::call('storage:link');
+    dd('linked');
+});
+Route::get('/', [SiteController::class, 'index'])->name('home');
+Route::get('{slug}/details', [SiteController::class, 'subcateDetails'])->name('subcategory-details');
+
+
+Route::get('cart', function () {
+    return view('front.shop-cart');
+})->name('shop-cart');
+
+
+Route::get('artwork', function () {
+    return view('front.artwork');
+})->name('artwork');
+
+
+Route::get('order-tracking', function () {
+    return view('front.order-tracking');
+})->name('order-tracking');
+
+Route::get('about-us', function () {
+    return view('front.about-us');
+})->name('about-us');
+
+Route::get('contact-us', function () {
+    return view('front.contact-us');
+})->name('contact-us');
+
+
+Route::get('blogs', function () {
+    return view('front.blogs');
+})->name('blogs');
+
+
+
+Route::controller(GoogleController::class)->group(function () {
+    Route::get('customer/google/redirect', 'redirectToGoogle')->name('google.redirect');
+    Route::middleware(['web'])->get('customer/google/callback', 'handleGoogleCallback')->name('google.callback');
+});
+
+Route::get('authentication-signin', function () {
+    return view('front.authentication-signin');
+})->name('authentication-signin');
+
+Route::get('authentication-signup', function () {
+    return view('front.authentication-signup');
+})->name('authentication-signup');
+
+Route::middleware(['web'])->group(function () {
+    Route::controller(CustomerController::class)->group(function () {
+        Route::get('add-required-details', 'addRequiredDetails')->name('first.details');
+        Route::post('/check-email', 'checkEmail')->name('check-email');
+        Route::get('account/verify/{token}', 'verifyAccount')->name('customer.verify');
+        Route::post('/customer-register', 'register')->name('customer-register');
+        Route::post('/authenticate', 'authenticate')->name('customer.authenticate');
+
+        Route::post('first/add-details/store', 'storeRequiredDetails')->name('first.details.store');
+        Route::get('authentication-forgot-password', 'showForgetPasswordForm')->name('authentication-forgot-password.get');
+        Route::post('authentication-forgot-password', 'submitForgetPasswordForm')->name('authentication-forgot-password.post');
+        Route::get('reset-password/{token}', 'showResetPasswordForm')->name('reset.password.get');
+        Route::post('reset-password', 'submitResetPasswordForm')->name('reset.password.post');
+
+    });
+
+    Route::get('shop-categories', [SiteController::class, 'shopCategories'])->name('shop-categories');
+
+
+    // Update front routes and functions start
+    Route::middleware(['auth:customer'])->group(function () {
+        Route::get('account-dashboard', [CustomerController::class, 'dashboard'])->name('account-dashboard');
+        Route::get('account-downloads', [CustomerController::class, 'orders'])->name('account-orders');
+        Route::get('account-downloads', [CustomerController::class, 'downloads'])->name('account-downloads');
+        Route::get('account-addresses', [CustomerController::class, 'addresses'])->name('account-addresses');
+        Route::get('account-payment-methods', [CustomerController::class, 'paymentmethods'])->name('account-payment-methods');
+        Route::get('account-user-details', [CustomerController::class, 'userDetails'])->name('account-user-details');
+        Route::get('account-logout', [CustomerController::class, 'logout'])->name('account-logout');
+    });
+});
