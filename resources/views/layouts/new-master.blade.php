@@ -14,6 +14,7 @@
 
   <meta name="description" content="Nuvem Print">
   <meta name="keywords" content="Nuvem Print">
+   @stack('before-styles')
   <title>@yield('title')</title>
   
   <link rel="stylesheet" type="text/css" href="{{ URL::asset('assets/plugins/OwlCarousel/css/owl.carousel.min.css') }}">

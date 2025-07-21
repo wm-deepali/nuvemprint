@@ -273,7 +273,7 @@
       const modifierGroup = row.querySelector('.modifier-type-group');
       const baseChargesGroup = row.querySelector('.base-charges-group');
       const showSetupFields = selectedAttr?.has_setup_charge === true;
-      
+
       extraCopySection.style.display = selectedAttr?.pricing_basis === 'per_extra_copy' ? 'block' : 'none';
       modifierGroup.style.display = showSetupFields ? 'block' : 'none';
       baseChargesGroup.style.display = showSetupFields ? 'block' : 'none';
@@ -357,12 +357,26 @@
     $('#save-pricing-rule-btn').on('click', function () {
       const $btn = $(this);
       const form = $('#pricing-rule-form')[0];
-      const formData = new FormData(form);
 
+      // Remove invalid per_page_pricing inputs before sending
+      $('.attribute-row').each(function () {
+      const pricingContainer = $(this).find('.per-page-container');
+      const attrSelect = $(this).find('select[name*="[attribute_id]"]');
+      const attrId = attrSelect.val();
+      const selectedAttr = subcategoryAttributes.find(attr => attr.id == attrId);
+
+      if (!['per_page', 'per_product'].includes(selectedAttr?.pricing_basis)) {
+      pricingContainer.find('input, select').each(function () {
+      $(this).prop('disabled', true); // prevents submission
+      });
+      }
+      });
+
+      const formData = new FormData(form);
       $btn.prop('disabled', true);
       $('input, select').removeClass('is-invalid');
       $('.invalid-feedback').remove();
-
+    
       $.ajax({
       url: "<?php echo e(route('admin.pricing-rules.store')); ?>",
       method: 'POST',

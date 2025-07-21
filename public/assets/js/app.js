@@ -1,8 +1,14 @@
 $(function() {
 	"use strict";
 
+const container = document.querySelector('.cart-list');
 
+if (container) {
   new PerfectScrollbar('.cart-list');
+} else {
+  console.error('Scroll container not found');
+}
+  
 
 // Prevent closing from click inside dropdown
 

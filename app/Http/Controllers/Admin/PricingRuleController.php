@@ -40,7 +40,7 @@ class PricingRuleController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-        $rules = [
+       $request->validate([
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
 
@@ -48,7 +48,7 @@ class PricingRuleController extends Controller
             'rows.*.attribute_id' => 'required|exists:attributes,id',
             'rows.*.value_id' => 'required|exists:attribute_values,id',
             'rows.*.dependency_value_id' => 'nullable|exists:attribute_values,id',
-            'rows.*.modifier_type' => 'required|in:add,multiply',
+            'rows.*.modifier_type' => 'nullable|in:add,multiply',
             'rows.*.modifier_value' => 'nullable|numeric',
             'rows.*.base_charges_type' => 'nullable|in:amount,percentage',
             'rows.*.extra_copy_charge' => 'nullable|numeric|min:0',
@@ -58,7 +58,7 @@ class PricingRuleController extends Controller
             'rows.*.per_page_pricing.*.quantity_from' => 'required_with:rows.*.per_page_pricing|integer|min:1',
             'rows.*.per_page_pricing.*.quantity_to' => 'required_with:rows.*.per_page_pricing|integer|min:1|gte:rows.*.per_page_pricing.*.quantity_from',
             'rows.*.per_page_pricing.*.price' => 'required_with:rows.*.per_page_pricing|numeric|min:0',
-        ];
+        ]);
 
 
         DB::beginTransaction();
@@ -131,8 +131,8 @@ class PricingRuleController extends Controller
             'rows.*.attribute_id' => 'required|exists:attributes,id',
             'rows.*.value_id' => 'required|exists:attribute_values,id',
             'rows.*.dependency_value_id' => 'nullable|exists:attribute_values,id',
-            'rows.*.modifier_type' => 'required|in:add,multiply',
-            'rows.*.modifier_value' => 'required|numeric',
+            'rows.*.modifier_type' => 'nullable|in:add,multiply',
+            'rows.*.modifier_value' => 'nullable|numeric',
             'rows.*.base_charges_type' => 'nullable|in:amount,percentage',
             'rows.*.extra_copy_charge' => 'nullable|numeric|min:0',
             'rows.*.extra_copy_charge_type' => 'nullable|in:amount,percentage',
@@ -162,7 +162,7 @@ class PricingRuleController extends Controller
                     'value_id' => $row['value_id'],
                     'dependency_value_id' => $row['dependency_value_id'] ?? null,
                     'price_modifier_type' => $row['modifier_type'],
-                    'price_modifier_value' => $row['modifier_value'],
+                    'price_modifier_value' => $row['modifier_value'] ?? 0,
                     'is_default' => isset($row['is_default']) ? 1 : 0,
                     'base_charges_type' => $row['base_charges_type'] ?? null,
                     'extra_copy_charge' => $row['extra_copy_charge'] ?? null,
