@@ -45,6 +45,7 @@ class AttributeConditionController extends Controller
                     return [
                         'id' => $sav->value->id,
                         'value' => $sav->value->value,
+                        'is_composite_value' => $sav->value->is_composite_value,
                     ];
                 });
 
@@ -52,6 +53,10 @@ class AttributeConditionController extends Controller
                 'id' => $sa->attribute->id,
                 'name' => $sa->attribute->name,
                 'values' => $values,
+                'pricing_basis' => $sa->attribute->pricing_basis,
+                'has_setup_charge' => $sa->attribute->has_setup_charge,
+                'has_dependency' => $sa->attribute->has_dependency,
+                'dependency_parent' => $sa->attribute->dependency_parent
             ];
         });
 

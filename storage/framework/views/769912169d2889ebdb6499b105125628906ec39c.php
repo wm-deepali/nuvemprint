@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
     <style>
         .remove-modifier,
         .add-modifier {
@@ -30,79 +30,81 @@
                     <h4 class="mb-0">Edit Pricing Rule</h4>
                 </div>
                 <div class="col-md-6 text-right">
-                    <a href="{{ route('admin.pricing-rules.index') }}" class="btn btn-secondary btn-sm">← Back to List</a>
+                    <a href="<?php echo e(route('admin.pricing-rules.index')); ?>" class="btn btn-secondary btn-sm">← Back to List</a>
                 </div>
             </div>
 
             <div class="content-body">
                 <div class="card">
                     <div class="card-body">
-                        <form method="POST" action="{{ route('admin.pricing-rules.update', $pricingRule->id) }}"
+                        <form method="POST" action="<?php echo e(route('admin.pricing-rules.update', $pricingRule->id)); ?>"
                             id="pricing-rule-form">
-                            @csrf
-                            @method('PUT')
+                            <?php echo csrf_field(); ?>
+                            <?php echo method_field('PUT'); ?>
 
-                            {{-- Category & Subcategory --}}
+                            
                             <div class="form-row">
                                 <div class="form-group col-md-4">
                                     <label>Category</label>
-                                    <div class="form-control-plaintext">{{ $pricingRule->category->name }}</div>
-                                    <input type="hidden" name="category_id" value="{{ $pricingRule->category_id }}">
+                                    <div class="form-control-plaintext"><?php echo e($pricingRule->category->name); ?></div>
+                                    <input type="hidden" name="category_id" value="<?php echo e($pricingRule->category_id); ?>">
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label>Subcategory</label>
-                                    <div class="form-control-plaintext">{{ $pricingRule->subcategory->name }}</div>
-                                    <input type="hidden" name="subcategory_id" value="{{ $pricingRule->subcategory_id }}">
+                                    <div class="form-control-plaintext"><?php echo e($pricingRule->subcategory->name); ?></div>
+                                    <input type="hidden" name="subcategory_id" value="<?php echo e($pricingRule->subcategory_id); ?>">
                                 </div>
                             </div>
 
                             <hr>
 
-                            {{-- Attribute Modifiers --}}
+                            
                             <h6>Attribute Modifiers</h6>
                             <div id="attribute-modifier-container">
-                                @foreach($pricingRule->attributes as $index => $mod)
+                                <?php $__currentLoopData = $pricingRule->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $mod): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="form-row attribute-row border rounded p-2 mb-2 position-relative">
-                                        {{-- Hidden ID input for tracking existing modifier --}}
-                                        <input type="hidden" name="rows[{{ $index }}][id]" value="{{ $mod->id }}">
+                                        
+                                        <input type="hidden" name="rows[<?php echo e($index); ?>][id]" value="<?php echo e($mod->id); ?>">
                                         <div class="form-group col-md-2">
                                             <label>Attribute</label>
-                                            <select class="form-control" name="rows[{{ $index }}][attribute_id]">
-                                                @foreach($subcategoryAttributes as $attr)
-                                                    <option value="{{ $attr->id }}" {{ $attr->id == $mod->attribute_id ? 'selected' : '' }}> {{ $attr->name }}
+                                            <select class="form-control" name="rows[<?php echo e($index); ?>][attribute_id]">
+                                                <?php $__currentLoopData = $subcategoryAttributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($attr->id); ?>" <?php echo e($attr->id == $mod->attribute_id ? 'selected' : ''); ?>> <?php echo e($attr->name); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
 
                                         <div class="form-group col-md-2">
                                             <label>Value</label>
-                                            @php
+                                            <?php
                                                 $selectedAttr = $subcategoryAttributes->firstWhere('id', $mod->attribute_id);
-                                            @endphp
-                                            <select class="form-control" name="rows[{{ $index }}][value_id]">
-                                                @foreach($selectedAttr->values ?? [] as $val)
-                                                    <option value="{{ $val->id }}" {{ $val->id == $mod->value_id ? 'selected' : '' }}>
-                                                        {{ $val->value }}
+                                            ?>
+                                            <select class="form-control" name="rows[<?php echo e($index); ?>][value_id]">
+                                                <?php $__currentLoopData = $selectedAttr->values ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($val->id); ?>" <?php echo e($val->id == $mod->value_id ? 'selected' : ''); ?>>
+                                                        <?php echo e($val->value); ?>
+
                                                     </option>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
 
                                         <div class="form-group col-md-3 dependency-group" style="display: none;">
                                             <label>Depends On Value</label>
                                             <select class="form-control dependency-value-select"
-                                                name="rows[{{ $index }}][dependency_value_id]">
+                                                name="rows[<?php echo e($index); ?>][dependency_value_id]">
                                                 <option value="">-- Select --</option>
                                             </select>
                                         </div>
 
                                         <div class="form-group col-md-2 modifier-type-group" style="display: none;">
                                             <label>Modifier Type</label>
-                                            <select class="form-control" name="rows[{{ $index }}][modifier_type]">
-                                                <option value="add" {{ $mod->price_modifier_type == 'add' ? 'selected' : '' }}>Add
+                                            <select class="form-control" name="rows[<?php echo e($index); ?>][modifier_type]">
+                                                <option value="add" <?php echo e($mod->price_modifier_type == 'add' ? 'selected' : ''); ?>>Add
                                                 </option>
-                                                <option value="multiply" {{ $mod->price_modifier_type == 'multiply' ? 'selected' : '' }}>Multiply</option>
+                                                <option value="multiply" <?php echo e($mod->price_modifier_type == 'multiply' ? 'selected' : ''); ?>>Multiply</option>
                                             </select>
                                         </div>
 
@@ -110,13 +112,13 @@
                                             <label>Base charges</label>
                                             <div class="input-group">
                                                 <input type="text" class="form-control"
-                                                    name="rows[{{ $index }}][modifier_value]"
-                                                    value="{{ $mod->price_modifier_value }}">
+                                                    name="rows[<?php echo e($index); ?>][modifier_value]"
+                                                    value="<?php echo e($mod->price_modifier_value); ?>">
                                                 <select class="form-control col-auto"
-                                                    name="rows[{{ $index }}][base_charges_type]" style="max-width: 100px;">
+                                                    name="rows[<?php echo e($index); ?>][base_charges_type]" style="max-width: 100px;">
                                                     <option value="">Select Type</option>
-                                                    <option value="amount" {{ $mod->base_charges_type === 'amount' ? 'selected' : '' }}>Amount</option>
-                                                    <option value="percentage" {{ $mod->base_charges_type === 'percentage' ? 'selected' : '' }}>%</option>
+                                                    <option value="amount" <?php echo e($mod->base_charges_type === 'amount' ? 'selected' : ''); ?>>Amount</option>
+                                                    <option value="percentage" <?php echo e($mod->base_charges_type === 'percentage' ? 'selected' : ''); ?>>%</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -125,22 +127,22 @@
                                             <label>Extra Copy Charge</label>
                                             <div class="input-group">
                                                 <input type="text" class="form-control"
-                                                    name="rows[{{ $index }}][extra_copy_charge]"
-                                                    value="{{ $mod->extra_copy_charge }}">
+                                                    name="rows[<?php echo e($index); ?>][extra_copy_charge]"
+                                                    value="<?php echo e($mod->extra_copy_charge); ?>">
                                                 <select class="form-control col-auto"
-                                                    name="rows[{{ $index }}][extra_copy_charge_type]" style="max-width: 100px;">
+                                                    name="rows[<?php echo e($index); ?>][extra_copy_charge_type]" style="max-width: 100px;">
                                                     <option value="">Select Type</option>
-                                                    <option value="amount" {{ $mod->extra_copy_charge_type === 'amount' ? 'selected' : '' }}>Amount</option>
-                                                    <option value="percentage" {{ $mod->extra_copy_charge_type === 'percentage' ? 'selected' : '' }}>%</option>
+                                                    <option value="amount" <?php echo e($mod->extra_copy_charge_type === 'amount' ? 'selected' : ''); ?>>Amount</option>
+                                                    <option value="percentage" <?php echo e($mod->extra_copy_charge_type === 'percentage' ? 'selected' : ''); ?>>%</option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         <div class="form-group col-md-1 d-flex align-items-center justify-content-center mt-2">
                                             <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="default_{{ $index }}"
-                                                    name="rows[{{ $index }}][is_default]" value="1" {{ $mod->is_default ? 'checked' : '' }}>
-                                                <label class="custom-control-label" for="default_{{ $index }}"
+                                                <input type="checkbox" class="custom-control-input" id="default_<?php echo e($index); ?>"
+                                                    name="rows[<?php echo e($index); ?>][is_default]" value="1" <?php echo e($mod->is_default ? 'checked' : ''); ?>>
+                                                <label class="custom-control-label" for="default_<?php echo e($index); ?>"
                                                     title="Mark this value as default">
                                                     Default
                                                 </label>
@@ -152,43 +154,43 @@
                                         <div class="col-md-12 per-page-container mt-2">
                                             <label class="font-weight-bold">Pricing</label>
                                             <div class="per-page-wrapper">
-                                                @foreach($mod->quantityRanges as $qIndex => $range)
+                                                <?php $__currentLoopData = $mod->quantityRanges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $qIndex => $range): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <div class="form-row per-page-row">
-                                                        <input type="hidden" name="rows[{{ $index }}][per_page_pricing][{{ $qIndex }}][id]"
-                                                            value="{{ $range->id }}">
+                                                        <input type="hidden" name="rows[<?php echo e($index); ?>][per_page_pricing][<?php echo e($qIndex); ?>][id]"
+                                                            value="<?php echo e($range->id); ?>">
                                                         <div class="form-group col-md-3">
                                                             <input type="number" class="form-control"
-                                                                name="rows[{{ $index }}][per_page_pricing][{{ $qIndex }}][quantity_from]"
-                                                                placeholder="From" value="{{ $range->quantity_from }}">
+                                                                name="rows[<?php echo e($index); ?>][per_page_pricing][<?php echo e($qIndex); ?>][quantity_from]"
+                                                                placeholder="From" value="<?php echo e($range->quantity_from); ?>">
                                                         </div>
                                                         <div class="form-group col-md-3">
                                                             <input type="number" class="form-control"
-                                                                name="rows[{{ $index }}][per_page_pricing][{{ $qIndex }}][quantity_to]"
-                                                                placeholder="To" value="{{ $range->quantity_to }}">
+                                                                name="rows[<?php echo e($index); ?>][per_page_pricing][<?php echo e($qIndex); ?>][quantity_to]"
+                                                                placeholder="To" value="<?php echo e($range->quantity_to); ?>">
                                                         </div>
                                                         <div class="form-group col-md-3">
                                                             <input type="text" class="form-control"
-                                                                name="rows[{{ $index }}][per_page_pricing][{{ $qIndex }}][price]"
-                                                                placeholder="Price" value="{{ $range->price }}">
+                                                                name="rows[<?php echo e($index); ?>][per_page_pricing][<?php echo e($qIndex); ?>][price]"
+                                                                placeholder="Price" value="<?php echo e($range->price); ?>">
                                                         </div>
                                                         <div class="form-group col-md-3 d-flex align-items-center">
-                                                            @if ($qIndex === 0)
+                                                            <?php if($qIndex === 0): ?>
                                                                 <button type="button" class="btn btn-sm btn-primary add-per-page">+
                                                                     Add</button>
-                                                            @else
+                                                            <?php else: ?>
                                                                 <button type="button" class="btn btn-sm btn-danger remove-per-page">−
                                                                     Remove</button>
-                                                            @endif
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </div>
                                         </div>
 
 
 
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
 
                             <button type="button" class="btn btn-success mt-2" id="save-pricing-rule-btn">Update Pricing
@@ -201,7 +203,7 @@
     </div>
 
     <script>
-        let subcategoryAttributes = @json($subcategoryAttributes);
+        let subcategoryAttributes = <?php echo json_encode($subcategoryAttributes, 15, 512) ?>;
 
         function createAttributeRow(index) {
             const attrOptions = subcategoryAttributes.map(attr => `<option value="${attr.id}">${attr.name}</option>`).join('');
@@ -473,7 +475,7 @@
 
     </script>
 
-    @push('scripts')
+    <?php $__env->startPush('scripts'); ?>
         <script>
             $(document).ready(function () {
                 $.ajaxSetup({
@@ -492,7 +494,7 @@
                     $('input, select').removeClass('is-invalid');
 
                     $.ajax({
-                        url: "{{ route('admin.pricing-rules.update', $pricingRule->id) }}",
+                        url: "<?php echo e(route('admin.pricing-rules.update', $pricingRule->id)); ?>",
                         method: 'POST',
                         data: formData,
                         processData: false,
@@ -527,5 +529,6 @@
                 });
             });
         </script>
-    @endpush
-@endsection
+    <?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/admin/pricing-rules/edit.blade.php ENDPATH**/ ?>

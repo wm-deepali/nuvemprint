@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
   <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
@@ -11,7 +11,7 @@
         <div class="col-12">
         <div class="breadcrumb-wrapper">
           <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
           <li class="breadcrumb-item active">Attributes</li>
           </ol>
         </div>
@@ -55,73 +55,81 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($attributes as $attribute)
+            <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
           <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>{{ $attribute->name }}</td>
-            <td>{{ $attribute->detail }}</td>
-            <td>{{ ucfirst(str_replace('_', ' ', $attribute->input_type)) }}</td>
+            <td><?php echo e($loop->iteration); ?></td>
+            <td><?php echo e($attribute->name); ?></td>
+            <td><?php echo e($attribute->detail); ?></td>
+            <td><?php echo e(ucfirst(str_replace('_', ' ', $attribute->input_type))); ?></td>
             <td>
-            {{ ucfirst($attribute->custom_input_type ?? 'N/A') }}
+            <?php echo e(ucfirst($attribute->custom_input_type ?? 'N/A')); ?>
+
             </td>
-            <td>{{ ucfirst(str_replace('_', ' ', $attribute->pricing_basis))  }}</td>
+            <td><?php echo e(ucfirst(str_replace('_', ' ', $attribute->pricing_basis))); ?></td>
             <td>
-            <span class="badge badge-{{ $attribute->has_dependency ? 'success' : 'secondary' }}">
-            {{ $attribute->has_dependency ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($attribute->has_dependency ? 'success' : 'secondary'); ?>">
+            <?php echo e($attribute->has_dependency ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
             <td>
-            @if($attribute->has_dependency && $attribute->dependency_parent)
+            <?php if($attribute->has_dependency && $attribute->dependency_parent): ?>
           <span class="badge badge-info">
-          {{ $attribute->parentAttribute->name ?? 'N/A' }}
+          <?php echo e($attribute->parentAttribute->name ?? 'N/A'); ?>
+
           </span>
-        @else
+        <?php else: ?>
           <span class="text-muted">—</span>
-        @endif
+        <?php endif; ?>
             </td>
              <td>
-            <span class="badge badge-{{ $attribute->has_setup_charge ? 'success' : 'secondary' }}">
-            {{ $attribute->has_setup_charge ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($attribute->has_setup_charge ? 'success' : 'secondary'); ?>">
+            <?php echo e($attribute->has_setup_charge ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
             <td>
-            <span class="badge badge-{{ $attribute->allow_quantity ? 'success' : 'secondary' }}">
-            {{ $attribute->allow_quantity ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($attribute->allow_quantity ? 'success' : 'secondary'); ?>">
+            <?php echo e($attribute->allow_quantity ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
             <td>
-            <span class="badge badge-{{ $attribute->is_composite ? 'success' : 'secondary' }}">
-            {{ $attribute->is_composite ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($attribute->is_composite ? 'success' : 'secondary'); ?>">
+            <?php echo e($attribute->is_composite ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
             <td>
-            <span class="badge badge-{{ $attribute->has_image ? 'success' : 'secondary' }}">
-            {{ $attribute->has_image ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($attribute->has_image ? 'success' : 'secondary'); ?>">
+            <?php echo e($attribute->has_image ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
             <td>
-            <span class="badge badge-{{ $attribute->has_icon ? 'success' : 'secondary' }}">
-            {{ $attribute->has_icon ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($attribute->has_icon ? 'success' : 'secondary'); ?>">
+            <?php echo e($attribute->has_icon ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
-            <td>{{ $attribute->created_at->format('d M Y') }}</td>
+            <td><?php echo e($attribute->created_at->format('d M Y')); ?></td>
             <td>
             <ul class="list-inline mb-0">
             <li class="list-inline-item">
             <a href="javascript:void(0)" class="btn btn-sm btn-primary edit-attribute"
-              data-id="{{ $attribute->id }}">
+              data-id="<?php echo e($attribute->id); ?>">
               <i class="fas fa-pencil-alt"></i>
             </a>
             </li>
             <li class="list-inline-item">
-            <a href="javascript:void(0)" onclick="deleteConfirmation({{ $attribute->id }})">
+            <a href="javascript:void(0)" onclick="deleteConfirmation(<?php echo e($attribute->id); ?>)">
               <i class="fa fa-trash text-danger"></i>
             </a>
             </li>
             </ul>
             </td>
           </tr>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
           </table>
           </div>
@@ -132,13 +140,13 @@
     </div>
     </div>
 
-    {{-- Modal --}}
+    
     <div class="modal fade" id="attribute-modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
   </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
     $.ajaxSetup({
     headers: {
@@ -149,7 +157,7 @@
 
     // Add Attribute
     $(document).on('click', '#add-attribute', function () {
-      $.get("{{ route('admin.attributes.create') }}", function (result) {
+      $.get("<?php echo e(route('admin.attributes.create')); ?>", function (result) {
       if (result.success) {
         $('#attribute-modal').html(result.html).modal('show');
       }
@@ -159,7 +167,7 @@
     // Edit Attribute
     $(document).on('click', '.edit-attribute', function () {
       const id = $(this).data('id');
-      $.get(`{{ url('admin/attributes') }}/${id}/edit`, function (result) {
+      $.get(`<?php echo e(url('admin/attributes')); ?>/${id}/edit`, function (result) {
       if (result.success) {
         $('#attribute-modal').html(result.html).modal('show');
       }
@@ -170,7 +178,7 @@
     $(document).on('click', '#save-attribute-btn', function () {
       const form = $('#attribute-form')[0];
       const formData = new FormData(form);
-      const url = `{{ url('admin/attributes') }}`;
+      const url = `<?php echo e(url('admin/attributes')); ?>`;
       const method = 'POST';
 
       $('#save-attribute-btn').attr('disabled', true);
@@ -271,4 +279,5 @@
     });
     }
   </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/admin/attributes/index.blade.php ENDPATH**/ ?>

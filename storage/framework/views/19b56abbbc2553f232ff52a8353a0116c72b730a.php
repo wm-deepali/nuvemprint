@@ -147,9 +147,9 @@
                   <label for="parent-0">Dependency Parent</label>
                   <select name="attributes[0][dependency_parent]" class="form-control dependency-parent" id="parent-0">
                     <option value="">-- Select Parent Attribute --</option>
-                    @foreach($attributes as $attribute)
-            <option value="{{ $attribute->id }}">{{ $attribute->name }}</option>
-          @endforeach
+                    <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <option value="<?php echo e($attribute->id); ?>"><?php echo e($attribute->name); ?></option>
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   </select>
                 </div>
               </div>
@@ -172,7 +172,7 @@
 
 <script>
   let attributeIndex = 1;
-  const allAttributes = @json($attributes);
+  const allAttributes = <?php echo json_encode($attributes, 15, 512) ?>;
   const excludedTypes = ['select_image', 'select_icon', 'grouped_select', 'range', 'toggle', 'number'];
 
   // Attach event to handle conditional hide/show
@@ -388,9 +388,9 @@
     <label for="parent-${attributeIndex}">Dependency Parent</label>
     <select name="attributes[${attributeIndex}][dependency_parent]" class="form-control dependency-parent" id="parent-${attributeIndex}">
       <option value="">-- Select Parent Attribute --</option>
-@foreach($attributes as $attr)
-  <option value="{{ $attr->id }}">{{ $attr->name }}</option>
-@endforeach
+<?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+  <option value="<?php echo e($attr->id); ?>"><?php echo e($attr->name); ?></option>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
       <!-- Options added via JS -->
     </select>
@@ -450,4 +450,4 @@
 
 
 
-</script>
+</script><?php /**PATH D:\web-mingo-project\new\resources\views/admin/attributes/add.blade.php ENDPATH**/ ?>

@@ -511,21 +511,21 @@
 <div class="row">
     <div class="col-md-7">
         <div class="reset-card">
-            <h5>Create Your {{ $subcategory->name ?? "Booklets" }}</h5>
+            <h5>Create Your <?php echo e($subcategory->name ?? "Booklets"); ?></h5>
             <button>Reset</button>
         </div>
         <form>
-            @if (!empty($attributeGroups) && count($attributeGroups))
-                @php
+            <?php if(!empty($attributeGroups) && count($attributeGroups)): ?>
+                <?php
                     $mainGroup = collect($attributeGroups)->first(function ($group) {
                         return str_contains(strtolower($group['group_name']), 'main attributes');
                     });
                     $otherGroups = collect($attributeGroups)->reject(function ($group) {
                         return str_contains(strtolower($group['group_name']), 'main attributes');
                     });
-                @endphp
+                ?>
                 <div class="calculation-card mt-3">
-                    {{-- Display attributes with values --}}
+                    
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="quantityInput" class="form-label d-flex align-items-center"
@@ -534,12 +534,12 @@
                             <input type="number" class="form-control" id="quantityInput" placeholder="100" value="100">
                         </div>
 
-                        {{-- Main Group Attributes --}}
-                        @isset($mainGroup['attributes'])
-                            @foreach ($mainGroup['attributes'] as $attribute)
-                                @include('front.attribute-block', ['attribute' => $attribute])
-                            @endforeach
-                        @endisset
+                        
+                        <?php if(isset($mainGroup['attributes'])): ?>
+                            <?php $__currentLoopData = $mainGroup['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php echo $__env->make('front.attribute-block', ['attribute' => $attribute], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                     </div>
                     <div class="form-row-section1">
                         <div class="s-row mb-3">
@@ -556,36 +556,36 @@
                         </div>
                     </div>
                 </div>
-                {{-- OTHER GROUPS (With Group Header) --}}
-                @foreach ($otherGroups as $group)
-                    @php
+                
+                <?php $__currentLoopData = $otherGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $groupKey = \Illuminate\Support\Str::slug($group['group_name'], '_');
                         $isToggleable = $group['is_toggleable'] ?? false;
-                    @endphp
+                    ?>
 
                     <div class="calculation-card mt-3">
-                        @if ($isToggleable)
-                            {{-- Toggleable group with checkbox --}}
+                        <?php if($isToggleable): ?>
+                            
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input group-toggle" type="checkbox" id="toggle_{{ $groupKey }}"
-                                    data-target="#section_{{ $groupKey }}">
-                                <label class="form-check-label" for="toggle_{{ $groupKey }}">{{ $group['group_name'] }}</label>
+                                <input class="form-check-input group-toggle" type="checkbox" id="toggle_<?php echo e($groupKey); ?>"
+                                    data-target="#section_<?php echo e($groupKey); ?>">
+                                <label class="form-check-label" for="toggle_<?php echo e($groupKey); ?>"><?php echo e($group['group_name']); ?></label>
                             </div>
-                        @else
-                            {{-- Non-toggleable header --}}
-                            <h5 class="mb-2">{{ $group['group_name'] }}</h5>
-                        @endif
-                        <div class="mt-3 {{ $isToggleable ? 'd-none' : '' }}" id="section_{{ $groupKey }}">
+                        <?php else: ?>
+                            
+                            <h5 class="mb-2"><?php echo e($group['group_name']); ?></h5>
+                        <?php endif; ?>
+                        <div class="mt-3 <?php echo e($isToggleable ? 'd-none' : ''); ?>" id="section_<?php echo e($groupKey); ?>">
                             <div class="row">
-                                @foreach ($group['attributes'] as $attribute)
-                                    @include('front.attribute-block', ['attribute' => $attribute])
-                                @endforeach
+                                <?php $__currentLoopData = $group['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php echo $__env->make('front.attribute-block', ['attribute' => $attribute], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            @endif
+            <?php endif; ?>
         </form>
     </div>
     <div class="col-md-5">
@@ -649,7 +649,7 @@
                 </div>
             </div>
             <div class="addtobtn">
-                <button id="addToCartBtn" data-route="{{ route('shop-cart') }}">Add to Cart</button>
+                <button id="addToCartBtn" data-route="<?php echo e(route('shop-cart')); ?>">Add to Cart</button>
                 <div class="note-dis">
                     <p>Delivery dates are estimated.</p>
                     <p>Total Order Weight: 1.60 kg</p>
@@ -700,8 +700,8 @@
 </div>
 
 <script>
-    const quantityPricing = @json($quantityPricing);
-    const attributeConditions = @json($conditionsMap);
+    const quantityPricing = <?php echo json_encode($quantityPricing, 15, 512) ?>;
+    const attributeConditions = <?php echo json_encode($conditionsMap, 15, 512) ?>;
 
     // ========== UTILS ==========
     function getBasePriceFromQuantity(quantity) {
@@ -929,4 +929,4 @@
             handleAttributeConditions(attrId, valueId);
         });
     });
-</script>
+</script><?php /**PATH D:\web-mingo-project\new\resources\views/front/calculator.blade.php ENDPATH**/ ?>

@@ -41,7 +41,6 @@
             <tr>
               <th>ID</th>
               <th>Subcategory</th>
-              <th colspan="3">Quantity Range & Base Price</th>
               <th>Attributes</th>
               <th>Actions</th>
             </tr>
@@ -54,12 +53,6 @@
             {{ $rule->subcategory->name ?? '-' }}<br>
             <small>Cat: {{ $rule->category->name ?? '-' }}</small>
             </td>
-            <td colspan="3">
-            @foreach ($rule->quantities as $qty)
-          From <strong>{{ $qty->quantity_from }}</strong> to <strong>{{ $qty->quantity_to }}</strong>:
-          ₹{{ number_format($qty->base_price, 2) }}<br>
-        @endforeach
-            </td>
             <td>
             @forelse ($rule->attributes as $attr)
           <div class="mb-1">
@@ -67,16 +60,40 @@
             {{ $attr->value->value ?? '-' }}
             <span class="text-muted">
             ({{ ucfirst($attr->price_modifier_type) }}
-            {{ $attr->price_modifier_type === 'multiply' ? '×' : '₹' }}{{ $attr->price_modifier_value }})
+            {{ $attr->price_modifier_type === 'multiply' ? '×' : '' }}{{ number_format($attr->price_modifier_value, 2) }}
+            {{ $attr->base_charges_type ? ($attr->base_charges_type === 'percentage' ? '%' : '') : ''}}
+            {{ $attr->extra_copy_charge ? '| Extra: ' . number_format($attr->extra_copy_charge, 2) : '' }}
+            {{ $attr->extra_copy_charge_type === 'percentage' ? '%' : '' }})
             </span>
 
             @if($attr->is_default)
           <span class="badge badge-pill badge-primary ml-1" title="Default value">Default</span>
           @endif
+
+            {{-- ✅ Show per-page pricing ranges --}}
+            @if ($attr->quantityRanges->isNotEmpty())
+          <div class="ml-2 text-muted small">
+          <u>
+          {{ $attr->attribute->pricing_basis === 'per_product' ? 'Per Product Pricing:' : 'Per Page Pricing:' }}
+          </u>
+          <ul class="mb-0 pl-2">
+          @foreach ($attr->quantityRanges as $range)
+          <li>
+          From <strong>{{ $range->quantity_from }}</strong> to
+          <strong>{{ $range->quantity_to }}</strong>:
+          ₹{{ number_format($range->price, 2) }}
+          </li>
+          @endforeach
+          </ul>
+          </div>
+          @endif
+
+
           </div>
         @empty
           <span class="text-muted">No Modifiers</span>
         @endforelse
+
 
             </td>
             <td>

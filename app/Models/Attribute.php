@@ -10,6 +10,13 @@ class Attribute extends Model
         'name',
         'detail',
         'input_type',
+        'pricing_basis',
+        'has_setup_charge',
+        'allow_quantity',
+        'is_composite',
+        'has_dependency',
+        'dependency_parent',
+        'custom_input_type',
         'has_image',
         'has_icon',
     ];
@@ -17,8 +24,17 @@ class Attribute extends Model
     protected $casts = [
         'has_icon' => 'boolean',
         'has_image' => 'boolean',
+        'allow_quantity' => 'boolean',
+        'is_composite' => 'boolean',
+        'has_dependency' => 'boolean',
+        'pricing_basis' => 'string',
+        'has_setup_charge' => 'boolean'
     ];
 
+    public function parentAttribute()
+    {
+        return $this->belongsTo(Attribute::class, 'dependency_parent');
+    }
 
     /** Attribute has many possible values */
     public function values()

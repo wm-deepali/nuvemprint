@@ -4,52 +4,62 @@ namespace App\Http\Controllers;
 use App\Models\Subcategory;
 use App\Models\Category;
 
-class SiteController extends Controller {
+class SiteController extends Controller
+{
 
-    public function index(){
+    public function index()
+    {
         $categories = Category::where('status', 'active')->get();
         return view('front.index', compact('categories'));
-    
+
     }
-    
+
     // public function subcateDetails($slug){
     //     $subcategory = Subcategory::with('details')->where('slug', $slug)->where('status', 'active')->first();
     //     return view('front.subcategory-detail', compact('subcategory'));
-    
+
     // }
-    
-     public function subcateDetails($slug)
+
+    public function subcateDetails($slug)
     {
+        // Step 1: Load the subcategory
         $subcategory = Subcategory::with('details')
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();
 
-        // Get all pricing attributes for this subcategory
-        $pricingAttributes = \App\Models\PricingRuleAttribute::whereHas('rule', function ($q) use ($subcategory) {
-            $q->where('subcategory_id', $subcategory->id);
+        $subcategoryId = $subcategory->id;
+
+        // Step 2: Fetch all pricing modifiers for attribute values
+        $pricingAttributes = \App\Models\PricingRuleAttribute::whereHas('rule', function ($q) use ($subcategoryId) {
+            $q->where('subcategory_id', $subcategoryId);
         })->get();
 
-        // Create value_id => price map
-        $pricingMap = $pricingAttributes->mapWithKeys(function ($pa) {
-            return [
-                $pa->value_id => [
-                    'type' => $pa->price_modifier_type,
-                    'value' => $pa->price_modifier_value,
-                    'is_default' => $pa->is_default,
-                ]
-            ];
-        });
+        $pricingMap = $pricingAttributes->mapWithKeys(fn($pa) => [
+            $pa->value_id => [
+                'type' => $pa->price_modifier_type,
+                'value' => $pa->price_modifier_value,
+                'is_default' => $pa->is_default,
+                'base_charges_type' => $pa->base_charges_type,
+                'extra_copy_charge' => $pa->extra_copy_charge,
+                'extra_copy_charge_type' => $pa->extra_copy_charge_type,
+            ]
+        ]);
 
-        // Load group assignments with group and attributes
+        // Step 3: Load all attribute values for the subcategory
+        $attributeValues = \App\Models\SubcategoryAttributeValue::with('value')
+            ->where('subcategory_id', $subcategoryId)
+            ->get()
+            ->groupBy('attribute_id');
+
+        // Step 4: Load grouped assignments and all subcategory attributes
         $groupAssignments = \App\Models\AttributeGroupSubcategoryAssignment::with(['group', 'group.attributes'])
-            ->where('subcategory_id', $subcategory->id)
+            ->where('subcategory_id', $subcategoryId)
             ->orderBy('sort_order', 'asc')
             ->get();
 
-        // Load all subcategory attributes
         $subcategoryAttributes = \App\Models\SubcategoryAttribute::with('attribute')
-            ->where('subcategory_id', $subcategory->id)
+            ->where('subcategory_id', $subcategoryId)
             ->orderBy('sort_order')
             ->get();
 
@@ -58,13 +68,17 @@ class SiteController extends Controller {
             ->unique()
             ->toArray();
 
-        // Helper for building attribute data
-        $mapAttributeData = function ($attribute) use ($subcategory, $pricingMap) {
-            $values = \App\Models\SubcategoryAttributeValue::with('value')
-                ->where('subcategory_id', $subcategory->id)
-                ->where('attribute_id', $attribute->id)
-                ->get()
-                ->map(function ($sav) use ($pricingMap) {
+        // Step 5: Build attribute display data
+        $mapAttributeData = function ($attribute) use ($pricingMap, $attributeValues) {
+            $values = $attributeValues[$attribute->id] ?? collect();
+
+            return [
+                'id' => $attribute->id,
+                'name' => $attribute->name,
+                'input_type' => $attribute->input_type,
+                'has_image' => $attribute->has_image,
+                'is_required' => $attribute->pivot->is_required ?? false,
+                'values' => $values->map(function ($sav) use ($pricingMap) {
                     $pricing = $pricingMap[$sav->value->id] ?? null;
                     return [
                         'id' => $sav->value->id,
@@ -73,32 +87,25 @@ class SiteController extends Controller {
                         'price' => $pricing['value'] ?? 0,
                         'price_modifier_type' => $pricing['type'] ?? 'add',
                         'is_default' => $pricing['is_default'] ?? false,
+                        'base_charges_type' => $pricing['base_charges_type'] ?? null,
+                        'extra_copy_charge' => $pricing['extra_copy_charge'] ?? 0,
+                        'extra_copy_charge_type' => $pricing['extra_copy_charge_type'] ?? null,
                     ];
-                });
-
-            return [
-                'id' => $attribute->id,
-                'name' => $attribute->name,
-                'input_type' => $attribute->input_type,
-                'values' => $values,
-                'has_image' => $attribute->has_image,
-                'is_required' => $attribute->pivot->is_required ?? false,
+                }),
             ];
         };
 
-        // Grouped attribute groups
+        // Step 6: Grouped attributes (by groups)
         $attributeGroups = $groupAssignments->map(function ($assignment) use ($mapAttributeData) {
-            $group = $assignment->group;
-
             return [
-                'group_name' => $group->name,
+                'group_name' => $assignment->group->name,
                 'sort_order' => $assignment->sort_order,
                 'is_toggleable' => $assignment->is_toggleable,
-                'attributes' => $group->attributes->map($mapAttributeData),
+                'attributes' => $assignment->group->attributes->map($mapAttributeData),
             ];
         });
 
-        // Ungrouped attributes ("Main Attributes")
+        // Step 7: Ungrouped attributes
         $ungroupedAttributes = $subcategoryAttributes->filter(function ($sa) use ($groupedAttributeIds) {
             return !in_array($sa->attribute_id, $groupedAttributeIds);
         })->map(function ($sa) use ($mapAttributeData) {
@@ -114,38 +121,36 @@ class SiteController extends Controller {
             ]);
         }
 
-        // Quantity pricing
-        $quantityPricing = \App\Models\PricingRuleQuantity::whereHas('rule', function ($q) use ($subcategory) {
-            $q->where('subcategory_id', $subcategory->id);
+        // Step 8: Quantity pricing
+        $quantityPricing = \App\Models\PricingRuleQuantity::whereHas('rule', function ($q) use ($subcategoryId) {
+            $q->where('subcategory_id', $subcategoryId);
         })->get();
 
-        // Attribute conditions
+        // Step 9: Attribute conditions
         $attributeConditions = \App\Models\AttributeCondition::with(['parentAttribute', 'parentValue', 'affectedAttribute', 'affectedValues'])
-            ->where('subcategory_id', $subcategory->id)
+            ->where('subcategory_id', $subcategoryId)
             ->get();
 
-        $conditionsMap = $attributeConditions->map(function ($cond) {
-            $valueIds = $cond->affectedValues->pluck('id')->toArray();
+        $conditionsMap = $attributeConditions->map(function ($cond) use ($subcategoryId) {
+            $affectedValueIds = $cond->affectedValues->pluck('id')->toArray();
 
-            // Get all possible values for the affected attribute
-            $allValueIds = \App\Models\SubcategoryAttributeValue::where('subcategory_id', $cond->subcategory_id)
+            $allValueIds = \App\Models\SubcategoryAttributeValue::where('subcategory_id', $subcategoryId)
                 ->where('attribute_id', $cond->affected_attribute_id)
                 ->pluck('attribute_value_id')
                 ->toArray();
-
-            $allSelected = !empty($valueIds) && empty(array_diff($allValueIds, $valueIds));
 
             return [
                 'parent_attribute_id' => $cond->parent_attribute_id,
                 'parent_value_id' => $cond->parent_value_id,
                 'affected_attribute_id' => $cond->affected_attribute_id,
-                'affected_value_ids' => $valueIds,
-                'all_values_affected' => $allSelected, // <-- NEW correct logic
+                'affected_value_ids' => $affectedValueIds,
+                'all_values_affected' => !array_diff($allValueIds, $affectedValueIds),
                 'action' => $cond->action,
             ];
         });
 
-        // dd($conditionsMap->toArray());
+        // dd($attributeGroups->toArray(),);
+        // Step 10: Return view
         return view('front.subcategory-detail', compact(
             'subcategory',
             'attributeGroups',
@@ -155,9 +160,11 @@ class SiteController extends Controller {
     }
 
 
-    public function shopCategories(){
+
+    public function shopCategories()
+    {
         $shpcategories = Category::with('subcategories')->where('status', 'active')->get();
         return view('front.shop-categories', compact('shpcategories'));
-    
+
     }
 }

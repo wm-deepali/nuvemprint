@@ -23,7 +23,6 @@ use App\Http\Controllers\Admin\SubcategoryAttributeController;
 use App\Http\Controllers\Admin\SubcategoryAttributeValueController;
 use App\Http\Controllers\Admin\AttributeConditionController;
 use App\Http\Controllers\Admin\PricingRuleController;
-use App\Http\Controllers\Admin\PricingRuleAttributeController;
 use App\Http\Controllers\Admin\QuoteController;
 
 use Illuminate\Support\Facades\Route;
@@ -354,7 +353,6 @@ Route::view('manage-department', 'admin.customer_estimates.manage-department')->
         Route::resource('subcategory-attributes', SubcategoryAttributeController::class);
         Route::resource('attribute-conditions', AttributeConditionController::class);
         Route::resource('pricing-rules', PricingRuleController::class);
-        Route::resource('pricing-rule-attributes', PricingRuleAttributeController::class);
         Route::resource('quotes', QuoteController::class);
 
         Route::get('attributes/{id}/values', [AttributeValueController::class, 'getValues']);

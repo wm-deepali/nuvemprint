@@ -7,124 +7,125 @@
       </div>
 
       <div class="modal-body">
-        {{-- Attribute (readonly) --}}
+        
         <div class="form-group">
           <label>Attribute <span class="text-danger">*</span></label>
           <select class="form-control" disabled id="attribute-select">
-            <option value="{{ $attribute->id }}" selected>{{ $attribute->name }}</option>
+            <option value="<?php echo e($attribute->id); ?>" selected><?php echo e($attribute->name); ?></option>
           </select>
-          <input type="hidden" name="attribute_id" value="{{ $attribute->id }}">
+          <input type="hidden" name="attribute_id" value="<?php echo e($attribute->id); ?>">
           <span class="text-danger validation-err" id="attribute_id-err"></span>
         </div>
 
-        {{-- Title --}}
+        
         <div class="form-group" id="title-wrapper" style="display: none;">
           <label>Title <span class="text-danger">*</span></label>
-          <input type="text" name="title" class="form-control" value="{{ $attributeValue->title }}">
+          <input type="text" name="title" class="form-control" value="<?php echo e($attributeValue->title); ?>">
           <span class="text-danger validation-err" id="title-err"></span>
         </div>
 
-        {{-- Value --}}
+        
         <div class="form-group" id="value-wrapper">
           <label>Value <span class="text-danger">*</span></label>
-          @php
+          <?php
       $inputType = $attributeConfigs[$attribute->id]['input_type'] ?? 'text';
-      @endphp
+      ?>
 
-          @if (in_array($inputType, ['select_image', 'select_icon']))
+          <?php if(in_array($inputType, ['select_image', 'select_icon'])): ?>
           <input type="file" name="value" class="form-control-file">
-          @if ($attributeValue->image_path)
+          <?php if($attributeValue->image_path): ?>
         <div class="mt-2 existing-preview">
         <strong>Existing Image:</strong><br>
-        <img src="{{ asset('storage/' . $attributeValue->image_path) }}" width="80" alt="Current Image">
+        <img src="<?php echo e(asset('storage/' . $attributeValue->image_path)); ?>" width="80" alt="Current Image">
         </div>
-        @endif
-      @else
-        <input type="text" name="value" class="form-control" value="{{ $attributeValue->value }}">
-      @endif
+        <?php endif; ?>
+      <?php else: ?>
+        <input type="text" name="value" class="form-control" value="<?php echo e($attributeValue->value); ?>">
+      <?php endif; ?>
 
           <span class="text-danger validation-err" id="value-err"></span>
         </div>
 
-        {{-- Icon Class --}}
-        @if ($attribute->has_icon)
+        
+        <?php if($attribute->has_icon): ?>
       <div class="form-group" id="icon-class-wrapper">
         <label>Icon Class</label>
-        <input type="text" name="icon_class" class="form-control" value="{{ $attributeValue->icon_class }}">
+        <input type="text" name="icon_class" class="form-control" value="<?php echo e($attributeValue->icon_class); ?>">
         <span class="text-danger validation-err" id="icon_class-err"></span>
       </div>
-    @endif
+    <?php endif; ?>
 
-        {{-- Optional Image Field --}}
-        @if ($attribute->has_image)
+        
+        <?php if($attribute->has_image): ?>
         <div class="form-group" id="image-wrapper">
           <label>Image (optional)</label>
           <input type="file" name="image" class="form-control-file">
-          @if ($attributeValue->image_path)
+          <?php if($attributeValue->image_path): ?>
         <div class="mt-2">
-        <img src="{{ asset('storage/' . $attributeValue->image_path) }}" width="60">
+        <img src="<?php echo e(asset('storage/' . $attributeValue->image_path)); ?>" width="60">
         </div>
-        @endif
+        <?php endif; ?>
           <span class="text-danger validation-err" id="image-err"></span>
         </div>
-    @endif
+    <?php endif; ?>
 
-        @if (!is_null($attribute->custom_input_type) && $attribute->custom_input_type !== 'none')
+        <?php if(!is_null($attribute->custom_input_type) && $attribute->custom_input_type !== 'none'): ?>
       <div class="form-group" id="custom-input-label-wrapper">
         <label>Custom Input Label</label>
         <input type="text" name="custom_input_label" class="form-control"
-        value="{{ $attributeValue->custom_input_label }}">
+        value="<?php echo e($attributeValue->custom_input_label); ?>">
         <span class="text-danger validation-err" id="custom_input_label-err"></span>
       </div>
-    @endif
+    <?php endif; ?>
 
         <div class="form-group mb-2">
           <label>Fixed Extra Charges?</label>
           <select class="form-control" name="fixed_extra_charges" id="fixed_extra_charges">
             <option value="">-- Select --</option>
-            <option value="0" {{ !$attributeValue->fixed_extra_charges ? 'selected' : '' }}>No</option>
-            <option value="1" {{ $attributeValue->fixed_extra_charges ? 'selected' : '' }}>Yes</option>
+            <option value="0" <?php echo e(!$attributeValue->fixed_extra_charges ? 'selected' : ''); ?>>No</option>
+            <option value="1" <?php echo e($attributeValue->fixed_extra_charges ? 'selected' : ''); ?>>Yes</option>
           </select>
         </div>
 
-        @if ($attribute->is_composite)
-        {{-- Show checkbox only if attribute supports composite values --}}
+        <?php if($attribute->is_composite): ?>
+        
 
         <div class="form-group mb-2" id="is-composite-wrapper">
           <label for="is_composite_value">Is Composite Value?</label>
           <select class="form-control" name="is_composite_value" id="is_composite_value">
-          <option value="0" {{ !$attributeValue->is_composite_value ? 'selected' : '' }}>No</option>
-          <option value="1" {{ $attributeValue->is_composite_value ? 'selected' : '' }}>Yes</option>
+          <option value="0" <?php echo e(!$attributeValue->is_composite_value ? 'selected' : ''); ?>>No</option>
+          <option value="1" <?php echo e($attributeValue->is_composite_value ? 'selected' : ''); ?>>Yes</option>
           </select>
         </div>
 
 
-        {{-- Composed Of Select --}}
-        <div class="form-group {{ $attributeValue->is_composite_value ? '' : 'd-none' }}" id="composed-of-wrapper">
+        
+        <div class="form-group <?php echo e($attributeValue->is_composite_value ? '' : 'd-none'); ?>" id="composed-of-wrapper">
           <label>Select Composed Of Values</label>
           <div id="composed-of-select-wrapper">
-          @forelse ($availableValues as $val)
-        @continue($val->id == $attributeValue->id)
+          <?php $__empty_1 = true; $__currentLoopData = $availableValues; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+        <?php if($val->id == $attributeValue->id) continue; ?>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="composed_of[]" value="{{ $val->id }}"
-          id="composed_of_{{ $val->id }}" {{ in_array($val->id, $attributeValue->composed_of_array ?? []) ? 'checked' : '' }}>
-          <label class="form-check-label" for="composed_of_{{ $val->id }}">
-          {{ $val->value }}
+          <input class="form-check-input" type="checkbox" name="composed_of[]" value="<?php echo e($val->id); ?>"
+          id="composed_of_<?php echo e($val->id); ?>" <?php echo e(in_array($val->id, $attributeValue->composed_of_array ?? []) ? 'checked' : ''); ?>>
+          <label class="form-check-label" for="composed_of_<?php echo e($val->id); ?>">
+          <?php echo e($val->value); ?>
+
           </label>
         </div>
-        @empty
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <p class="text-muted">No values available to compose.</p>
-        @endforelse
+        <?php endif; ?>
           </div>
         </div>
-    @endif
+    <?php endif; ?>
 
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" id="update-attribute-value-btn"
-          data-id="{{ $attributeValue->id }}">
+          data-id="<?php echo e($attributeValue->id); ?>">
           Update
         </button>
       </div>
@@ -134,7 +135,7 @@
 
 <script>
   $(document).ready(function () {
-    const inputType = @json($attributeConfigs[$attribute->id]['input_type'] ?? 'text');
+    const inputType = <?php echo json_encode($attributeConfigs[$attribute->id]['input_type'] ?? 'text', 15, 512) ?>;
 
     function toggleComposedWrapper() {
       const isComposite = $('#is_composite_value').val() === '1';
@@ -157,4 +158,4 @@
       $(this).siblings('.existing-preview').hide();
     });
   });
-</script>
+</script><?php /**PATH D:\web-mingo-project\new\resources\views/admin/attribute-values/edit.blade.php ENDPATH**/ ?>

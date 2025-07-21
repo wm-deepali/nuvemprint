@@ -11,33 +11,42 @@ class AttributeController extends Controller
 {
     public function index()
     {
-        $attributes = Attribute::latest()->get();
+        $attributes = Attribute::with('parentAttribute')->latest()->get();
         return view('admin.attributes.index', compact('attributes'));
     }
-
     public function create()
     {
+        $attributes = Attribute::latest()->get(); // Fetch existing attributes
+
         return response()->json([
             'success' => true,
             'html' => view('admin.attributes.add', [
                 'action' => route('admin.attributes.store'),
+                'attributes' => $attributes, // Pass to view
             ])->render(),
         ]);
     }
 
     public function store(Request $request)
     {
-        // 🔍 Validate the incoming request
+        // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'attributes' => 'required|array',
-            'attributes.*.name' => 'required|string|max:255',
+            'attributes.*.name' => 'required|string|max:255|distinct|unique:attributes,name',
             'attributes.*.input_type' => 'required|in:dropdown,radio,checkbox,text,number,range,select_image,select_icon,toggle,textarea,grouped_select',
-            'attributes.*.has_image' => 'nullable|in:1',
-            'attributes.*.has_icon' => 'nullable|in:1',
-            'detail' => 'nullable|string|max:1000',
+            'attributes.*.custom_input_type' => 'nullable|in:number,text,file,none',
+            'attributes.*.has_image' => 'nullable|boolean',
+            'attributes.*.has_icon' => 'nullable|boolean',
+            'attributes.*.has_dependency' => 'nullable|boolean',
+            'attributes.*.allow_quantity' => 'nullable|boolean',
+            'attributes.*.is_composite' => 'nullable|boolean',
+            'attributes.*.has_setup_charge' => 'nullable|boolean',
+            'attributes.*.pricing_basis' => 'nullable|string|in:per_page,per_product,per_extra_copy',
+            'attributes.*.detail' => 'nullable|string|max:1000',
+            'attributes.*.dependency_parent' => 'nullable|exists:attributes,id'
         ]);
 
-        // ❌ If validation fails, return errors
+        // If validation fails, return errors
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -47,32 +56,42 @@ class AttributeController extends Controller
         }
 
         $attributes = $request->input('attributes');
-        // ✅ Loop through attributes and create them
+
+        // Loop through attributes and create them
         foreach ($attributes as $attr) {
             Attribute::create([
                 'name' => $attr['name'],
                 'input_type' => $attr['input_type'],
-                'has_image' => isset($attr['has_image']) ? 1 : 0,
-                'has_icon' => isset($attr['has_icon']) ? 1 : 0,
-                'detail' => $attr['detail'] ?? null, // ✅ Add this line
+                'custom_input_type' => $attr['custom_input_type'] ?? null,
+                'pricing_basis' => $attr['pricing_basis'] ?? null,
+                'detail' => $attr['detail'] ?? null,
+                'has_image' => filter_var($attr['has_image'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'has_icon' => filter_var($attr['has_icon'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'has_dependency' => filter_var($attr['has_dependency'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'allow_quantity' => filter_var($attr['allow_quantity'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'is_composite' => filter_var($attr['is_composite'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'has_setup_charge' => filter_var($attr['has_setup_charge'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                'dependency_parent' => $attr['dependency_parent'] ?? null,
             ]);
         }
 
-        // ✅ Return success response
+        // Return success response
         return $request->ajax()
             ? response()->json(['success' => true, 'message' => 'Attributes added.'])
             : redirect()->route('admin.attributes.index')->with('success', 'Attributes added.');
     }
 
 
-
     public function edit($id)
     {
         $attribute = Attribute::findOrFail($id);
+        $attributes = Attribute::where('id', '!=', $id)->get(); // exclude current one
+
         return response()->json([
             'success' => true,
             'html' => view('admin.attributes.edit', [
                 'attribute' => $attribute,
+                'attributes' => $attributes,
                 'action' => route('admin.attributes.update', $attribute->id),
             ])->render(),
         ]);
@@ -86,7 +105,15 @@ class AttributeController extends Controller
             'input_type' => 'required|in:dropdown,radio,checkbox,text,number,range,select_image,select_icon,toggle,textarea,grouped_select',
             'has_image' => 'sometimes|boolean',
             'has_icon' => 'sometimes|boolean',
+            'has_dependency' => 'sometimes|boolean',
+            'pricing_basis' => 'nullable|string|in:per_page,per_product,per_extra_copy',
             'detail' => 'nullable|string|max:1000',
+            'is_composite' => 'sometimes|boolean',
+            'custom_input_type' => 'nullable|in:number,text,file,none',
+            'allow_quantity' => 'sometimes|boolean',
+            'has_setup_charge' => 'sometimes|boolean',
+            'dependency_parent' => 'nullable|exists:attributes,id'
+
         ]);
 
         if ($validator->fails()) {
@@ -97,12 +124,21 @@ class AttributeController extends Controller
             ]);
         }
 
+        $allowQuantity = $request->input('allow_quantity', $request->input('allow_quantity_hidden'));
+
         $attribute->update([
             'name' => $request->name,
             'input_type' => $request->input_type,
             'has_image' => $request->boolean('has_image'),
             'has_icon' => $request->boolean('has_icon'),
-            'detail' => $request->detail, // ✅ Add this line
+            'has_dependency' => $request->boolean('has_dependency'),
+            'pricing_basis' => $request->pricing_basis,
+            'detail' => $request->detail,
+            'is_composite' => $request->boolean('is_composite'),
+            'composite_input_type' => $request->custom_input_type,
+            'allow_quantity' => (bool) $allowQuantity,
+            'has_setup_charge' => $request->boolean('has_setup_charge'),
+            'dependency_parent' => $request->dependency_parent ?? null,
         ]);
 
 

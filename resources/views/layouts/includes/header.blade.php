@@ -177,9 +177,23 @@
 							<div class="top-cart-icons">
 								<nav class="navbar navbar-expand">
 									<ul class="navbar-nav ms-auto">
+									    @if(Auth::guard('customer')->check() && Auth::guard('customer')->user()->id !="")
+										
+										<li class="nav-item dropdown">
+            								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret cart-link" href="#"
+            									data-bs-toggle="dropdown">
+            									<i class='bx bx-user'></i> <i class='bx bx-chevron-down'></i>
+            								</a>
+            								<ul class="dropdown-menu">
+            									<li><a class="dropdown-item" href="{{route('account-logout')}}">Dashboard</a></li>
+            									<li><a class="dropdown-item" href="{{route('account-logout')}}">Logout</a></li>
+            								</ul>
+            							</li>
+										@else
 										<li class="nav-item"><a href="{{route('authentication-signin')}}"
 												class="nav-link cart-link"><i class='bx bx-user'></i></a>
 										</li>
+										@endif
 										<li class="nav-item"><a href="" class="nav-link cart-link"><i
 													class='bx bx-heart'></i></a>
 										</li>
@@ -234,7 +248,7 @@
                             <ul class="list-unstyled1 ">
                                 @foreach($menucat->subcategories as $subcat)
                                 <div class="main-cat">
-                                 <img src="https://d1e8vjamx1ssze.cloudfront.net/price-calculator-product-selector/mixambooklets-1.jpg" >
+                                 <img src="{{ asset('storage/'.$subcat->thumbnail) }}" >
                                     <li>
                                         <a class="text-center" href="{{ route('subcategory-details', ['slug' => $subcat->slug]) }}">
                                             {{ $subcat->name }}
@@ -274,7 +288,7 @@
 								<ul class="dropdown-menu show-category-with-images">
 									@foreach($menucate->subcategories as $k=>$menusubcates)
 									<div class="">
-									    <img src="https://d1e8vjamx1ssze.cloudfront.net/price-calculator-product-selector/mixambooklets-1.jpg" >
+									    <img src="{{ asset('storage/'.$menusubcates->thumbnail) }}" >
 									<li><a class="dropdown-item text-center" href="{{ route('subcategory-details', ['slug' => $menusubcates->slug]) }}">{{$menusubcates->name ?? ""}}</a></li>
 									</div>
 								    @endforeach

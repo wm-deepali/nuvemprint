@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
   <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
@@ -11,7 +11,7 @@
         <div class="col-12">
         <div class="breadcrumb-wrapper">
           <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
           <li class="breadcrumb-item active">Attribute Values</li>
           </ol>
         </div>
@@ -50,53 +50,56 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($values as $value)
+            <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
           <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>{{ $value->attribute->name ?? '-' }}</td>
+            <td><?php echo e($loop->iteration); ?></td>
+            <td><?php echo e($value->attribute->name ?? '-'); ?></td>
             <td>
-            <span class="badge badge-{{ $value->is_composite_value ? 'success' : 'secondary' }}">
-            {{ $value->is_composite_value ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($value->is_composite_value ? 'success' : 'secondary'); ?>">
+            <?php echo e($value->is_composite_value ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
             <td>
-            {{ $value->value }}
-            @if ($value->is_composite_value)
-          <span>({{ $value->components->pluck('value')->implode(', ') }})</span>
-        @endif
+            <?php echo e($value->value); ?>
+
+            <?php if($value->is_composite_value): ?>
+          <span>(<?php echo e($value->components->pluck('value')->implode(', ')); ?>)</span>
+        <?php endif; ?>
             </td>
             <td>
-            @if ($value->image_path)
-          <img src="{{ asset('storage/' . $value->image_path) }}" width="40">
-        @else
+            <?php if($value->image_path): ?>
+          <img src="<?php echo e(asset('storage/' . $value->image_path)); ?>" width="40">
+        <?php else: ?>
           -
-        @endif
+        <?php endif; ?>
             </td>
-            <td>{!! $value->icon_class ? "<i class='{$value->icon_class}'></i>" : '-' !!}</td>
-            <td>{{ $value->custom_input_label ?? '-' }}</td>
+            <td><?php echo $value->icon_class ? "<i class='{$value->icon_class}'></i>" : '-'; ?></td>
+            <td><?php echo e($value->custom_input_label ?? '-'); ?></td>
             <td>
-            <span class="badge badge-{{ $value->fixed_extra_charges ? 'success' : 'secondary' }}">
-            {{ $value->fixed_extra_charges ? 'Yes' : 'No' }}
+            <span class="badge badge-<?php echo e($value->fixed_extra_charges ? 'success' : 'secondary'); ?>">
+            <?php echo e($value->fixed_extra_charges ? 'Yes' : 'No'); ?>
+
             </span>
             </td>
-            <td>{{ $value->created_at->format('d M Y') }}</td>
+            <td><?php echo e($value->created_at->format('d M Y')); ?></td>
             <td>
             <ul class="list-inline mb-0">
             <li class="list-inline-item">
             <a href="javascript:void(0)" class="btn btn-sm btn-primary edit-attribute-value"
-              data-id="{{ $value->id }}">
+              data-id="<?php echo e($value->id); ?>">
               <i class="fas fa-pencil-alt"></i>
             </a>
             </li>
             <li class="list-inline-item">
-            <a href="javascript:void(0)" onclick="deleteValue({{ $value->id }})">
+            <a href="javascript:void(0)" onclick="deleteValue(<?php echo e($value->id); ?>)">
               <i class="fa fa-trash text-danger"></i>
             </a>
             </li>
             </ul>
             </td>
           </tr>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
           </table>
           </div>
@@ -107,12 +110,12 @@
     </div>
     </div>
 
-    {{-- Modal --}}
+    
     <div class="modal fade" id="attribute-value-modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
   </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
     $.ajaxSetup({
     headers: {
@@ -123,7 +126,7 @@
     $(document).ready(function () {
     // Add Attribute Value
     $(document).on('click', '#add-attribute-value', function () {
-      $.get("{{ route('admin.attribute-values.create') }}", function (result) {
+      $.get("<?php echo e(route('admin.attribute-values.create')); ?>", function (result) {
       if (result.success) {
         $('#attribute-value-modal').html(result.html).modal('show');
 
@@ -140,7 +143,7 @@
     // Edit Attribute Value
     $(document).on('click', '.edit-attribute-value', function () {
       const id = $(this).data('id');
-      $.get(`{{ url('admin/attribute-values') }}/${id}/edit`, function (result) {
+      $.get(`<?php echo e(url('admin/attribute-values')); ?>/${id}/edit`, function (result) {
       if (result.success) {
         $('#attribute-value-modal').html(result.html).modal('show');
 
@@ -160,7 +163,7 @@
       const form = $('#attribute-value-form')[0];
       const formData = new FormData(form);
       const id = $(this).data("id");
-      const url = id ? `{{ url('admin/attribute-values') }}/${id}` : `{{ url('admin/attribute-values') }}`;
+      const url = id ? `<?php echo e(url('admin/attribute-values')); ?>/${id}` : `<?php echo e(url('admin/attribute-values')); ?>`;
       const method = id ? 'POST' : 'POST';
 
       if (id) formData.append('_method', 'PUT');
@@ -254,9 +257,9 @@
     }).then((result) => {
       if (result.isConfirmed) {
       $.ajax({
-        url: `{{ url('admin/attribute-values') }}/${id}`,
+        url: `<?php echo e(url('admin/attribute-values')); ?>/${id}`,
         type: 'POST',
-        data: { _method: 'DELETE', _token: '{{ csrf_token() }}' },
+        data: { _method: 'DELETE', _token: '<?php echo e(csrf_token()); ?>' },
         success: function () {
         Swal.fire('Deleted!', '', 'success');
         setTimeout(() => location.reload(), 500);
@@ -272,4 +275,5 @@
     });
 
   </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/admin/attribute-values/index.blade.php ENDPATH**/ ?>

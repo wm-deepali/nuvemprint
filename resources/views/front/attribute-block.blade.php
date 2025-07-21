@@ -16,13 +16,12 @@
             <div class="col-md-6">
                 <div class="paper-type-section">
                     @foreach ($values as $value)
-                        <button type="button" class="btn btn-light text-start {{ $value['is_default'] ? 'active' : '' }}"
-                            data-attribute-id="{{ $attribute['id'] }}"
-                            data-value-id="{{ $value['id'] }}"
-                            data-price="{{ $value['price'] }}"
-                            data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}"
-                            data-value="{{ $value['value'] }}"
-                            data-image="{{ asset('storage/' . ($value['image_path'] ?? 'default-preview.png')) }}">
+                        <button type="button"
+                            class="btn btn-light radio-button text-start {{ $value['is_default'] ? 'active' : '' }}"
+                            data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
+                            data-price="{{ $value['price'] }}" data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}"
+                            data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}"
+                            data-image="{{ asset('storage/' . ($value['image_path'] ?? 'default-preview.png')) }}" {{ $value['is_default'] ? 'data-selected=true' : '' }}>
                             {{ $value['value'] }}
                         </button>
                     @endforeach
@@ -44,7 +43,7 @@
         </div>
     </div>
 
-{{-- ========== PLAIN RADIO ========== --}}
+    {{-- ========== PLAIN RADIO ========== --}}
 @elseif ($inputType === 'radio')
     <div class="{{ in_array($attribute['name'], ['Paper Weight', 'Cover Paper Weight']) ? 'col-md-12 attribute-wrapper' : 'col-md-6 attribute-wrapper' }} mb-3"
         data-attribute-id="{{ $attribute['id'] }}">
@@ -55,19 +54,17 @@
         </label>
         <div class="attribute-values {{ count($values) <= 4 ? 'color-print' : 'color-print1' }}">
             @foreach ($values as $value)
-                <div class="print-color {{ $value['is_default'] ? 'active' : '' }}"
-                    data-price="{{ $value['price'] }}"
-                    data-attribute-id="{{ $attribute['id'] }}"
-                    data-value-id="{{ $value['id'] }}"
-                    data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}"
-                    data-value="{{ $value['value'] }}">
+                <div class="print-color {{ $value['is_default'] ? 'active' : '' }}" data-price="{{ $value['price'] }}"
+                    data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
+                    data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}"
+                    data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}" data-value="{{ $value['value'] }}">
                     <p>{{ $value['value'] }}</p>
                 </div>
             @endforeach
         </div>
     </div>
 
-{{-- ========== SELECT WITH IMAGES ========== --}}
+    {{-- ========== SELECT WITH IMAGES ========== --}}
 @elseif ($inputType === 'select_image')
     <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="{{ $attribute['id'] }}">
         <label class="form-label d-flex align-items-center" style="gap: 5px;">
@@ -77,11 +74,9 @@
         </label>
         <div class="attribute-value color-print1">
             @foreach ($values as $value)
-                <div class="choose-binding {{ $value['is_default'] ? 'active' : '' }}"
-                    data-value="{{ $value['value'] }}"
-                    data-price="{{ $value['price'] }}"
-                    data-attribute-id="{{ $attribute['id'] }}"
-                    data-value-id="{{ $value['id'] }}"
+                <div class="choose-binding {{ $value['is_default'] ? 'active' : '' }}" data-value="{{ $value['value'] }}"
+                    data-price="{{ $value['price'] }}" data-attribute-id="{{ $attribute['id'] }}"
+                    data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}" data-value-id="{{ $value['id'] }}"
                     data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}">
                     <div>
                         <img src="{{ asset('storage/' . ($value['image_path'] ?? 'default.png')) }}"
@@ -98,7 +93,7 @@
         </div>
     </div>
 
-{{-- ========== DROPDOWN SELECT ========== --}}
+    {{-- ========== DROPDOWN SELECT ========== --}}
 @elseif ($inputType === 'dropdown')
     <div class="attribute-wrapper col-md-6 mb-3" data-attribute-id="{{ $attribute['id'] }}">
         <div class="d-flex justify-content-between size-btn">
@@ -109,19 +104,16 @@
             </label>
             <button type="button" class="btn btn-link p-0">Custom Size</button>
         </div>
-         <div class="attribute-values">
-        <select class="custom-select" id="dropdown_{{ $attribute['id'] }}" name="attributes[{{ $attribute['id'] }}]">
-            @foreach ($values as $value)
-                <option value="{{ $value['value'] }}"
-                    data-price="{{ $value['price'] }}"
-                    data-attribute-id="{{ $attribute['id'] }}"
-                    data-value-id="{{ $value['id'] }}"
-                    data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}"
-                    {{ $value['is_default'] ? 'selected data-selected=true' : '' }}>
-                    {{ $value['value'] }}
-                </option>
-            @endforeach
-        </select>
+        <div class="attribute-values">
+            <select class="custom-select" id="dropdown_{{ $attribute['id'] }}" name="attributes[{{ $attribute['id'] }}]">
+                @foreach ($values as $value)
+                    <option value="{{ $value['value'] }}" data-price="{{ $value['price'] }}"
+                        data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
+                        data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}"
+                        data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}" {{ $value['is_default'] ? 'selected' : '' }}> {{ $value['value'] }}
+                    </option>
+                @endforeach
+            </select>
         </div>
     </div>
 @endif

@@ -13,6 +13,14 @@ class AttributeValue extends Model
         'icon_class',
         'description',
         'title',
+        'custom_input_label',
+        'is_composite_value',
+        'fixed_extra_charges'
+    ];
+
+    protected $casts = [
+        'is_composite_value' => 'boolean',
+        'fixed_extra_charges' => 'boolean'
     ];
 
     /** Value belongs to a parent attribute */
@@ -33,5 +41,29 @@ class AttributeValue extends Model
         return $this->hasMany(PricingRuleAttribute::class, 'value_id');
     }
 
-    /** Used in conditional logic as parent value */
+    /**
+     * If this value is composite, it is made up of these components.
+     */
+    public function components()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'attribute_value_composites',
+            'composite_id',  // This value is the composite
+            'component_id'   // These are the components it consists of
+        );
+    }
+
+    /**
+     * If this value is a component, it may belong to one or more composites.
+     */
+    public function composites()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'attribute_value_composites',
+            'component_id',  // This value is the component
+            'composite_id'   // These are the composites it belongs to
+        );
+    }
 }

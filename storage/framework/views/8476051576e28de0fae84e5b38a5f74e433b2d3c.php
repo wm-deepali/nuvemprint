@@ -13,7 +13,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label>Name <span class="text-danger">*</span></label>
-              <input type="text" name="name" class="form-control" value="{{ $attribute->name ?? '' }}">
+              <input type="text" name="name" class="form-control" value="<?php echo e($attribute->name ?? ''); ?>">
             </div>
           </div>
 
@@ -21,19 +21,19 @@
             <div class="form-group">
               <label>Input Type <span class="text-danger">*</span></label>
               <select name="input_type" class="form-control">
-                <option value="dropdown" {{ $attribute->input_type == 'dropdown' ? 'selected' : '' }}>Dropdown</option>
-                <option value="radio" {{ $attribute->input_type == 'radio' ? 'selected' : '' }}>Radio</option>
-                <option value="checkbox" {{ $attribute->input_type == 'checkbox' ? 'selected' : '' }}>Checkbox</option>
-                <option value="text" {{ $attribute->input_type == 'text' ? 'selected' : '' }}>Text</option>
-                <option value="number" {{ $attribute->input_type == 'number' ? 'selected' : '' }}>Number</option>
-                <option value="range" {{ $attribute->input_type == 'range' ? 'selected' : '' }}>Range</option>
-                <option value="select_image" {{ $attribute->input_type == 'select_image' ? 'selected' : '' }}>Select Image
+                <option value="dropdown" <?php echo e($attribute->input_type == 'dropdown' ? 'selected' : ''); ?>>Dropdown</option>
+                <option value="radio" <?php echo e($attribute->input_type == 'radio' ? 'selected' : ''); ?>>Radio</option>
+                <option value="checkbox" <?php echo e($attribute->input_type == 'checkbox' ? 'selected' : ''); ?>>Checkbox</option>
+                <option value="text" <?php echo e($attribute->input_type == 'text' ? 'selected' : ''); ?>>Text</option>
+                <option value="number" <?php echo e($attribute->input_type == 'number' ? 'selected' : ''); ?>>Number</option>
+                <option value="range" <?php echo e($attribute->input_type == 'range' ? 'selected' : ''); ?>>Range</option>
+                <option value="select_image" <?php echo e($attribute->input_type == 'select_image' ? 'selected' : ''); ?>>Select Image
                 </option>
-                <option value="select_icon" {{ $attribute->input_type == 'select_icon' ? 'selected' : '' }}>Select Icon
+                <option value="select_icon" <?php echo e($attribute->input_type == 'select_icon' ? 'selected' : ''); ?>>Select Icon
                 </option>
-                <option value="toggle" {{ $attribute->input_type == 'toggle' ? 'selected' : '' }}>Toggle</option>
-                <option value="textarea" {{ $attribute->input_type == 'textarea' ? 'selected' : '' }}>Textarea</option>
-                <option value="grouped_select" {{ $attribute->input_type == 'grouped_select' ? 'selected' : '' }}>Grouped
+                <option value="toggle" <?php echo e($attribute->input_type == 'toggle' ? 'selected' : ''); ?>>Toggle</option>
+                <option value="textarea" <?php echo e($attribute->input_type == 'textarea' ? 'selected' : ''); ?>>Textarea</option>
+                <option value="grouped_select" <?php echo e($attribute->input_type == 'grouped_select' ? 'selected' : ''); ?>>Grouped
                   Select</option>
               </select>
 
@@ -45,10 +45,10 @@
               <label>Custom Input Type</label>
               <select name="custom_input_type" class="form-control">
                 <option value="">-- Select --</option>
-                <option value="number" {{ $attribute->custom_input_type == 'number' ? 'selected' : '' }}>Number</option>
-                <option value="text" {{ $attribute->custom_input_type == 'text' ? 'selected' : '' }}>Text</option>
-                <option value="file" {{ $attribute->custom_input_type == 'file' ? 'selected' : '' }}>File</option>
-                <option value="none" {{ $attribute->custom_input_type == 'none' ? 'selected' : '' }}>None</option>
+                <option value="number" <?php echo e($attribute->custom_input_type == 'number' ? 'selected' : ''); ?>>Number</option>
+                <option value="text" <?php echo e($attribute->custom_input_type == 'text' ? 'selected' : ''); ?>>Text</option>
+                <option value="file" <?php echo e($attribute->custom_input_type == 'file' ? 'selected' : ''); ?>>File</option>
+                <option value="none" <?php echo e($attribute->custom_input_type == 'none' ? 'selected' : ''); ?>>None</option>
               </select>
             </div>
           </div>
@@ -58,10 +58,10 @@
               <label>Pricing Basis</label>
               <select name="pricing_basis" class="form-control">
                 <option value="">-- Select --</option>
-                <option value="per_page" {{ $attribute->pricing_basis == 'per_page' ? 'selected' : '' }}>Per Page</option>
-                <option value="per_product" {{ $attribute->pricing_basis == 'per_product' ? 'selected' : '' }}>Per Product
+                <option value="per_page" <?php echo e($attribute->pricing_basis == 'per_page' ? 'selected' : ''); ?>>Per Page</option>
+                <option value="per_product" <?php echo e($attribute->pricing_basis == 'per_product' ? 'selected' : ''); ?>>Per Product
                 </option>
-                <option value="per_extra_copy" {{ $attribute->pricing_basis == 'per_extra_copy' ? 'selected' : '' }}>Per
+                <option value="per_extra_copy" <?php echo e($attribute->pricing_basis == 'per_extra_copy' ? 'selected' : ''); ?>>Per
                   Extra Copy</option>
               </select>
             </div>
@@ -70,7 +70,7 @@
           <div class="col-md-12">
             <div class="form-group">
               <label>Detail</label>
-              <textarea name="detail" class="form-control" rows="3">{{ $attribute->detail ?? '' }}</textarea>
+              <textarea name="detail" class="form-control" rows="3"><?php echo e($attribute->detail ?? ''); ?></textarea>
             </div>
           </div>
 
@@ -79,8 +79,8 @@
               <label for="edit-setup">Setup Charges</label>
               <select name="has_setup_charge" id="edit-setup" class="form-control">
                 <option value="">-- Select --</option>
-                <option value="1" {{ $attribute->has_setup_charge ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_setup_charge ? 'selected' : '' }}>No</option>
+                <option value="1" <?php echo e($attribute->has_setup_charge ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_setup_charge ? 'selected' : ''); ?>>No</option>
               </select>
             </div>
           </div>
@@ -89,10 +89,10 @@
             <div class="form-group">
               <label for="edit-quantity">Allow Quantity</label>
               <select name="allow_quantity" class="form-control" id="edit-quantity">
-                <option value="1" {{ $attribute->allow_quantity ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->allow_quantity ? 'selected' : '' }}>No</option>
+                <option value="1" <?php echo e($attribute->allow_quantity ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->allow_quantity ? 'selected' : ''); ?>>No</option>
               </select>
-              <input type="hidden" name="allow_quantity_hidden" id="allow_quantity_hidden" value="{{ $attribute->allow_quantity }}">
+              <input type="hidden" name="allow_quantity_hidden" id="allow_quantity_hidden" value="<?php echo e($attribute->allow_quantity); ?>">
             </div>
           </div>
 
@@ -100,8 +100,8 @@
             <div class="form-group">
               <label for="edit-composite">Is Composite</label>
               <select name="is_composite" class="form-control" id="edit-composite">
-                <option value="1" {{ $attribute->is_composite ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->is_composite ? 'selected' : '' }}>No</option>
+                <option value="1" <?php echo e($attribute->is_composite ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->is_composite ? 'selected' : ''); ?>>No</option>
               </select>
             </div>
           </div>
@@ -110,8 +110,8 @@
             <div class="form-group">
               <label for="edit-image">Supports Images</label>
               <select name="has_image" class="form-control" id="edit-image">
-                <option value="1" {{ $attribute->has_image ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_image ? 'selected' : '' }}>No</option>
+                <option value="1" <?php echo e($attribute->has_image ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_image ? 'selected' : ''); ?>>No</option>
               </select>
             </div>
           </div>
@@ -120,8 +120,8 @@
             <div class="form-group">
               <label for="edit-icon">Supports Icons</label>
               <select name="has_icon" class="form-control" id="edit-icon">
-                <option value="1" {{ $attribute->has_icon ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_icon ? 'selected' : '' }}>No</option>
+                <option value="1" <?php echo e($attribute->has_icon ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_icon ? 'selected' : ''); ?>>No</option>
               </select>
             </div>
           </div>
@@ -130,23 +130,24 @@
             <div class="form-group">
               <label for="edit-dependency">Has Dependency</label>
               <select name="has_dependency" class="form-control" id="edit-dependency">
-                <option value="1" {{ $attribute->has_dependency ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_dependency ? 'selected' : '' }}>No</option>
+                <option value="1" <?php echo e($attribute->has_dependency ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_dependency ? 'selected' : ''); ?>>No</option>
               </select>
             </div>
           </div>
 
           <div class="col-md-3 dependency-parent-block"
-            style="{{ !$attribute->has_dependency ? 'display: none;' : '' }}">
+            style="<?php echo e(!$attribute->has_dependency ? 'display: none;' : ''); ?>">
             <div class="form-group">
               <label for="edit-dependency-parent">Dependency Parent</label>
               <select name="dependency_parent" class="form-control" id="edit-dependency-parent">
                 <option value="">-- Select Parent Attribute --</option>
-                @foreach($attributes as $parent)
-          <option value="{{ $parent->id }}" {{ $attribute->dependency_parent == $parent->id ? 'selected' : '' }}>
-            {{ $parent->name }}
+                <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parent): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <option value="<?php echo e($parent->id); ?>" <?php echo e($attribute->dependency_parent == $parent->id ? 'selected' : ''); ?>>
+            <?php echo e($parent->name); ?>
+
           </option>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
             </div>
           </div>
@@ -156,7 +157,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary mr-1" data-dismiss="modal">Cancel</button>
           <button type="button" class="btn btn-primary" id="update-attribute-btn"
-            data-id="{{ $attribute->id }}">Update</button>
+            data-id="<?php echo e($attribute->id); ?>">Update</button>
         </div>
     </form>
   </div>
@@ -222,4 +223,4 @@
 
   });
 
-</script>
+</script><?php /**PATH D:\web-mingo-project\new\resources\views/admin/attributes/edit.blade.php ENDPATH**/ ?>
