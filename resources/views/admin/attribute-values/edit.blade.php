@@ -78,15 +78,6 @@
       </div>
     @endif
 
-        <div class="form-group mb-2">
-          <label>Fixed Extra Charges?</label>
-          <select class="form-control" name="fixed_extra_charges" id="fixed_extra_charges">
-            <option value="">-- Select --</option>
-            <option value="0" {{ !$attributeValue->fixed_extra_charges ? 'selected' : '' }}>No</option>
-            <option value="1" {{ $attributeValue->fixed_extra_charges ? 'selected' : '' }}>Yes</option>
-          </select>
-        </div>
-
         @if ($attribute->is_composite)
         {{-- Show checkbox only if attribute supports composite values --}}
 

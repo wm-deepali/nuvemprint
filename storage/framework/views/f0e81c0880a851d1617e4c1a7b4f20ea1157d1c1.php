@@ -52,16 +52,7 @@
               <span class="text-danger validation-err" id="values_0_custom_input_label-err"></span>
             </div>
 
-            <div class="form-group mb-2">
-              <label>Fixed Extra Charges?</label>
-              <select class="form-control" data-index="0" name="attribute_values[0][fixed_extra_charges]"
-                id="fixed_extra_charges_0">
-                <option value="">-- Select --</option>
-                <option value="0">No</option>
-                <option value="1">Yes</option>
-              </select>
-            </div>
-
+        
 
             <div class="form-group mb-2" id="is-composite-wrapper-0">
               <label for="is_composite_0">Is Composite Value?</label>
@@ -196,15 +187,7 @@
               <span class="text-danger validation-err" id="values_${valueIndex}_custom_input_label-err"></span>
             </div>
 
-              <div class="form-group mb-2" >
-              <label>Fixed Extra Charges?</label>
-              <select class="form-control" data-index="${valueIndex}" name="attribute_values[${valueIndex}][fixed_extra_charges]"
-                id="fixed_extra_charges_${valueIndex}">
-                <option value="">-- Select --</option>
-                <option value="0">No</option>
-                <option value="1">Yes</option>
-              </select>
-            </div>
+              
 
 <div class="form-group mb-2" id="is-composite-wrapper-${valueIndex}">
   <label for="is_composite_${valueIndex}">Is Composite Value?</label>

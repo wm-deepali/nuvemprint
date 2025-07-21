@@ -44,7 +44,6 @@
               <th>Image</th>
               <th>Icon</th>
               <th>Custom Input Label</th>
-              <th>Fixed Extra Charges</th>
               <th>Created At</th>
               <th width="100px">Action</th>
             </tr>
@@ -77,10 +76,7 @@
             <td><?php echo $value->icon_class ? "<i class='{$value->icon_class}'></i>" : '-'; ?></td>
             <td><?php echo e($value->custom_input_label ?? '-'); ?></td>
             <td>
-            <span class="badge badge-<?php echo e($value->fixed_extra_charges ? 'success' : 'secondary'); ?>">
-            <?php echo e($value->fixed_extra_charges ? 'Yes' : 'No'); ?>
-
-            </span>
+          
             </td>
             <td><?php echo e($value->created_at->format('d M Y')); ?></td>
             <td>
