@@ -1,4 +1,3 @@
-
 <style>
     /*.show-category-with-images{*/
     /*    width:100%;*/
@@ -177,9 +176,23 @@
 							<div class="top-cart-icons">
 								<nav class="navbar navbar-expand">
 									<ul class="navbar-nav ms-auto">
+									    <?php if(Auth::guard('customer')->check() && Auth::guard('customer')->user()->id !=""): ?>
+										
+										<li class="nav-item dropdown">
+            								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret cart-link" href="#"
+            									data-bs-toggle="dropdown">
+            									<i class='bx bx-user'></i> <i class='bx bx-chevron-down'></i>
+            								</a>
+            								<ul class="dropdown-menu">
+            									<li><a class="dropdown-item" href="<?php echo e(route('account-logout')); ?>">Dashboard</a></li>
+            									<li><a class="dropdown-item" href="<?php echo e(route('account-logout')); ?>">Logout</a></li>
+            								</ul>
+            							</li>
+										<?php else: ?>
 										<li class="nav-item"><a href="<?php echo e(route('authentication-signin')); ?>"
 												class="nav-link cart-link"><i class='bx bx-user'></i></a>
 										</li>
+										<?php endif; ?>
 										<li class="nav-item"><a href="" class="nav-link cart-link"><i
 													class='bx bx-heart'></i></a>
 										</li>
@@ -235,7 +248,7 @@
                             <ul class="list-unstyled1 ">
                                 <?php $__currentLoopData = $menucat->subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="main-cat">
-                                 <img src="https://d1e8vjamx1ssze.cloudfront.net/price-calculator-product-selector/mixambooklets-1.jpg" >
+                                 <img src="<?php echo e(asset('storage/'.$subcat->thumbnail)); ?>" >
                                     <li>
                                         <a class="text-center" href="<?php echo e(route('subcategory-details', ['slug' => $subcat->slug])); ?>">
                                             <?php echo e($subcat->name); ?>
@@ -276,7 +289,7 @@
 								<ul class="dropdown-menu show-category-with-images">
 									<?php $__currentLoopData = $menucate->subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k=>$menusubcates): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 									<div class="">
-									    <img src="https://d1e8vjamx1ssze.cloudfront.net/price-calculator-product-selector/mixambooklets-1.jpg" >
+									    <img src="<?php echo e(asset('storage/'.$menusubcates->thumbnail)); ?>" >
 									<li><a class="dropdown-item text-center" href="<?php echo e(route('subcategory-details', ['slug' => $menusubcates->slug])); ?>"><?php echo e($menusubcates->name ?? ""); ?></a></li>
 									</div>
 								    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -333,5 +346,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-</script>
-<?php /**PATH D:\web-mingo-project\new\resources\views/layouts/includes/header.blade.php ENDPATH**/ ?>
+</script><?php /**PATH D:\web-mingo-project\new\resources\views/layouts/includes/header.blade.php ENDPATH**/ ?>

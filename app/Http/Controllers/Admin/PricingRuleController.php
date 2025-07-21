@@ -118,11 +118,13 @@ class PricingRuleController extends Controller
                 $q->where('subcategory_id', $pricingRule->subcategory_id);
             })->get();
 
+            // dd($pricingRule->attributes->toArray());
         return view('admin.pricing-rules.edit', compact('pricingRule', 'subcategoryAttributes'));
     }
 
     public function update(Request $request, PricingRule $pricingRule)
     {
+        // dd($request->all());
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',

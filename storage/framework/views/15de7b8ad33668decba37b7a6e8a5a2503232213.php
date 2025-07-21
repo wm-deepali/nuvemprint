@@ -14,6 +14,7 @@
 
   <meta name="description" content="Nuvem Print">
   <meta name="keywords" content="Nuvem Print">
+   <?php echo $__env->yieldPushContent('before-styles'); ?>
   <title><?php echo $__env->yieldContent('title'); ?></title>
   
   <link rel="stylesheet" type="text/css" href="<?php echo e(URL::asset('assets/plugins/OwlCarousel/css/owl.carousel.min.css')); ?>">

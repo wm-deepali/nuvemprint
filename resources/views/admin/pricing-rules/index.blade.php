@@ -60,11 +60,13 @@
             {{ $attr->value->value ?? '-' }}
             <span class="text-muted">
             ({{ ucfirst($attr->price_modifier_type) }}
-            {{ $attr->price_modifier_type === 'multiply' ? '×' : '' }}{{ number_format($attr->price_modifier_value, 2) }}
-            {{ $attr->base_charges_type ? ($attr->base_charges_type === 'percentage' ? '%' : '') : ''}}
-            {{ $attr->extra_copy_charge ? '| Extra: ' . number_format($attr->extra_copy_charge, 2) : '' }}
+            {{ $attr->price_modifier_type === 'multiply' ? '×' : '' }}
+            {{ rtrim(rtrim(number_format($attr->price_modifier_value, 4, '.', ''), '0'), '.') }}
+            {{ $attr->base_charges_type ? ($attr->base_charges_type === 'percentage' ? '%' : '') : '' }}
+            {{ $attr->extra_copy_charge ? '| Extra: ' . rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.') : '' }}
             {{ $attr->extra_copy_charge_type === 'percentage' ? '%' : '' }})
             </span>
+
 
             @if($attr->is_default)
           <span class="badge badge-pill badge-primary ml-1" title="Default value">Default</span>
@@ -81,7 +83,7 @@
           <li>
           From <strong>{{ $range->quantity_from }}</strong> to
           <strong>{{ $range->quantity_to }}</strong>:
-          ₹{{ number_format($range->price, 2) }}
+          ₹{{ rtrim(rtrim(number_format($range->price, 4, '.', ''), '0'), '.') }}
           </li>
           @endforeach
           </ul>
