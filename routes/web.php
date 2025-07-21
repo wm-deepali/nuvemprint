@@ -82,7 +82,7 @@ Auth::routes(['register' => false]);
 Route::group(['middleware' => 'auth'], function () {
 
 
-    
+
 
     Route::get('/profile', [HomeController::class, 'profile'])
         ->name('profile.show');
@@ -323,16 +323,16 @@ Route::post('store-cover-banner', [CoverDesignController::class, 'storeBanner'])
 
 Route::group(['middleware' => 'auth'], function () {
     Route::name('admin.')->group(function () {
-        
-Route::get('/home', [HomeController::class, 'index'])
-        ->name('home');
-Route::view('customers', 'admin.customer_estimates.customers')->name('customers');
-Route::view('customers/detail', 'admin.customer_estimates.customer_detail')->name('customers.detail');
-Route::view('quote-request', 'admin.customer_estimates.quote_request')->name('quote.request');
-Route::view('order-details', 'admin.quotes.index')->name('quote.index');
-Route::view('manage-department', 'admin.customer_estimates.manage-department')->name('manage.department');
 
- Route::view('content/blogs', 'admin.content.blogs')->name('content.blogs');
+        Route::get('/home', [HomeController::class, 'index'])
+            ->name('home');
+        Route::view('customers', 'admin.customer_estimates.customers')->name('customers');
+        Route::view('customers/detail', 'admin.customer_estimates.customer_detail')->name('customers.detail');
+        Route::view('quote-request', 'admin.customer_estimates.quote_request')->name('quote.request');
+        Route::view('order-details', 'admin.quotes.index')->name('quote.index');
+        Route::view('manage-department', 'admin.customer_estimates.manage-department')->name('manage.department');
+
+        Route::view('content/blogs', 'admin.content.blogs')->name('content.blogs');
         Route::view('content/blogs/create', 'admin.content.blogs_create')->name('content.blogs.create'); // add blog
         Route::view('content/faq', 'admin.content.faq')->name('content.faq');
         Route::view('content/dynamic-pages', 'admin.content.dynamic_pages')->name('content.dynamic.pages');
@@ -340,7 +340,7 @@ Route::view('manage-department', 'admin.customer_estimates.manage-department')->
 
 
 
-       // ===== Category MANAGEMENT ROUTES ===== //
+        // ===== Category MANAGEMENT ROUTES ===== //
         Route::resource('manage-categories', CategoryController::class);
         Route::resource('manage-subcategories', SubCategoryController::class);
 
@@ -359,7 +359,7 @@ Route::view('manage-department', 'admin.customer_estimates.manage-department')->
         Route::get('subcategories/{id}/attributes', [AttributeConditionController::class, 'getSubcategoryAttributes']);
 
 
-       
+
 
         // ===== Book Pages MANAGEMENT ROUTES ===== //
 

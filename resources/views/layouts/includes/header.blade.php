@@ -1,4 +1,3 @@
-
 <style>
     /*.show-category-with-images{*/
     /*    width:100%;*/

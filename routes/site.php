@@ -62,7 +62,8 @@ Route::get('blogs', function () {
     return view('front.blogs');
 })->name('blogs');
 
-
+Route::post('states-by-country',[CustomerController::class,'statesByCountry'])->name('states-by-country');
+Route::post('cities-by-state',[CustomerController::class,'citiesByState'])->name('cities-by-state');
 
 Route::controller(GoogleController::class)->group(function () {
     Route::get('customer/google/redirect', 'redirectToGoogle')->name('google.redirect');
@@ -99,11 +100,20 @@ Route::middleware(['web'])->group(function () {
     // Update front routes and functions start
     Route::middleware(['auth:customer'])->group(function () {
         Route::get('account-dashboard', [CustomerController::class, 'dashboard'])->name('account-dashboard');
-        Route::get('account-downloads', [CustomerController::class, 'orders'])->name('account-orders');
+        Route::get('account-orders', [CustomerController::class, 'orders'])->name('account-orders');
         Route::get('account-downloads', [CustomerController::class, 'downloads'])->name('account-downloads');
         Route::get('account-addresses', [CustomerController::class, 'addresses'])->name('account-addresses');
         Route::get('account-payment-methods', [CustomerController::class, 'paymentmethods'])->name('account-payment-methods');
         Route::get('account-user-details', [CustomerController::class, 'userDetails'])->name('account-user-details');
+        
+        Route::post('profile-update', [CustomerController::class, 'updateProfile'])->name('profile.update');
+        Route::post('profile-pic-update', [CustomerController::class, 'updateProfilePic'])->name('profile-pic.update');
+        Route::post('profile-password-update', [CustomerController::class, 'changePassword'])->name('profile-password.update');
+        
+        Route::post('addresses-store', [CustomerController::class, 'addressStore'])->name('addresses.store');
+
+
+        
         Route::get('account-logout', [CustomerController::class, 'logout'])->name('account-logout');
     });
 });

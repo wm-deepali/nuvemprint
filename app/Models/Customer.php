@@ -10,7 +10,7 @@ class Customer extends Authenticatable
 {
     protected $table = 'customers';
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password','mobile','mobile_verified_at','email_verified_at','google_id', 'profile_pic',
+        'first_name', 'last_name', 'display_name', 'email', 'password','mobile', 'whatsapp_number', 'mobile_verified_at', 'email_verified_at','google_id', 'profile_pic',
         'customer_id',
         'country',
         'status',
@@ -31,4 +31,18 @@ class Customer extends Authenticatable
         return $this->hasOne(Country::class, 'id', 'country');
     }
     
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+    
+    public function billingAddresses()
+    {
+        return $this->addresses()->where('type', 'billing');
+    }
+    
+    public function shippingAddresses()
+    {
+        return $this->addresses()->where('type', 'shipping');
+    }
 }

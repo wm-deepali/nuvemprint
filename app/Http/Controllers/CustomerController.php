@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\CustomerTemp;
 use App\Models\CustomerVerify;
+use App\Models\Address;
 use App\Models\Country;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +22,8 @@ use Mail;
 use App\Mail\EmailVerificationEmail;
 use App\Mail\MailForgotPassword;
 use Carbon\Carbon;
+use App\Models\State;
+use App\Models\City;
 
 
 class CustomerController extends Controller
@@ -284,23 +287,227 @@ class CustomerController extends Controller
             ->withErrors('Please login to access the dashboard.');
         }  
     } 
-    public function profile()
+    
+    public function orders()
     {
         if(Auth::guard('customer')->check())
         {
             $user_id = Auth::guard('customer')->user()->id;
-            $data['user'] = Customer::with('countryname')->where('id', $user_id)->first();
-            return view('front.profile', $data);
+            $data['user'] = Customer::findOrFail($user_id);
+            return view('front.account-orders', $data);
         }
         else{
             return redirect()->route('authentication-signin')
             ->withErrors('Please login to access the dashboard.');
         }  
     } 
+    public function downloads()
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $user_id = Auth::guard('customer')->user()->id;
+            $data['user'] = Customer::findOrFail($user_id);
+            return view('front.account-downloads', $data);
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+    } 
+    public function paymentmethods()
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $user_id = Auth::guard('customer')->user()->id;
+            $data['user'] = Customer::findOrFail($user_id);
+            return view('front.account-payment-methods', $data);
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+    } 
+    public function addresses()
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $user_id = Auth::guard('customer')->user()->id;
+            $data['user'] = Customer::findOrFail($user_id);
+            $data['addresses'] = Auth::guard('customer')->user()->addresses()->get();
+            return view('front.account-addresses', $data);
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+    } 
+    public function userDetails()
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $user_id = Auth::guard('customer')->user()->id;
+            $data['user'] = Customer::with('countryname')->where('id', $user_id)->first();
+            return view('front.account-user-details', $data);
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+    } 
+    
+    public function updateProfile(Request $request)
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $user = Auth::guard('customer')->user();
+    
+            $request->validate([
+                'first_name' => 'required|string|max:155',
+                'display_name' => 'required|string|max:155',
+                'last_name' => 'required|string|max:155',
+                'email' => 'required|email|unique:customers,email,' . $user->id,
+                'mobile' => 'required|digits_between:10,15|unique:customers,mobile,' . $user->id,
+                'whatsapp_number' => 'required|digits_between:10,15',
+            ]);
+        
+            $user->first_name = $request->first_name;
+            $user->display_name = $request->display_name;
+            $user->last_name = $request->last_name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->whatsapp_number = $request->whatsapp_number;
+    
+            $user->save();
+            return response()->json(['success'=> true, 'message' => 'Profile updated successfully.']);
+           
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+    }
+    
+    public function updateProfilePic(Request $request)
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $user = Auth::guard('customer')->user();
+    
+            $request->validate([
+                'profile_pic' => 'required|image|max:2048',
+            ]);
+        
+            if($request->hasFile('profile_pic'))
+            {
+                $path = $request->file('profile_pic')->store('customers', 'public');// Example storage locatio
+                $user->profile_pic = $path;
+            }
+    
+            $user->save();
+        
+            return response()->json(['success'=> true, 'message' => 'Profile updated successfully.']);
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+    }
+    
+    public function changePassword(Request $request)
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $request->validate([
+                'old_password' => 'required|string',
+                'new_password' => 'required|string|min:8|confirmed',
+            ]);
 
+            $user = Auth::guard('customer')->user();
 
+            if (!Hash::check($request->old_password, $user->password)) {
+                return response()->json(['errors' => ['old_password' => ['Old password is incorrect.']]], 422);
+            }
 
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
 
+            return response()->json(['success'=> true, 'message' => 'Password successfully updated.']);
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+        
+    }
+
+    public function addressStore(Request $request)
+    {
+        if(Auth::guard('customer')->check())
+        {
+            $data = $request->validate([
+                'type' => 'required|in:billing,shipping',
+                'address_line1' => 'required',
+                'address_line2' => 'nullable',
+                'city' => 'required',
+                'state' => 'required',
+                'postal_code' => 'required',
+                'country' => 'required',
+                'is_default' => 'boolean',
+                'address_tag' => 'required|in:Home,Office,Others',
+            ]);
+            
+            
+            if ($data['is_default']) {
+                Auth::guard('customer')->user()->addresses()->where('type', $data['type'])->update(['is_default' => false]);
+            }
+        
+            Auth::guard('customer')->user()->addresses()->create($data);
+        
+            return response()->json(['success' => true, 'message' => 'Address added successfully.']);
+            
+        }
+        else{
+            return redirect()->route('authentication-signin')
+            ->withErrors('Please login to access the dashboard.');
+        }  
+    }
+    public function statesByCountry(Request $request)
+    {
+		$id 		= $request->country_id;
+		$states 		= State::where('country_id',$id)->get();
+		//dd($city);
+		if(isset($states))
+		{
+		    $response 	= '<option value="">Select State </option>';
+    		foreach($states as $row)
+    		{
+    			$response .= '<option value='.$row->id.'>'.$row->name.'</option>';
+    		}
+		}else{
+		    $response 	.= '<option value="">No State Found </option>';
+		}
+		
+		return response()->json($response);
+	}
+	public function citiesByState(Request $request)
+    {
+		$id 		= $request->state_id;
+		$city 		= City::where('state_id',$id)->get();
+		//dd($city);
+		if(isset($city))
+		{
+		    $response 	= '<option value="">Select City </option>';
+    		foreach($city as $row)
+    		{
+    			$response .= '<option value='.$row->id.'>'.$row->name.'</option>';
+    		}
+		}else{
+		    $response 	.= '<option value="">No City Found </option>';
+		}
+		
+		return response()->json($response);
+	}
     public function logout()
     {
         if(Auth::guard('customer')->check()) // this means that the admin was logged in.
