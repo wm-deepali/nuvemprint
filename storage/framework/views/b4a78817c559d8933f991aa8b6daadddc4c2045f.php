@@ -72,17 +72,17 @@
 
             </span>
             </td>
-            <td>
-            <?php if($attribute->has_dependency && $attribute->dependency_parent): ?>
-          <span class="badge badge-info">
-          <?php echo e($attribute->parentAttribute->name ?? 'N/A'); ?>
 
-          </span>
+            <td>
+            <?php if($attribute->has_dependency && $attribute->parents->isNotEmpty()): ?>
+          <?php $__currentLoopData = $attribute->parents; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parent): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <span class="badge badge-info"><?php echo e($parent->name); ?></span>
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <?php else: ?>
           <span class="text-muted">—</span>
         <?php endif; ?>
             </td>
-             <td>
+            <td>
             <span class="badge badge-<?php echo e($attribute->has_setup_charge ? 'success' : 'secondary'); ?>">
             <?php echo e($attribute->has_setup_charge ? 'Yes' : 'No'); ?>
 

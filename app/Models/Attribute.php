@@ -12,7 +12,7 @@ class Attribute extends Model
         'input_type',
         'pricing_basis',
         'has_setup_charge',
-        'allow_quantity',
+        // 'allow_quantity',
         'is_composite',
         'has_dependency',
         'dependency_parent',
@@ -31,10 +31,17 @@ class Attribute extends Model
         'has_setup_charge' => 'boolean'
     ];
 
-    public function parentAttribute()
+
+    public function parents()
     {
-        return $this->belongsTo(Attribute::class, 'dependency_parent');
+        return $this->belongsToMany(Attribute::class, 'attribute_dependency', 'attribute_id', 'parent_attribute_id');
     }
+
+    public function children()
+    {
+        return $this->belongsToMany(Attribute::class, 'attribute_dependency', 'parent_attribute_id', 'attribute_id');
+    }
+
 
     /** Attribute has many possible values */
     public function values()

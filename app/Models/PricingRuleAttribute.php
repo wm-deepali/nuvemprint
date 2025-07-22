@@ -13,23 +13,18 @@ class PricingRuleAttribute extends Model
         'pricing_rule_id',
         'attribute_id',
         'value_id',
-        'dependency_value_id',
         'price_modifier_type',
         'price_modifier_value',
         'base_charges_type',
         'extra_copy_charge',
         'extra_copy_charge_type',
+        'flat_rate_per_page',
         'is_default',
     ];
 
     public function rule()
     {
         return $this->belongsTo(PricingRule::class, 'pricing_rule_id');
-    }
-
-    public function dependencyValue()
-    {
-        return $this->belongsTo(AttributeValue::class, 'dependency_value_id');
     }
 
 
@@ -47,6 +42,12 @@ class PricingRuleAttribute extends Model
     {
         return $this->hasMany(PricingRuleAttributeQuantity::class);
     }
+
+    public function dependencies()
+    {
+        return $this->hasMany(PricingRuleAttributeDependency::class);
+    }
+
 
 }
 

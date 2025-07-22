@@ -32,7 +32,7 @@
 
         {{-- Category & Subcategory --}}
         <div class="form-row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
           <label>Category</label>
           <select class="form-control" id="category-select" name="category_id" required>
             <option value="">-- Select Category --</option>
@@ -41,12 +41,26 @@
         @endforeach
           </select>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
           <label>Subcategory</label>
           <select class="form-control" id="subcategory-select" name="subcategory_id" required>
             <option value="">-- Select Subcategory --</option>
           </select>
           </div>
+
+          <div class="form-group col-md-3" id="pages-dragger-checkbox-wrapper" style="display: none;">
+          <label>
+            <input type="checkbox" id="pages-dragger-checkbox" name="pages_dragger_required">
+            Number of Pages Dragger Required
+          </label>
+          </div>
+          <div class="form-group col-md-3" id="pages-dragger-dependency-group" style="display: none;">
+          <label for="pages-dragger-dependency">Dependency Attribute</label>
+          <select id="pages-dragger-dependency" class="form-control" name="pages_dragger_dependency">
+            <option value="">-- Select Attribute --</option>
+          </select>
+          </div>
+
         </div>
         <hr>
 
@@ -84,6 +98,28 @@
     document.getElementById('attribute-modifier-container').innerHTML = '<p class="text-muted">Select a subcategory to load attributes.</p>';
     });
 
+    document.getElementById('pages-dragger-checkbox').addEventListener('change', function () {
+    const dependencyGroup = document.getElementById('pages-dragger-dependency-group');
+    if (this.checked) {
+  
+      dependencyGroup.style.display = 'block';
+
+      const select = document.getElementById('pages-dragger-dependency');
+      select.innerHTML = '<option value="">-- Select Attribute --</option>';
+      subcategoryAttributes.forEach(attr => {
+      if (!attr.is_composite && attr.values?.length) {
+        const option = document.createElement('option');
+        option.value = attr.id;
+        option.textContent = attr.name;
+        select.appendChild(option);
+      }
+      });
+    } else {
+      dependencyGroup.style.display = 'none';
+    }
+    });
+
+
     document.getElementById('subcategory-select').addEventListener('change', function () {
     const subcategoryId = this.value;
     if (!subcategoryId) return;
@@ -93,7 +129,15 @@
       .then(data => {
       subcategoryAttributes = data.attributes || [];
       renderAttributeRows();
+
+      // 👇 Show the checkbox now that attributes are available
+      document.getElementById('pages-dragger-checkbox-wrapper').style.display = 'block';
+
+      // Optionally reset previous selection
+      document.getElementById('pages-dragger-checkbox').checked = false;
+      document.getElementById('pages-dragger-dependency-group').style.display = 'none';
       });
+
     });
 
     function renderAttributeRows() {
@@ -131,13 +175,8 @@
       </select>
       </div>
 
-      <div class="form-group col-md-3 dependency-group" style="display: none;">
-    <label>Depends On Value</label>
-    <select class="form-control dependency-value-select" name="rows[${index}][dependency_value_id]">
-    <option value="">-- Select --</option>
-    </select>
-    </div>
 
+    <div class="dependency-group" style="display: none;"></div>
 
     <div class="form-group col-md-2 modifier-type-group" style="display: none;">
       <label>Modifier Type</label>
@@ -155,6 +194,13 @@
       <option value="amount">amount</option>
       <option value="percentage">%</option>
       </select>
+      </div>
+      </div>
+
+      <div class="form-group col-md-2 fixed-per-page-group" style="display: none;">
+       <label>Price per Page (Fixed)</label>
+      <div class="input-group">
+      <input type="text" class="form-control" name="rows[${index}][flat_rate_per_page]">
       </div>
       </div>
 
@@ -230,10 +276,6 @@
       const attrId = e.target.value;
       const selectedAttr = subcategoryAttributes.find(attr => attr.id == attrId);
       const row = e.target.closest('.attribute-row');
-      const dependencyGroup = row.querySelector('.dependency-group');
-      const dependencySelect = row.querySelector('.dependency-value-select');
-      dependencyGroup.style.display = 'none';
-      dependencySelect.innerHTML = '<option value="">-- Select --</option>';
 
       // Update value options
       const valueSelect = row.querySelector('select[name*="[value_id]"]');
@@ -242,15 +284,40 @@
       .map(v => `<option value="${v.id}">${v.value}</option>`)
       .join('') || '';
 
-      if (selectedAttr?.dependency_parent) {
-      const parentAttr = subcategoryAttributes.find(attr => attr.id == selectedAttr.dependency_parent);
-      const values = parentAttr?.values?.filter(v => !v.is_composite_value) || [];
+      // dependency-group
+      if (Array.isArray(selectedAttr?.dependency_parents) && selectedAttr.dependency_parents.length > 0) {
 
-      dependencySelect.innerHTML = values
-        .map(v => `<option value="${v.id}">${v.value}</option>`)
-        .join('');
+      const attrName = row.querySelector('select[name*="[attribute_id]"]').name;
+      const attrIndex = attrName.match(/rows\[(\d+)\]/)[1];
 
-      dependencyGroup.style.display = 'block';
+      // Find the "Value" field's parent form-group
+      const valueField = row.querySelector('select[name*="[value_id]"]');
+      const valueGroup = valueField.closest('.form-group');
+
+      selectedAttr.dependency_parents.forEach((parentId) => {
+        const parentAttr = subcategoryAttributes.find(attr => attr.id == parentId);
+        if (!parentAttr) return;
+
+        const values = parentAttr.values?.filter(v => !v.is_composite_value) || [];
+
+        if (values.length > 0) {
+        const selectName = `rows[${attrIndex}][dependency_value_ids][${parentId}]`;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'form-group col-md-2 dependency-select';
+        wrapper.innerHTML = `
+      <label>Depends on "${parentAttr.name}"</label>
+      <select class="form-control" name="${selectName}">
+      <option value="">-- Select --</option>
+      ${values.map(v => `<option value="${v.id}">${v.value}</option>`).join('')}
+      </select>
+    `;
+
+        // Insert AFTER the valueGroup
+        valueGroup.after(wrapper);
+        }
+      });
+
       }
 
       // Show/hide Per Page Pricing
@@ -273,7 +340,9 @@
       const modifierGroup = row.querySelector('.modifier-type-group');
       const baseChargesGroup = row.querySelector('.base-charges-group');
       const showSetupFields = selectedAttr?.has_setup_charge === true;
+      const fixedPriceSection = row.querySelector('.fixed-per-page-group');
 
+      fixedPriceSection.style.display = selectedAttr?.pricing_basis === 'fixed_per_page' ? 'block' : 'none';
       extraCopySection.style.display = selectedAttr?.pricing_basis === 'per_extra_copy' ? 'block' : 'none';
       modifierGroup.style.display = showSetupFields ? 'block' : 'none';
       baseChargesGroup.style.display = showSetupFields ? 'block' : 'none';
@@ -376,7 +445,7 @@
       $btn.prop('disabled', true);
       $('input, select').removeClass('is-invalid');
       $('.invalid-feedback').remove();
-    
+
       $.ajax({
       url: "{{ route('admin.pricing-rules.store') }}",
       method: 'POST',

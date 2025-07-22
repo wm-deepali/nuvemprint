@@ -12,6 +12,8 @@ class PricingRule extends Model
     protected $fillable = [
         'category_id',
         'subcategory_id',
+        'pages_dragger_required',
+        'pages_dragger_dependency'
     ];
 
     public function category()

@@ -44,9 +44,10 @@
                   <label>Pricing Basis</label>
                   <select name="attributes[0][pricing_basis]" class="form-control">
                     <option value="">-- Select --</option>
-                    <option value="per_page">Per Page</option>
-                    <option value="per_product">Per Product</option>
-                    <option value="per_extra_copy">Per Extra Copy</option>
+                    <option value="per_page">Depends Upon No. of Pages</option>
+                    <option value="fixed_per_page">Fixed Price Per Page</option>
+                    <option value="per_product">Depends Upon Quantity Range</option>
+                    <option value="per_extra_copy">Per Extra Copy (Multiply by Product Qnty)</option>
                   </select>
                   <small class="text-danger validation-err" id="attributes_0_pricing_basis-err"></small>
                 </div>
@@ -86,7 +87,7 @@
                 </div>
               </div>
 
-              <div class="col-md-3">
+              <!-- <div class="col-md-3">
                 <div class="form-group">
                   <label for="quantity-0">Allow Quantity</label>
                   <select name="attributes[0][allow_quantity]" id="quantity-0" class="form-control">
@@ -95,7 +96,7 @@
                     <option value="0">No</option>
                   </select>
                 </div>
-              </div>
+              </div> -->
 
               <div class="col-md-3">
                 <div class="form-group">
@@ -144,13 +145,19 @@
 
               <div class="col-md-6 dependency-parent-wrapper d-none">
                 <div class="form-group">
-                  <label for="parent-0">Dependency Parent</label>
-                  <select name="attributes[0][dependency_parent]" class="form-control dependency-parent" id="parent-0">
-                    <option value="">-- Select Parent Attribute --</option>
-                    @foreach($attributes as $attribute)
-            <option value="{{ $attribute->id }}">{{ $attribute->name }}</option>
+                  <label>Dependency Parent <span class="text-danger">*</span></label>
+                  <div class="border p-1 rounded" style="max-height: 200px; overflow-y: auto;">
+                    @foreach ($attributes as $attribute)
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input dependency-checkbox"
+              name="attributes[0][dependency_parent][]" value="{{ $attribute->id }}"
+              id="dep-0-{{ $attribute->id }}">
+              <label class="form-check-label" for="dep-0-{{ $attribute->id }}">
+              {{ $attribute->name }}
+              </label>
+            </div>
           @endforeach
-                  </select>
+                  </div>
                 </div>
               </div>
 
@@ -194,24 +201,24 @@
   });
 
   // Handle Pricing Basis change
-  $(document).on('change', 'select[name$="[pricing_basis]"]', function () {
-    const $item = $(this).closest('.attribute-item');
-    const pricingBasis = $(this).val();
-    const $allowQty = $item.find('select[name$="[allow_quantity]"]');
-    const allowQtyName = $allowQty.attr('name');
+  // $(document).on('change', 'select[name$="[pricing_basis]"]', function () {
+  //   const $item = $(this).closest('.attribute-item');
+  //   const pricingBasis = $(this).val();
+  //   const $allowQty = $item.find('select[name$="[allow_quantity]"]');
+  //   const allowQtyName = $allowQty.attr('name');
 
-    if (pricingBasis === 'per_page') {
-      $allowQty.val('1').prop('disabled', true);
+  //   if (pricingBasis === 'per_page') {
+  //     $allowQty.val('1').prop('disabled', true);
 
-      // If hidden field not already added
-      if ($item.find(`input[type="hidden"][name="${allowQtyName}"]`).length === 0) {
-        $allowQty.after(`<input type="hidden" name="${allowQtyName}" value="1" class="hidden-allow-quantity">`);
-      }
-    } else {
-      $allowQty.prop('disabled', false);
-      $item.find(`.hidden-allow-quantity`).remove();
-    }
-  });
+  //     // If hidden field not already added
+  //     if ($item.find(`input[type="hidden"][name="${allowQtyName}"]`).length === 0) {
+  //       $allowQty.after(`<input type="hidden" name="${allowQtyName}" value="1" class="hidden-allow-quantity">`);
+  //     }
+  //   } else {
+  //     $allowQty.prop('disabled', false);
+  //     $item.find(`.hidden-allow-quantity`).remove();
+  //   }
+  // });
 
 
   // Handle Dependency toggle
@@ -285,9 +292,10 @@
         <label>Pricing Basis</label>
         <select name="attributes[${attributeIndex}][pricing_basis]" class="form-control">
           <option value="">-- Select --</option>
-          <option value="per_page">Per Page</option>
-          <option value="per_product">Per Product</option>
-           <option value="per_extra_copy">Per Extra Copy</option>
+          <option value="per_page">Depends Upon No. of Pages</option>
+          <option value="fixed_per_page">Fixed Price Per Page</option>
+          <option value="per_product">Depends Upon Quantity Range</option>
+          <option value="per_extra_copy">Per Extra Copy (Multiply by Product Qnty)</option>
         </select>
         <small class="text-danger" id="attributes.${attributeIndex}.pricing_basis-err"></small>
       </div>
@@ -323,18 +331,6 @@
             <option value="0">No</option>
           </select>
         </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="quantity-${attributeIndex}">Allow Quantity</label>
-        <select name="attributes[${attributeIndex}][allow_quantity]" class="form-control"
-          id="quantity-${attributeIndex}">
-          <option value="">-- Select --</option>
-          <option value="1">Yes</option>
-          <option value="0" selected>No</option>
-        </select>
-      </div>
     </div>
 
     <div class="col-md-3">
@@ -383,20 +379,26 @@
         </select>
       </div>
     </div>
-    <div class="col-md-6 dependency-parent-wrapper d-none">
-  <div class="form-group">
-    <label for="parent-${attributeIndex}">Dependency Parent</label>
-    <select name="attributes[${attributeIndex}][dependency_parent]" class="form-control dependency-parent" id="parent-${attributeIndex}">
-      <option value="">-- Select Parent Attribute --</option>
-@foreach($attributes as $attr)
-  <option value="{{ $attr->id }}">{{ $attr->name }}</option>
-@endforeach
 
-      <!-- Options added via JS -->
-    </select>
-  </div>
-</div>
 
+ <div class="col-md-6 dependency-parent-wrapper d-none">
+                <div class="form-group">
+                  <label for="parent-${attributeIndex}">Dependency Parent <span class="text-danger">*</span></label>
+                  <div class="border p-1 rounded" style="max-height: 200px; overflow-y: auto;">
+                    @foreach ($attributes as $attribute)
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input dependency-checkbox"
+              name="attributes[${attributeIndex}][dependency_parent][]" value="{{ $attribute->id }}"
+              id="dep-${attributeIndex}-{{ $attribute->id }}">
+              <label class="form-check-label" for="dep-${attributeIndex}-{{ $attribute->id }}">
+              {{ $attribute->name }}
+              </label>
+            </div>
+            @endforeach
+                  </div>
+                </div>
+              </div>
+              
 
     <div class="col-md-12 text-right">
       <button type="button" class="btn btn-danger btn-sm remove-attribute">Remove</button>
@@ -406,11 +408,11 @@
     `;
 
     $('#attribute-fields-wrapper').append(html);
-    const $newItem = $('#attribute-fields-wrapper .attribute-item').last();
-    const $pricing = $newItem.find('select[name$="[pricing_basis]"]');
-    if ($pricing.val() === 'per_page') {
-      $newItem.find('select[name$="[allow_quantity]"]').val('1').prop('disabled', true);
-    }
+    // const $newItem = $('#attribute-fields-wrapper .attribute-item').last();
+    // const $pricing = $newItem.find('select[name$="[pricing_basis]"]');
+    // if ($pricing.val() === 'per_page') {
+    //   $newItem.find('select[name$="[allow_quantity]"]').val('1').prop('disabled', true);
+    // }
     attributeIndex++;
 
 
@@ -428,23 +430,23 @@
     const selectedType = $firstItem.find('select[name$="[input_type]"]').val();
     toggleSupportFields($firstItem, selectedType);
 
-    
+
     // Handle dependency on load
     const hasDependency = $firstItem.find('select[name$="[has_dependency]"]').val() === '1';
     if (hasDependency) {
       $firstItem.find('select[name$="[has_dependency]"]').trigger('change');
     }
-    
-    const pricingBasis = $firstItem.find('select[name$="[pricing_basis]"]').val();
-    if (pricingBasis === 'per_page') {
-      const $allowQty = $firstItem.find('select[name$="[allow_quantity]"]');
-      const allowQtyName = $allowQty.attr('name');
-      $allowQty.val('1').prop('disabled', true);
 
-      if ($firstItem.find(`input[type="hidden"][name="${allowQtyName}"]`).length === 0) {
-        $allowQty.after(`<input type="hidden" name="${allowQtyName}" value="1" class="hidden-allow-quantity">`);
-      }
-    }
+    // const pricingBasis = $firstItem.find('select[name$="[pricing_basis]"]').val();
+    // if (pricingBasis === 'per_page') {
+    //   const $allowQty = $firstItem.find('select[name$="[allow_quantity]"]');
+    //   const allowQtyName = $allowQty.attr('name');
+    //   $allowQty.val('1').prop('disabled', true);
+
+    //   if ($firstItem.find(`input[type="hidden"][name="${allowQtyName}"]`).length === 0) {
+    //     $allowQty.after(`<input type="hidden" name="${allowQtyName}" value="1" class="hidden-allow-quantity">`);
+    //   }
+    // }
 
   });
 

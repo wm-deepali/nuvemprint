@@ -58,11 +58,14 @@
               <label>Pricing Basis</label>
               <select name="pricing_basis" class="form-control">
                 <option value="">-- Select --</option>
-                <option value="per_page" <?php echo e($attribute->pricing_basis == 'per_page' ? 'selected' : ''); ?>>Per Page</option>
-                <option value="per_product" <?php echo e($attribute->pricing_basis == 'per_product' ? 'selected' : ''); ?>>Per Product
-                </option>
+                <option value="per_page" <?php echo e($attribute->pricing_basis == 'per_page' ? 'selected' : ''); ?>>Depends Upon No.
+                  of Pages</option>
+                <option value="fixed_per_page" <?php echo e($attribute->pricing_basis == 'fixed_per_page' ? 'selected' : ''); ?>>Fixed
+                  Price Per Page</option>
+                <option value="per_product" <?php echo e($attribute->pricing_basis == 'per_product' ? 'selected' : ''); ?>>Depends
+                  Upon Quantity Range</option>
                 <option value="per_extra_copy" <?php echo e($attribute->pricing_basis == 'per_extra_copy' ? 'selected' : ''); ?>>Per
-                  Extra Copy</option>
+                  Extra Copy (Multiply by Product Qnty)</option>
               </select>
             </div>
           </div>
@@ -85,16 +88,17 @@
             </div>
           </div>
 
-          <div class="col-md-3">
+          <!-- <div class="col-md-3">
             <div class="form-group">
               <label for="edit-quantity">Allow Quantity</label>
               <select name="allow_quantity" class="form-control" id="edit-quantity">
                 <option value="1" <?php echo e($attribute->allow_quantity ? 'selected' : ''); ?>>Yes</option>
                 <option value="0" <?php echo e(!$attribute->allow_quantity ? 'selected' : ''); ?>>No</option>
               </select>
-              <input type="hidden" name="allow_quantity_hidden" id="allow_quantity_hidden" value="<?php echo e($attribute->allow_quantity); ?>">
+              <input type="hidden" name="allow_quantity_hidden" id="allow_quantity_hidden"
+                value="<?php echo e($attribute->allow_quantity); ?>">
             </div>
-          </div>
+          </div> -->
 
           <div class="col-md-3">
             <div class="form-group">
@@ -136,21 +140,28 @@
             </div>
           </div>
 
-          <div class="col-md-3 dependency-parent-block"
+
+          <div class="col-md-6 dependency-parent-wrapper"
             style="<?php echo e(!$attribute->has_dependency ? 'display: none;' : ''); ?>">
             <div class="form-group">
-              <label for="edit-dependency-parent">Dependency Parent</label>
-              <select name="dependency_parent" class="form-control" id="edit-dependency-parent">
-                <option value="">-- Select Parent Attribute --</option>
-                <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parent): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-          <option value="<?php echo e($parent->id); ?>" <?php echo e($attribute->dependency_parent == $parent->id ? 'selected' : ''); ?>>
-            <?php echo e($parent->name); ?>
+              <label>Dependency Parents <span class="text-danger">*</span></label>
+              <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parentAttr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <?php if($parentAttr->id != $attribute->id): ?> 
+            <div class="form-check">
+            <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
+            value="<?php echo e($parentAttr->id); ?>" id="edit-dep-<?php echo e($parentAttr->id); ?>" <?php echo e($attribute->parents->contains('id', $parentAttr->id) ? 'checked' : ''); ?>>
+            <label class="form-check-label" for="edit-dep-<?php echo e($parentAttr->id); ?>">
+            <?php echo e($parentAttr->name); ?>
 
-          </option>
+            </label>
+            </div>
+          <?php endif; ?>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-              </select>
+              </div>
             </div>
           </div>
+
 
         </div>
 
@@ -168,15 +179,15 @@
     const excludedTypes = ['select_image', 'select_icon', 'grouped_select', 'range', 'toggle', 'number'];
 
     // Pricing Basis - Allow Quantity auto set
-    function autoSetAllowQuantity(pricingBasis) {
-  if (pricingBasis === 'per_page') {
-    $('#edit-quantity').val('1').prop('disabled', true); // set to Yes and disable
-    $('#allow_quantity_hidden').val('1'); // mirror to hidden
-  } else {
-    $('#edit-quantity').prop('disabled', false);
-    $('#allow_quantity_hidden').val($('#edit-quantity').val()); // mirror current value
-  }
-}
+    // function autoSetAllowQuantity(pricingBasis) {
+    //   if (pricingBasis === 'per_page') {
+    //     $('#edit-quantity').val('1').prop('disabled', true); // set to Yes and disable
+    //     $('#allow_quantity_hidden').val('1'); // mirror to hidden
+    //   } else {
+    //     $('#edit-quantity').prop('disabled', false);
+    //     $('#allow_quantity_hidden').val($('#edit-quantity').val()); // mirror current value
+    //   }
+    // }
 
 
 
@@ -194,12 +205,13 @@
     // Dependency Parent Show/Hide
     function toggleDependencyParentField(value) {
       if (value === '1') {
-        $('.dependency-parent-block').show();
+        $('.dependency-parent-wrapper').show();
       } else {
-        $('.dependency-parent-block').hide();
-        $('#edit-dependency-parent').val('');
+        $('.dependency-parent-wrapper').hide();
+        $('.dependency-checkbox').prop('checked', false); // uncheck all
       }
     }
+
 
     // On load
     toggleEditSupportFields($('select[name="input_type"]').val());

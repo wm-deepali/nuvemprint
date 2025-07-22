@@ -58,11 +58,14 @@
               <label>Pricing Basis</label>
               <select name="pricing_basis" class="form-control">
                 <option value="">-- Select --</option>
-                <option value="per_page" {{ $attribute->pricing_basis == 'per_page' ? 'selected' : '' }}>Per Page</option>
-                <option value="per_product" {{ $attribute->pricing_basis == 'per_product' ? 'selected' : '' }}>Per Product
-                </option>
+                <option value="per_page" {{ $attribute->pricing_basis == 'per_page' ? 'selected' : '' }}>Depends Upon No.
+                  of Pages</option>
+                <option value="fixed_per_page" {{ $attribute->pricing_basis == 'fixed_per_page' ? 'selected' : '' }}>Fixed
+                  Price Per Page</option>
+                <option value="per_product" {{ $attribute->pricing_basis == 'per_product' ? 'selected' : '' }}>Depends
+                  Upon Quantity Range</option>
                 <option value="per_extra_copy" {{ $attribute->pricing_basis == 'per_extra_copy' ? 'selected' : '' }}>Per
-                  Extra Copy</option>
+                  Extra Copy (Multiply by Product Qnty)</option>
               </select>
             </div>
           </div>
@@ -85,16 +88,17 @@
             </div>
           </div>
 
-          <div class="col-md-3">
+          <!-- <div class="col-md-3">
             <div class="form-group">
               <label for="edit-quantity">Allow Quantity</label>
               <select name="allow_quantity" class="form-control" id="edit-quantity">
                 <option value="1" {{ $attribute->allow_quantity ? 'selected' : '' }}>Yes</option>
                 <option value="0" {{ !$attribute->allow_quantity ? 'selected' : '' }}>No</option>
               </select>
-              <input type="hidden" name="allow_quantity_hidden" id="allow_quantity_hidden" value="{{ $attribute->allow_quantity }}">
+              <input type="hidden" name="allow_quantity_hidden" id="allow_quantity_hidden"
+                value="{{ $attribute->allow_quantity }}">
             </div>
-          </div>
+          </div> -->
 
           <div class="col-md-3">
             <div class="form-group">
@@ -136,20 +140,27 @@
             </div>
           </div>
 
-          <div class="col-md-3 dependency-parent-block"
+
+          <div class="col-md-6 dependency-parent-wrapper"
             style="{{ !$attribute->has_dependency ? 'display: none;' : '' }}">
             <div class="form-group">
-              <label for="edit-dependency-parent">Dependency Parent</label>
-              <select name="dependency_parent" class="form-control" id="edit-dependency-parent">
-                <option value="">-- Select Parent Attribute --</option>
-                @foreach($attributes as $parent)
-          <option value="{{ $parent->id }}" {{ $attribute->dependency_parent == $parent->id ? 'selected' : '' }}>
-            {{ $parent->name }}
-          </option>
+              <label>Dependency Parents <span class="text-danger">*</span></label>
+              <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                @foreach ($attributes as $parentAttr)
+              @if ($parentAttr->id != $attribute->id) {{-- prevent self-reference --}}
+            <div class="form-check">
+            <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
+            value="{{ $parentAttr->id }}" id="edit-dep-{{ $parentAttr->id }}" {{ $attribute->parents->contains('id', $parentAttr->id) ? 'checked' : '' }}>
+            <label class="form-check-label" for="edit-dep-{{ $parentAttr->id }}">
+            {{ $parentAttr->name }}
+            </label>
+            </div>
+          @endif
         @endforeach
-              </select>
+              </div>
             </div>
           </div>
+
 
         </div>
 
@@ -167,15 +178,15 @@
     const excludedTypes = ['select_image', 'select_icon', 'grouped_select', 'range', 'toggle', 'number'];
 
     // Pricing Basis - Allow Quantity auto set
-    function autoSetAllowQuantity(pricingBasis) {
-  if (pricingBasis === 'per_page') {
-    $('#edit-quantity').val('1').prop('disabled', true); // set to Yes and disable
-    $('#allow_quantity_hidden').val('1'); // mirror to hidden
-  } else {
-    $('#edit-quantity').prop('disabled', false);
-    $('#allow_quantity_hidden').val($('#edit-quantity').val()); // mirror current value
-  }
-}
+    // function autoSetAllowQuantity(pricingBasis) {
+    //   if (pricingBasis === 'per_page') {
+    //     $('#edit-quantity').val('1').prop('disabled', true); // set to Yes and disable
+    //     $('#allow_quantity_hidden').val('1'); // mirror to hidden
+    //   } else {
+    //     $('#edit-quantity').prop('disabled', false);
+    //     $('#allow_quantity_hidden').val($('#edit-quantity').val()); // mirror current value
+    //   }
+    // }
 
 
 
@@ -193,12 +204,13 @@
     // Dependency Parent Show/Hide
     function toggleDependencyParentField(value) {
       if (value === '1') {
-        $('.dependency-parent-block').show();
+        $('.dependency-parent-wrapper').show();
       } else {
-        $('.dependency-parent-block').hide();
-        $('#edit-dependency-parent').val('');
+        $('.dependency-parent-wrapper').hide();
+        $('.dependency-checkbox').prop('checked', false); // uncheck all
       }
     }
+
 
     // On load
     toggleEditSupportFields($('select[name="input_type"]').val());

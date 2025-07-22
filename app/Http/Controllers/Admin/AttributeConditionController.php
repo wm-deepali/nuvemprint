@@ -56,7 +56,7 @@ class AttributeConditionController extends Controller
                 'pricing_basis' => $sa->attribute->pricing_basis,
                 'has_setup_charge' => $sa->attribute->has_setup_charge,
                 'has_dependency' => $sa->attribute->has_dependency,
-                'dependency_parent' => $sa->attribute->dependency_parent
+                'dependency_parents' => $sa->attribute->parents->pluck('id')
             ];
         });
 
@@ -157,7 +157,7 @@ class AttributeConditionController extends Controller
 
     public function update(Request $request, AttributeCondition $attributeCondition)
     {
-       $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'subcategory_id' => 'required|exists:subcategories,id',
             'parent_attribute_id' => 'required|exists:attributes,id',
             'parent_value_id' => 'required|exists:attribute_values,id',

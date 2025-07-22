@@ -70,16 +70,17 @@
             {{ $attribute->has_dependency ? 'Yes' : 'No' }}
             </span>
             </td>
+
             <td>
-            @if($attribute->has_dependency && $attribute->dependency_parent)
-          <span class="badge badge-info">
-          {{ $attribute->parentAttribute->name ?? 'N/A' }}
-          </span>
+            @if($attribute->has_dependency && $attribute->parents->isNotEmpty())
+          @foreach($attribute->parents as $parent)
+          <span class="badge badge-info">{{ $parent->name }}</span>
+          @endforeach
         @else
           <span class="text-muted">—</span>
         @endif
             </td>
-             <td>
+            <td>
             <span class="badge badge-{{ $attribute->has_setup_charge ? 'success' : 'secondary' }}">
             {{ $attribute->has_setup_charge ? 'Yes' : 'No' }}
             </span>

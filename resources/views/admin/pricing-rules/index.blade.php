@@ -41,6 +41,7 @@
             <tr>
               <th>ID</th>
               <th>Subcategory</th>
+              <th>Pages Dragger</th>
               <th>Attributes</th>
               <th>Actions</th>
             </tr>
@@ -54,31 +55,71 @@
             <small>Cat: {{ $rule->category->name ?? '-' }}</small>
             </td>
             <td>
+            @if ($rule->pages_dragger_required)
+          <div class="mb-1">
+            <div class="small text-muted ml-1">
+            Required: <strong class="text-success">Yes</strong><br>
+            @php
+          $depAttr = $dependencyAttrs[$rule->pages_dragger_dependency] ?? null;
+          @endphp
+            @if ($depAttr)
+          Depends on Attribute: <strong>{{ $depAttr->name }}</strong>
+          @else
+          <em class="text-danger">Invalid Dependency</em>
+          @endif
+            </div>
+          </div>
+        @endif
+
+            </td>
+            <td>
             @forelse ($rule->attributes as $attr)
           <div class="mb-1">
+            <div>
             <strong>{{ $attr->attribute->name ?? '-' }}</strong>:
             {{ $attr->value->value ?? '-' }}
-            <span class="text-muted">
-            ({{ ucfirst($attr->price_modifier_type) }}
-            {{ $attr->price_modifier_type === 'multiply' ? '×' : '' }}
-            {{ rtrim(rtrim(number_format($attr->price_modifier_value, 4, '.', ''), '0'), '.') }}
-            {{ $attr->base_charges_type ? ($attr->base_charges_type === 'percentage' ? '%' : '') : '' }}
-            {{ $attr->extra_copy_charge ? '| Extra: ' . rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.') : '' }}
-            {{ $attr->extra_copy_charge_type === 'percentage' ? '%' : '' }})
-            </span>
-
 
             @if($attr->is_default)
           <span class="badge badge-pill badge-primary ml-1" title="Default value">Default</span>
           @endif
+            </div>
 
-            {{-- ✅ Show per-page pricing ranges --}}
+            {{-- Price Modifier --}}
+            <div class="small text-muted ml-1">
+            <em>
+            ({{ ucfirst($attr->price_modifier_type) }}
+            {{ $attr->price_modifier_type === 'multiply' ? '×' : '' }}
+            {{ rtrim(rtrim(number_format($attr->price_modifier_value, 4, '.', ''), '0'), '.') }}
+            {{ $attr->base_charges_type === 'percentage' ? '%' : '' }}
+            {{ $attr->extra_copy_charge ? '| Extra: ' . rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.') : '' }}
+            {{ $attr->extra_copy_charge_type === 'percentage' ? '%' : '' }})
+            </em>
+            </div>
+
+            {{-- Dependency Section --}}
+            @if ($attr->dependencies && $attr->dependencies->isNotEmpty())
+          <div class="small text-danger ml-1 mt-1">
+          <u><strong>Depends on:</strong></u>
+          <ul class="mb-0 pl-3">
+          @foreach ($attr->dependencies as $dep)
+          <li>
+          <strong>{{ $dep->parentAttribute->name ?? 'Attribute #' . $dep->parent_attribute_id }}</strong>
+          =
+          <span
+          class="text-dark">{{ $dep->parentValue->value ?? 'Value #' . $dep->parent_value_id }}</span>
+          </li>
+          @endforeach
+          </ul>
+          </div>
+          @endif
+
+            {{-- Quantity Ranges --}}
             @if ($attr->quantityRanges->isNotEmpty())
-          <div class="ml-2 text-muted small">
+          <div class="ml-1 text-muted small mt-1">
           <u>
           {{ $attr->attribute->pricing_basis === 'per_product' ? 'Per Product Pricing:' : 'Per Page Pricing:' }}
           </u>
-          <ul class="mb-0 pl-2">
+          <ul class="mb-0 pl-3">
           @foreach ($attr->quantityRanges as $range)
           <li>
           From <strong>{{ $range->quantity_from }}</strong> to
@@ -89,9 +130,15 @@
           </ul>
           </div>
           @endif
-
+            @if ($attr->is_fixed_per_page && $attr->fixed_per_page_price)
+          <div class="ml-1 text-muted small mt-1">
+          <u>Fixed Per Page Price:</u>
+          ₹{{ rtrim(rtrim(number_format($attr->fixed_per_page_price, 4, '.', ''), '0'), '.') }}
+          </div>
+          @endif
 
           </div>
+
         @empty
           <span class="text-muted">No Modifiers</span>
         @endforelse

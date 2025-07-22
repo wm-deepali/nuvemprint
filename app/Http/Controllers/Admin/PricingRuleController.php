@@ -10,8 +10,11 @@ use App\Models\PricingRuleAttribute;
 use App\Models\PricingRuleAttributeQuantity;
 use App\Models\PricingRuleQuantity;
 use App\Models\Subcategory;
+use App\Models\SubcategoryAttribute;
+use App\Models\SubcategoryAttributeValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\PricingRuleAttributeDependency;
 
 class PricingRuleController extends Controller
 {
@@ -23,12 +26,20 @@ class PricingRuleController extends Controller
             'subcategory',
             'attributes.attribute',
             'attributes.value',
-            'attributes.quantityRanges'
+            'attributes.quantityRanges',
+            'attributes.dependencies.parentAttribute',
+            'attributes.dependencies.parentValue',
         ])->latest()->get();
 
+        // Collect all non-null pages_dragger_dependency IDs
+        $dependencyAttrIds = $rules->pluck('pages_dragger_dependency')->filter()->unique();
 
-        return view('admin.pricing-rules.index', compact('rules'));
+        // Get those attributes and key them by ID
+        $dependencyAttrs = Attribute::whereIn('id', $dependencyAttrIds)->get()->keyBy('id');
+
+        return view('admin.pricing-rules.index', compact('rules', 'dependencyAttrs'));
     }
+
 
     public function create()
     {
@@ -40,17 +51,22 @@ class PricingRuleController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-       $request->validate([
+        $request->validate([
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
+            'pages_dragger_required' => 'nullable',
+            'pages_dragger_dependency' => 'nullable|numeric',
 
             'rows' => 'array',
             'rows.*.attribute_id' => 'required|exists:attributes,id',
             'rows.*.value_id' => 'required|exists:attribute_values,id',
-            'rows.*.dependency_value_id' => 'nullable|exists:attribute_values,id',
+            'rows.*.dependency_value_ids' => 'nullable|array',
+            'rows.*.dependency_value_ids.*' => 'nullable|exists:attribute_values,id',
+
             'rows.*.modifier_type' => 'nullable|in:add,multiply',
             'rows.*.modifier_value' => 'nullable|numeric',
             'rows.*.base_charges_type' => 'nullable|in:amount,percentage',
+            'rows.*.flat_rate_per_page' => 'nullable|numeric|min:0',
             'rows.*.extra_copy_charge' => 'nullable|numeric|min:0',
             'rows.*.extra_copy_charge_type' => 'nullable|in:amount,percentage',
             'rows.*.is_default' => 'nullable|boolean',
@@ -67,20 +83,24 @@ class PricingRuleController extends Controller
             $pricingRule = PricingRule::create([
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
+                'pages_dragger_required' => $request->has('pages_dragger_required') ? 1 : 0,
+                'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null, // Add this line
             ]);
+
 
             foreach ($request->rows as $row) {
                 $attribute = PricingRuleAttribute::create([
                     'pricing_rule_id' => $pricingRule->id,
                     'attribute_id' => $row['attribute_id'],
                     'value_id' => $row['value_id'],
-                    'dependency_value_id' => $row['dependency_value_id'] ?? null,
+                    // 'dependency_value_id' => $row['dependency_value_id'] ?? null,
                     'price_modifier_type' => $row['modifier_type'],
                     'price_modifier_value' => $row['modifier_value'] ?? 0,
                     'is_default' => isset($row['is_default']) && $row['is_default'] ? 1 : 0,
                     'base_charges_type' => $row['base_charges_type'] ?? null,
                     'extra_copy_charge' => $row['extra_copy_charge'] ?? null,
                     'extra_copy_charge_type' => $row['extra_copy_charge_type'] ?? null,
+                    'flat_rate_per_page' => $row['flat_rate_per_page'] ?? null,
                 ]);
 
                 // Save quantity ranges if provided
@@ -94,6 +114,18 @@ class PricingRuleController extends Controller
                         ]);
                     }
                 }
+                if (!empty($row['dependency_value_ids'])) {
+                    foreach ($row['dependency_value_ids'] as $parentAttrId => $valueId) {
+                        if ($valueId) {
+                            PricingRuleAttributeDependency::create([
+                                'pricing_rule_attribute_id' => $attribute->id,
+                                'parent_attribute_id' => $parentAttrId,
+                                'parent_value_id' => $valueId,
+                            ]);
+                        }
+                    }
+                }
+
             }
 
             DB::commit();
@@ -110,17 +142,50 @@ class PricingRuleController extends Controller
 
     public function edit(PricingRule $pricingRule)
     {
-        $pricingRule->load(['attributes.attribute', 'attributes.value', 'attributes.quantityRanges', 'subcategory', 'category']);
+        $pricingRule->load([
+            'attributes.attribute',
+            'attributes.value',
+            'attributes.quantityRanges',
+            'attributes.dependencies',
+            'subcategory',
+            'category'
+        ]);
+        $subcategoryAttributes = SubcategoryAttribute::with('attribute.parents')
+            ->where('subcategory_id', $pricingRule->subcategory_id)
+            ->get();
 
-        // Fetch all attributes for the subcategory (with their values)
-        $subcategoryAttributes = Attribute::with('values')
-            ->whereHas('subcategories', function ($q) use ($pricingRule) {
-                $q->where('subcategory_id', $pricingRule->subcategory_id);
-            })->get();
+        $attributes = $subcategoryAttributes->map(function ($sa) {
+            // Fetch filtered values
+            $values = SubcategoryAttributeValue::with('value')
+                ->where('subcategory_id', $sa->subcategory_id)
+                ->where('attribute_id', $sa->attribute_id)
+                ->get()
+                ->map(function ($sav) {
+                    return [
+                        'id' => $sav->value->id,
+                        'value' => $sav->value->value,
+                        'is_composite_value' => $sav->value->is_composite_value,
+                    ];
+                });
 
-            // dd($pricingRule->attributes->toArray());
-        return view('admin.pricing-rules.edit', compact('pricingRule', 'subcategoryAttributes'));
+            return [
+                'id' => $sa->attribute->id,
+                'name' => $sa->attribute->name,
+                'values' => $values,
+                'pricing_basis' => $sa->attribute->pricing_basis,
+                'has_setup_charge' => $sa->attribute->has_setup_charge,
+                'has_dependency' => $sa->attribute->has_dependency,
+                'dependency_parents' => $sa->attribute->parents->pluck('id'),
+            ];
+
+        });
+        // dd($attributes->toArray());
+        return view('admin.pricing-rules.edit', [
+            'pricingRule' => $pricingRule,
+            'subcategoryAttributes' => $attributes,
+        ]);
     }
+
 
     public function update(Request $request, PricingRule $pricingRule)
     {
@@ -128,14 +193,19 @@ class PricingRuleController extends Controller
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
+            'pages_dragger_required' => 'nullable|boolean',
+            'pages_dragger_dependency' => 'nullable|numeric',
+
             'rows' => 'nullable|array',
             'rows.*.id' => 'nullable|exists:pricing_rule_attributes,id',
             'rows.*.attribute_id' => 'required|exists:attributes,id',
             'rows.*.value_id' => 'required|exists:attribute_values,id',
-            'rows.*.dependency_value_id' => 'nullable|exists:attribute_values,id',
+            'rows.*.dependency_value_ids' => 'nullable|array',
+            'rows.*.dependency_value_ids.*' => 'nullable|exists:attribute_values,id',
             'rows.*.modifier_type' => 'nullable|in:add,multiply',
             'rows.*.modifier_value' => 'nullable|numeric',
             'rows.*.base_charges_type' => 'nullable|in:amount,percentage',
+            'rows.*.flat_rate_per_page' => 'nullable|numeric|min:0',
             'rows.*.extra_copy_charge' => 'nullable|numeric|min:0',
             'rows.*.extra_copy_charge_type' => 'nullable|in:amount,percentage',
             'rows.*.is_default' => 'nullable|in:1',
@@ -153,7 +223,10 @@ class PricingRuleController extends Controller
             $pricingRule->update([
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
+                'pages_dragger_required' => isset($request->pages_dragger_required) && $request->pages_dragger_required ? 1 : 0,
+                'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null,
             ]);
+
 
             $existingIds = $pricingRule->attributes()->pluck('id')->toArray();
             $submittedIds = [];
@@ -162,13 +235,14 @@ class PricingRuleController extends Controller
                 $data = [
                     'attribute_id' => $row['attribute_id'],
                     'value_id' => $row['value_id'],
-                    'dependency_value_id' => $row['dependency_value_id'] ?? null,
+                    // 'dependency_value_id' => $row['dependency_value_id'] ?? null,
                     'price_modifier_type' => $row['modifier_type'],
                     'price_modifier_value' => $row['modifier_value'] ?? 0,
                     'is_default' => isset($row['is_default']) ? 1 : 0,
                     'base_charges_type' => $row['base_charges_type'] ?? null,
                     'extra_copy_charge' => $row['extra_copy_charge'] ?? null,
                     'extra_copy_charge_type' => $row['extra_copy_charge_type'] ?? null,
+                    'flat_rate_per_page' => $row['flat_rate_per_page'] ?? null,
                 ];
 
                 if (!empty($row['id'])) {
@@ -216,6 +290,32 @@ class PricingRuleController extends Controller
                         ->whereNotIn('id', $submittedRangeIds)
                         ->delete();
                 }
+
+                if (!empty($row['dependency_value_ids'])) {
+                    $existingDeps = PricingRuleAttributeDependency::where('pricing_rule_attribute_id', $attribute->id)->get();
+                    $submittedDepKeys = [];
+
+                    foreach ($row['dependency_value_ids'] as $parentAttrId => $valueId) {
+                        if ($valueId) {
+                            $submittedDepKeys[] = $parentAttrId;
+
+                            // Update if exists, otherwise create
+                            PricingRuleAttributeDependency::updateOrCreate(
+                                [
+                                    'pricing_rule_attribute_id' => $attribute->id,
+                                    'parent_attribute_id' => $parentAttrId,
+                                ],
+                                ['parent_value_id' => $valueId]
+                            );
+                        }
+                    }
+
+                    // Delete dependencies that were not submitted (i.e., removed)
+                    PricingRuleAttributeDependency::where('pricing_rule_attribute_id', $attribute->id)
+                        ->whereNotIn('parent_attribute_id', $submittedDepKeys)
+                        ->delete();
+                }
+
             }
 
             // Delete removed attributes

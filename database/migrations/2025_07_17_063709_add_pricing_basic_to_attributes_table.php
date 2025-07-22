@@ -14,7 +14,7 @@ class AddPricingBasicToAttributesTable extends Migration
     public function up()
     {
         Schema::table('attributes', function (Blueprint $table) {
-            $table->enum('pricing_basis', ['per_page', 'per_product', 'per_extra_copy'])->nullable()->after('input_type');
+            $table->enum('pricing_basis', ['per_page', 'per_product', 'per_extra_copy', 'fixed_per_page'])->nullable()->after('input_type');
             $table->boolean('has_setup_charge')->default(false)->after('pricing_basis');
             $table->boolean('allow_quantity')->default(false)->after('has_setup_charge');
             $table->boolean('is_composite')->default(false)->after('allow_quantity');
