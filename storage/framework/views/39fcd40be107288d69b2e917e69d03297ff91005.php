@@ -132,12 +132,14 @@ Nuvem Prints
 [
     'subcategory' => $subcategory,
     'attributeGroups' => $attributeGroups,
-	'quantityPricing' => $quantityPricing,
-	'conditionsMap' => $conditionsMap
+	'conditionsMap' => $conditionsMap,
+    'pagesDraggerRequired'=> $pagesDraggerRequired,
+	'pagesDraggerAttributeId' => $pagesDraggerAttributeId,
+	'compositeMap' => $compositeMap,
 ], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <div class="tab-container">
-      <div class="tab-buttons">
+       <div class="tab-buttons">
         <button class="active" data-tab="tab-information">Information</button>
         <button data-tab="tab-available-size">Available Sizes</button>
         <button data-tab="tab-binding-options">Binding Options</button>

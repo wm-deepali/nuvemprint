@@ -33,6 +33,7 @@ Route::get('/stl', function () {
 });
 Route::get('/', [SiteController::class, 'index'])->name('home');
 Route::get('{slug}/details', [SiteController::class, 'subcateDetails'])->name('subcategory-details');
+Route::post('/calculate-price', [SiteController::class, 'calculate'])->name('calculate.price');
 
 
 Route::get('cart', function () {

@@ -541,20 +541,32 @@
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <?php endif; ?>
                     </div>
-                    <div class="form-row-section1">
-                        <div class="s-row mb-3">
-                            <label>Pages <span class="help-circle" data-label="Pages" data-toggle="modal"
-                                    data-target="#helpModal">?</span></label>
-                            <div class="page-slider">
-                                <input type="range" min="32" max="840" value="32" id="pageSlider">
-                                <div class="range-value">
-                                    <button type="button">-</button>
-                                    <span id="pageValue">32</span>
-                                    <button type="button">+</button>
+
+                    <?php if($pagesDraggerRequired): ?>
+                        <div id="composite-draggers" class="mt-3">
+                            
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if($pagesDraggerRequired): ?>
+                        <div class="form-row-section1 pages-dragger-wrapper">
+                            <div class="s-row mb-3 pages-dragger">
+                                <label>Pages
+                                    <span class="help-circle" data-label="Pages" data-toggle="modal"
+                                        data-target="#helpModal">?</span>
+                                </label>
+                                <div class="page-slider">
+                                    <input type="range" name="pages[]" min="32" max="840" value="32" id="pageSlider">
+                                    <div class="range-value">
+                                        <button type="button">-</button>
+                                        <span id="pageValue">32</span>
+                                        <button type="button">+</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
+
                 </div>
                 
                 <?php $__currentLoopData = $otherGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -700,78 +712,105 @@
 </div>
 
 <script>
-    const quantityPricing = <?php echo json_encode($quantityPricing, 15, 512) ?>;
     const attributeConditions = <?php echo json_encode($conditionsMap, 15, 512) ?>;
+    const debouncedCalculateTotalPrice = debounce(calculateTotalPrice, 300);
+    const compositeMap = <?php echo json_encode($compositeMap ?? [], 15, 512) ?>;
+    const compositeDraggerValues = <?php echo json_encode($compositeDraggerValues ?? [], 15, 512) ?>;
 
-    // ========== UTILS ==========
-    function getBasePriceFromQuantity(quantity) {
-        let matched = null, maxRange = null;
-
-        quantityPricing.forEach((q) => {
-            if (!maxRange || q.quantity_to > maxRange.quantity_to) maxRange = q;
-            if (quantity >= q.quantity_from && quantity <= q.quantity_to) matched = q;
-        });
-
-        return parseFloat((matched || maxRange)?.base_price || 0);
+    function debounce(func, delay) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
     }
-
-
-    function getModifierAmount(price, modifier, base, type = 'amount') {
-        const parsedPrice = parseFloat(price || 0);
-        console.log('parsedPrice', parsedPrice);
-
-        if (type === 'percentage') {
-            const percentValue = (parsedPrice / 100) * base;
-            return modifier === 'multiply' ? base * percentValue : percentValue;
-        }
-
-        return modifier === 'multiply' ? base * parsedPrice : parsedPrice;
-    }
-
 
     function calculateTotalPrice() {
-        let quantity = parseInt($('#quantityInput').val()) || 1;
-        let base = getBasePriceFromQuantity(quantity);
-        let total = base;
+        const quantity = parseInt($('#quantityInput').val()) || 1;
+        // const pages = parseInt($('#pageSlider').val()) || 32;
 
-        // Collect all adjustments first
-        let adjustments = [];
+        let selectedAttributes = {};
 
         $('.attribute-wrapper .active').each(function () {
-            const price = parseFloat($(this).data('price') || 0);
-            const modifier = $(this).data('modifier') || 'add';
-            const baseType = $(this).data('base-type') || 'amount';
-
-            adjustments.push({ price, modifier, baseType });
+            const attrId = $(this).data('attribute-id');
+            const valueId = $(this).data('value-id');
+            if (attrId && valueId) selectedAttributes[attrId] = valueId;
         });
 
         $('select.custom-select').each(function () {
             const selected = $(this).find('option:selected');
-            const price = parseFloat(selected.data('price') || 0);
-            const modifier = selected.data('modifier') || 'add';
-            const baseType = selected.data('base-type') || 'amount';
-
-            adjustments.push({ price, modifier, baseType });
+            const attrId = selected.data('attribute-id');
+            const valueId = selected.data('value-id');
+            if (attrId && valueId) selectedAttributes[attrId] = valueId;
         });
 
-        // First add all fixed amounts
-        adjustments.forEach(({ price, modifier, baseType }) => {
-            if (baseType === 'amount') {
-                total += getModifierAmount(price, modifier, base);
+        let pages = 0;
+        let compositePages = {}; // { value_id: { 'Cover': 32, 'Inner': 64 } }
+
+        const $compositeSliders = $('.composite-slider');
+
+        if ($compositeSliders.length > 0) {
+            // Get selected composite value ID
+            let compositeValueId = null;
+
+
+            $('.attribute-wrapper .active').each(function () {
+                const valueId = $(this).data('value-id');
+                if (compositeMap[valueId]) {
+                    compositeValueId = valueId;
+                }
+            });
+
+            $('select.custom-select').each(function () {
+                const selected = $(this).find('option:selected');
+                const valueId = selected.data('value-id');
+                if (compositeMap[valueId]) {
+                    compositeValueId = valueId;
+                }
+            });
+            if (compositeValueId) {
+                const valueObj = compositeDraggerValues.find(val => val.id === compositeValueId);
+                const components = valueObj?.components || [];
+
+                let pageBreakdown = {};
+
+                $compositeSliders.each(function () {
+                    const index = parseInt($(this).data('index')); // 1-based index
+                    const label = components[index - 1] || `Part ${index}`;
+                    const value = parseInt($(this).val()) || 0;
+
+                    pageBreakdown[label] = value;
+                });
+
+                compositePages[compositeValueId] = pageBreakdown;
+                console.log('here', pageBreakdown);
+            }
+        } else {
+            pages = parseInt($('#pageSlider').val()) || 32;
+        }
+
+
+
+        $.ajax({
+            url: '<?php echo e(route('calculate.price')); ?>',
+            method: 'POST',
+            data: {
+                _token: '<?php echo e(csrf_token()); ?>',
+                quantity,
+                pages,
+                attributes: selectedAttributes,
+                composite_pages: compositePages
+            },
+            success: function (res) {
+                if (res.success) {
+                    $('.final-price').text(res.formatted_price);
+                }
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
             }
         });
-
-        // Then apply percentage charges on new total
-        adjustments.forEach(({ price, modifier, baseType }) => {
-            if (baseType === 'percentage') {
-                const percentValue = (price / 100) * total;
-                total += modifier === 'multiply' ? total * percentValue : percentValue;
-            }
-        });
-
-        $('.final-price').text(`£${total.toFixed(2)}`);
     }
-
 
     function handleAttributeConditions(selectedAttrId, selectedValueId) {
         $('.attribute-wrapper').removeClass('d-none');
@@ -810,52 +849,116 @@
         });
     }
 
-    // ========== INIT ==========
     $(function () {
-        // On quantity change
-        $('#quantityInput').on('input', calculateTotalPrice);
+        const compositeMap = <?php echo json_encode($compositeMap ?? [], 15, 512) ?>;
+        const compositeDraggerValues = <?php echo json_encode($compositeDraggerValues ?? [], 15, 512) ?>;
+
+        function renderCompositeDraggers(valueId) {
+            const count = compositeMap[valueId] ?? 0;
+            const valueObj = compositeDraggerValues.find(val => val.id === valueId);
+            const componentLabels = valueObj?.components || [];
+
+            const $container = $('#composite-draggers');
+            const $baseWrapper = $('.pages-dragger-wrapper');
+
+            if (count > 1) {
+                $baseWrapper.hide();
+            } else {
+                $baseWrapper.show();
+                $container.empty();
+                return;
+            }
+
+            $container.empty();
+            $container.find('.composite-slider').each(function () {
+                updateSliderFill(this); // apply fill on load
+            });
+
+
+            for (let i = 1; i <= count; i++) {
+                const label = componentLabels[i - 1] ? `Pages ${componentLabels[i - 1]}` : `Pages ${i}`;
+                $container.append(`
+                    <div class="form-row-section1">
+                        <div class="s-row mb-3">
+                            <label>${label}
+                                <span class="help-circle" data-label="${label}" data-toggle="modal"
+                                    data-target="#helpModal">?</span>
+                            </label>
+                            <div class="page-slider">
+                                <input type="range" name="composite_pages[]" min="32" max="840" value="32" class="composite-slider" data-index="${i}">
+                                <div class="range-value">
+                                    <button type="button" class="decrease">-</button>
+                                    <span class="composite-value">32</span>
+                                    <button type="button" class="increase">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }
+        }
+
+        function renderCompositeFromCurrentSelection() {
+            let compositeValueId = null;
+
+            $('.attribute-wrapper .active').each(function () {
+                const valueId = $(this).data('value-id');
+                if (compositeMap[valueId]) {
+                    compositeValueId = valueId;
+                }
+            });
+
+            $('select.custom-select').each(function () {
+                const selected = $(this).find('option:selected');
+                const valueId = selected.data('value-id');
+                if (compositeMap[valueId]) {
+                    compositeValueId = valueId;
+                }
+            });
+
+            if (compositeValueId) {
+                renderCompositeDraggers(compositeValueId);
+            } else {
+                $('#composite-draggers').empty();
+                $('.pages-dragger-wrapper').show();
+            }
+        }
 
         $(document).on('click', '.attr-select, .print-color, .choose-binding', function () {
             const $this = $(this);
             const $wrapper = $this.closest('.attribute-wrapper');
 
-            // If no wrapper found, skip
-            if (!$wrapper.length) return;
-
-            // Deactivate all other buttons in this group
             $wrapper.find('.attr-select, .print-color, .choose-binding')
                 .removeClass('active')
                 .removeAttr('data-selected');
 
-            // Activate current one
             $this.addClass('active').attr('data-selected', 'true');
 
             const attrId = $wrapper.data('attribute-id');
             const valueId = $this.data('value-id');
 
             handleAttributeConditions(attrId, valueId);
+            renderCompositeFromCurrentSelection();
             calculateTotalPrice();
         });
 
-
-
-
-        // On dropdown change
         $(document).on('change', 'select.custom-select', function () {
             const selected = $(this).find('option:selected');
             const attrId = selected.data('attribute-id');
             const valueId = selected.data('value-id');
+
             handleAttributeConditions(attrId, valueId);
+            renderCompositeFromCurrentSelection();
             calculateTotalPrice();
         });
 
-        // Group toggle visibility
+        $('#quantityInput').on('input', calculateTotalPrice);
+
         $(document).on('change', '.group-toggle', function () {
             const target = $(this).data('target');
             $(target).toggleClass('d-none', !$(this).is(':checked'));
         });
 
-        // Help circle popups
         $('.help-circle').on('click', function () {
             const label = $(this).data('label');
             const helpContent = {
@@ -873,28 +976,30 @@
             $('#helpModalBody').text(helpContent[label] || 'No help content available.');
         });
 
-        // Page slider
         const slider = document.getElementById('pageSlider');
         const valueDisplay = document.getElementById('pageValue');
         const decrementBtn = valueDisplay.previousElementSibling;
         const incrementBtn = valueDisplay.nextElementSibling;
 
-        function updateSliderFill() {
-            const percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
-            slider.style.setProperty('--value', `${percent}%`);
+        function updateSliderFill(sliderElement) {
+            const percent = ((sliderElement.value - sliderElement.min) / (sliderElement.max - sliderElement.min)) * 100;
+            sliderElement.style.setProperty('--value', `${percent}%`);
         }
 
-        slider.addEventListener('input', () => {
-            valueDisplay.textContent = slider.value;
-            updateSliderFill();
-        });
+
+        // slider.addEventListener('input', () => {
+        //     valueDisplay.textContent = slider.value;
+        //     updateSliderFill();
+        //     debouncedCalculateTotalPrice();
+        // });
 
         decrementBtn?.addEventListener('click', () => {
             let val = +slider.value;
             if (val > 32) {
                 slider.value = val - 1;
                 valueDisplay.textContent = slider.value;
-                updateSliderFill();
+                updateSliderFill(slider); // <-- updated here
+                debouncedCalculateTotalPrice();
             }
         });
 
@@ -903,25 +1008,89 @@
             if (val < 840) {
                 slider.value = val + 1;
                 valueDisplay.textContent = slider.value;
-                updateSliderFill();
+                updateSliderFill(slider); // <-- updated here
+                debouncedCalculateTotalPrice();
             }
         });
 
-        updateSliderFill();
 
-        // Add to cart button
+        $(document).on('input', '#pageSlider', function () {
+            const val = $(this).val();
+            $(this).next('.range-value').find('#page-value').text(val);
+            updateSliderFill(this); // <-- new addition
+            debouncedCalculateTotalPrice();
+        });
+
+        $(document).on('input', '.composite-slider', function () {
+            const val = $(this).val();
+            $(this).next('.range-value').find('.composite-value').text(val);
+            updateSliderFill(this); // <-- new addition
+            debouncedCalculateTotalPrice();
+        });
+
+        $(document).on('click', '.increase', function () {
+            const $slider = $(this).closest('.range-value').prev('input.composite-slider');
+            let current = +$slider.val();
+            if (current < 840) {
+                $slider.val(current + 1).trigger('input');
+                updateSliderFill($slider[0]); // <-- new
+            }
+        });
+
+        $(document).on('click', '.decrease', function () {
+            const $slider = $(this).closest('.range-value').prev('input.composite-slider');
+            let current = +$slider.val();
+            if (current > 32) {
+                $slider.val(current - 1).trigger('input');
+                updateSliderFill($slider[0]); // <-- new
+            }
+        });
+
+
+
         $('#addToCartBtn').on('click', function () {
+            let isValid = true;
+            let missingFields = [];
+
+            $('.attribute-wrapper').each(function () {
+                const $wrapper = $(this);
+                const isRequired = $wrapper.data('is-required');
+
+                if (isRequired) {
+                    const hasActive = $wrapper.find('.attr-select.active, .print-color.active, .choose-binding.active').length > 0;
+                    const hasSelect = $wrapper.find('select.custom-select option:selected').filter(function () {
+                        return $(this).val() !== '';
+                    }).length > 0;
+
+                    if (!hasActive && !hasSelect) {
+                        isValid = false;
+
+                        const label = $wrapper.find('label').clone().children().remove().end().text().trim();
+                        missingFields.push(label || 'Required attribute');
+                    }
+                }
+            });
+
+            if (!isValid) {
+                alert(`Please select the following required options:\n- ${missingFields.join('\n- ')}`);
+                return;
+            }
+
             const route = $(this).data('route');
             if (route) window.location.href = route;
         });
 
-        // Initial condition/price evaluation
+        updateSliderFill();
+
         calculateTotalPrice();
+        renderCompositeFromCurrentSelection();
+
         $('.attribute-wrapper .active').each(function () {
             const attrId = $(this).data('attribute-id');
             const valueId = $(this).data('value-id');
             handleAttributeConditions(attrId, valueId);
         });
+
         $('select.custom-select').each(function () {
             const selected = $(this).find('option:selected');
             const attrId = selected.data('attribute-id');

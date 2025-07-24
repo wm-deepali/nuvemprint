@@ -6,7 +6,8 @@
 
 {{-- ========== RADIO WITH IMAGE ========== --}}
 @if ($inputType === 'radio' && $supportImage)
-    <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="{{ $attribute['id'] }}">
+    <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="{{ $attribute['id'] }}"
+        data-is-required="{{ $attribute['is_required'] }}">
         <label class="form-label d-flex align-items-center" style="gap: 5px;">
             {{ $attribute['name'] }}
             <span class="help-circle" data-label="{{ $attribute['name'] }}" data-toggle="modal"
@@ -19,8 +20,6 @@
                         <button type="button"
                             class="btn btn-light radio-button text-start {{ $value['is_default'] ? 'active' : '' }}"
                             data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
-                            data-price="{{ $value['price'] }}" data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}"
-                            data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}"
                             data-image="{{ asset('storage/' . ($value['image_path'] ?? 'default-preview.png')) }}" {{ $value['is_default'] ? 'data-selected=true' : '' }}>
                             {{ $value['value'] }}
                         </button>
@@ -46,7 +45,7 @@
     {{-- ========== PLAIN RADIO ========== --}}
 @elseif ($inputType === 'radio')
     <div class="{{ in_array($attribute['name'], ['Paper Weight', 'Cover Paper Weight']) ? 'col-md-12 attribute-wrapper' : 'col-md-6 attribute-wrapper' }} mb-3"
-        data-attribute-id="{{ $attribute['id'] }}">
+        data-attribute-id="{{ $attribute['id'] }}" data-is-required="{{ $attribute['is_required'] }}">
         <label class="form-label d-flex align-items-center" style="gap: 5px;">
             {{ $attribute['name'] }}
             <span class="help-circle" data-label="{{ $attribute['name'] }}" data-toggle="modal"
@@ -54,10 +53,8 @@
         </label>
         <div class="attribute-values {{ count($values) <= 4 ? 'color-print' : 'color-print1' }}">
             @foreach ($values as $value)
-                <div class="print-color {{ $value['is_default'] ? 'active' : '' }}" data-price="{{ $value['price'] }}"
-                    data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
-                    data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}"
-                    data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}" data-value="{{ $value['value'] }}">
+                <div class="print-color {{ $value['is_default'] ? 'active' : '' }}" data-attribute-id="{{ $attribute['id'] }}"
+                    data-value-id="{{ $value['id'] }}" data-value="{{ $value['value'] }}">
                     <p>{{ $value['value'] }}</p>
                 </div>
             @endforeach
@@ -66,7 +63,8 @@
 
     {{-- ========== SELECT WITH IMAGES ========== --}}
 @elseif ($inputType === 'select_image')
-    <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="{{ $attribute['id'] }}">
+    <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="{{ $attribute['id'] }}"
+        data-is-required="{{ $attribute['is_required'] }}">
         <label class="form-label d-flex align-items-center" style="gap: 5px;">
             {{ $attribute['name'] }}
             <span class="help-circle" data-label="{{ $attribute['name'] }}" data-toggle="modal"
@@ -75,9 +73,7 @@
         <div class="attribute-value color-print1">
             @foreach ($values as $value)
                 <div class="choose-binding {{ $value['is_default'] ? 'active' : '' }}" data-value="{{ $value['value'] }}"
-                    data-price="{{ $value['price'] }}" data-attribute-id="{{ $attribute['id'] }}"
-                    data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}" data-value-id="{{ $value['id'] }}"
-                    data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}">
+                    data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}">
                     <div>
                         <img src="{{ asset('storage/' . ($value['image_path'] ?? 'default.png')) }}"
                             alt="{{ $value['value'] }}" />
@@ -95,7 +91,8 @@
 
     {{-- ========== DROPDOWN SELECT ========== --}}
 @elseif ($inputType === 'dropdown')
-    <div class="attribute-wrapper col-md-6 mb-3" data-attribute-id="{{ $attribute['id'] }}">
+    <div class="attribute-wrapper col-md-6 mb-3" data-attribute-id="{{ $attribute['id'] }}"
+        data-is-required="{{ $attribute['is_required'] }}">
         <div class="d-flex justify-content-between size-btn">
             <label class="form-label d-flex align-items-center" style="gap: 5px;">
                 {{ $attribute['name'] }}
@@ -106,14 +103,15 @@
         </div>
         <div class="attribute-values">
             <select class="custom-select" id="dropdown_{{ $attribute['id'] }}" name="attributes[{{ $attribute['id'] }}]">
+                <option value="">-- Select --</option>
                 @foreach ($values as $value)
-                    <option value="{{ $value['value'] }}" data-price="{{ $value['price'] }}"
-                        data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
-                        data-base-type="{{ $value['base_charges_type'] ?? 'amount' }}"
-                        data-modifier="{{ $value['price_modifier_type'] ?? 'add' }}" {{ $value['is_default'] ? 'selected' : '' }}> {{ $value['value'] }}
+                    <option value="{{ $value['value'] }}" data-attribute-id="{{ $attribute['id'] }}"
+                        data-value-id="{{ $value['id'] }}" {{ $value['is_default'] ? 'selected' : '' }}>
+                        {{ $value['value'] }}
                     </option>
                 @endforeach
             </select>
+
         </div>
     </div>
 @endif
