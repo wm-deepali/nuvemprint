@@ -33,7 +33,10 @@ class SiteController extends Controller
 
         $subcategoryId = $subcategory->id;
 
+        $defaultQuantity = PricingRule::where('subcategory_id', $subcategoryId)->value('default_quantity');
         $pagesDraggerRequired = PricingRule::where('subcategory_id', $subcategoryId)->value('pages_dragger_required');
+        $defaultPages = PricingRule::where('subcategory_id', $subcategoryId)->value('default_pages');
+
         // Set the dragger attribute ID only if required
         $pagesDraggerAttributeId = null;
         if ($pagesDraggerRequired) {
@@ -64,6 +67,49 @@ class SiteController extends Controller
         }
 
         // dd($compositeDraggerValues);
+
+
+        $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
+        // Get all attributes with quantity ranges
+        $attributesWithRanges = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)
+            ->with('quantityRanges') // eager load
+            ->get();
+        $attributeQuantityRanges = [];
+
+        foreach ($attributesWithRanges as $attribute) {
+            $basis = $attribute->attribute->pricing_basis ?? null;
+
+            if ($basis !== 'per_page') {
+                continue;
+            }
+
+            $valueId = $attribute->value_id;
+            $dependency = $attribute->dependencies->first();
+            $key = $dependency ? $dependency->parent_value_id : 'default';
+
+            $minFrom = null;
+            $maxTo = null;
+
+            foreach ($attribute->quantityRanges as $range) {
+                if (is_null($minFrom) || $range->quantity_from < $minFrom) {
+                    $minFrom = $range->quantity_from;
+                }
+
+                if (is_null($maxTo) || $range->quantity_to > $maxTo) {
+                    $maxTo = $range->quantity_to;
+                }
+            }
+
+            if (!is_null($minFrom) && !is_null($maxTo)) {
+                $attributeQuantityRanges[$valueId][$key] = [
+                    'min' => $minFrom,
+                    'max' => $maxTo,
+                ];
+            }
+        }
+
+
+        // dd($attributeQuantityRanges);
 
         $attributeValues = \App\Models\SubcategoryAttributeValue::with('value')
             ->where('subcategory_id', $subcategoryId)
@@ -97,9 +143,16 @@ class SiteController extends Controller
                 'values' => $values->map(function ($sav) use ($attribute) {
                     $valueId = $sav->value->id;
 
-                    $isDefault = PricingRuleAttribute::where('attribute_id', $attribute->id)
-                        ->where('value_id', $valueId)
+                    $isDefault = PricingRuleAttribute::where(function ($q) use ($attribute, $valueId) {
+                        $q->where('attribute_id', $attribute->id)
+                            ->where('value_id', $valueId);
+                    })
+                        ->orWhereHas('dependencies', function ($q) use ($attribute, $valueId) {
+                            $q->where('parent_attribute_id', $attribute->id)
+                                ->where('parent_value_id', $valueId);
+                        })
                         ->value('is_default');
+
 
                     return [
                         'id' => $valueId,
@@ -183,7 +236,10 @@ class SiteController extends Controller
             'pagesDraggerRequired',
             'pagesDraggerAttributeId',
             'compositeDraggerValues',
-            'compositeMap'
+            'compositeMap',
+            'defaultQuantity',
+            'defaultPages',
+            'attributeQuantityRanges'
         ));
     }
 

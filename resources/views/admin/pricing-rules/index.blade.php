@@ -42,6 +42,7 @@
               <th>ID</th>
               <th>Subcategory</th>
               <th>Pages Dragger</th>
+              <th>Default Qty</th>
               <th>Attributes</th>
               <th>Actions</th>
             </tr>
@@ -49,41 +50,50 @@
             <tbody>
             @forelse ($rules as $rule)
           <tr>
+
             <td>{{ $rule->id }}</td>
+
             <td>
             {{ $rule->subcategory->name ?? '-' }}<br>
             <small>Cat: {{ $rule->category->name ?? '-' }}</small>
             </td>
+
             <td>
             @if ($rule->pages_dragger_required)
           <div class="mb-1">
             <div class="small text-muted ml-1">
             Required: <strong class="text-success">Yes</strong><br>
+
             @php
           $depAttr = $dependencyAttrs[$rule->pages_dragger_dependency] ?? null;
           @endphp
+
             @if ($depAttr)
-          Depends on Attribute: <strong>{{ $depAttr->name }}</strong>
+          Depends on Attribute: <strong>{{ $depAttr->name }}</strong><br>
           @else
-          <em class="text-danger">Invalid Dependency</em>
+          <em class="text-danger">Invalid Dependency</em><br>
           @endif
+
+            Default Pages: <strong>{{ $rule->default_pages ?? '-' }}</strong>
             </div>
           </div>
+        @else
+          <span class="text-muted">No</span>
         @endif
-
             </td>
+
+            <td>{{ $rule->default_quantity ?? '-' }}</td>
+
             <td>
             @forelse ($rule->attributes as $attr)
           <div class="mb-1">
             <div>
             <strong>{{ $attr->attribute->name ?? '-' }}</strong>:
             {{ $attr->value->value ?? '-' }}
-
             @if($attr->is_default)
           <span class="badge badge-pill badge-primary ml-1" title="Default value">Default</span>
           @endif
             </div>
-
             {{-- Price Modifier --}}
             <div class="small text-muted ml-1">
             <em>
@@ -136,15 +146,12 @@
           ₹{{ rtrim(rtrim(number_format($attr->fixed_per_page_price, 4, '.', ''), '0'), '.') }}
           </div>
           @endif
-
           </div>
-
         @empty
           <span class="text-muted">No Modifiers</span>
         @endforelse
-
-
             </td>
+
             <td>
             <a href="{{ route('admin.pricing-rules.edit', $rule->id) }}" class="btn btn-sm btn-primary">
             <i class="fas fa-edit"></i> Edit
@@ -153,6 +160,7 @@
             <i class="fas fa-trash"></i> Delete
             </button>
             </td>
+
 
           </tr>
         @empty

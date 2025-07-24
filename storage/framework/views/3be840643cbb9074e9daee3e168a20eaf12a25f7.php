@@ -42,6 +42,7 @@
               <th>ID</th>
               <th>Subcategory</th>
               <th>Pages Dragger</th>
+              <th>Default Qty</th>
               <th>Attributes</th>
               <th>Actions</th>
             </tr>
@@ -49,29 +50,40 @@
             <tbody>
             <?php $__empty_1 = true; $__currentLoopData = $rules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
           <tr>
+
             <td><?php echo e($rule->id); ?></td>
+
             <td>
             <?php echo e($rule->subcategory->name ?? '-'); ?><br>
             <small>Cat: <?php echo e($rule->category->name ?? '-'); ?></small>
             </td>
+
             <td>
             <?php if($rule->pages_dragger_required): ?>
           <div class="mb-1">
             <div class="small text-muted ml-1">
             Required: <strong class="text-success">Yes</strong><br>
+
             <?php
           $depAttr = $dependencyAttrs[$rule->pages_dragger_dependency] ?? null;
           ?>
+
             <?php if($depAttr): ?>
-          Depends on Attribute: <strong><?php echo e($depAttr->name); ?></strong>
+          Depends on Attribute: <strong><?php echo e($depAttr->name); ?></strong><br>
           <?php else: ?>
-          <em class="text-danger">Invalid Dependency</em>
+          <em class="text-danger">Invalid Dependency</em><br>
           <?php endif; ?>
+
+            Default Pages: <strong><?php echo e($rule->default_pages ?? '-'); ?></strong>
             </div>
           </div>
+        <?php else: ?>
+          <span class="text-muted">No</span>
         <?php endif; ?>
-
             </td>
+
+            <td><?php echo e($rule->default_quantity ?? '-'); ?></td>
+
             <td>
             <?php $__empty_2 = true; $__currentLoopData = $rule->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
           <div class="mb-1">
@@ -79,12 +91,10 @@
             <strong><?php echo e($attr->attribute->name ?? '-'); ?></strong>:
             <?php echo e($attr->value->value ?? '-'); ?>
 
-
             <?php if($attr->is_default): ?>
           <span class="badge badge-pill badge-primary ml-1" title="Default value">Default</span>
           <?php endif; ?>
             </div>
-
             
             <div class="small text-muted ml-1">
             <em>
@@ -145,15 +155,12 @@
 
           </div>
           <?php endif; ?>
-
           </div>
-
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
           <span class="text-muted">No Modifiers</span>
         <?php endif; ?>
-
-
             </td>
+
             <td>
             <a href="<?php echo e(route('admin.pricing-rules.edit', $rule->id)); ?>" class="btn btn-sm btn-primary">
             <i class="fas fa-edit"></i> Edit
@@ -162,6 +169,7 @@
             <i class="fas fa-trash"></i> Delete
             </button>
             </td>
+
 
           </tr>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

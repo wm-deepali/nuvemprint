@@ -15,6 +15,7 @@ use App\Models\SubcategoryAttributeValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\PricingRuleAttributeDependency;
+use Illuminate\Validation\Rule;
 
 class PricingRuleController extends Controller
 {
@@ -56,6 +57,13 @@ class PricingRuleController extends Controller
             'subcategory_id' => 'required|exists:subcategories,id',
             'pages_dragger_required' => 'nullable',
             'pages_dragger_dependency' => 'nullable|numeric',
+            'default_quantity' => 'required|integer|min:1',
+            'default_pages' => [
+                'nullable',
+                'integer',
+                'min:1',
+                Rule::requiredIf($request->pages_dragger_required == 'on'),
+            ],
 
             'rows' => 'array',
             'rows.*.attribute_id' => 'required|exists:attributes,id',
@@ -85,6 +93,8 @@ class PricingRuleController extends Controller
                 'subcategory_id' => $request->subcategory_id,
                 'pages_dragger_required' => $request->has('pages_dragger_required') ? 1 : 0,
                 'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null, // Add this line
+                'default_quantity' => $request->default_quantity ?? null,
+                'default_pages' => $request->default_pages ?? null,
             ]);
 
 
@@ -195,6 +205,13 @@ class PricingRuleController extends Controller
             'subcategory_id' => 'required|exists:subcategories,id',
             'pages_dragger_required' => 'nullable|boolean',
             'pages_dragger_dependency' => 'nullable|numeric',
+            'default_quantity' => 'required|integer|min:1',
+            'default_pages' => [
+                'nullable',
+                'integer',
+                'min:1',
+                Rule::requiredIf($request->pages_dragger_required == '1'),
+            ],
 
             'rows' => 'nullable|array',
             'rows.*.id' => 'nullable|exists:pricing_rule_attributes,id',
@@ -225,6 +242,8 @@ class PricingRuleController extends Controller
                 'subcategory_id' => $request->subcategory_id,
                 'pages_dragger_required' => isset($request->pages_dragger_required) && $request->pages_dragger_required ? 1 : 0,
                 'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null,
+                'default_quantity' => $request->default_quantity ?? null,
+                'default_pages' => $request->default_pages ?? null,
             ]);
 
 

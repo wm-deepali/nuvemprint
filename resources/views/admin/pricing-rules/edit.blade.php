@@ -71,11 +71,18 @@
                                     <div class="form-control-plaintext">{{ $pricingRule->subcategory->name }}</div>
                                     <input type="hidden" name="subcategory_id" value="{{ $pricingRule->subcategory_id }}">
                                 </div>
+
+                                <div class="form-group col-md-3">
+                                    <label for="default_quantity">Default Quantity</label>
+                                    <input type="number" name="default_quantity" id="default_quantity" class="form-control"
+                                    placeholder="e.g. 1" min="1"  value="{{ $pricingRule->default_quantity }}">
+                                </div>
+                            </div>
+                            <div class="form-row" id="pages-dragger-checkbox-wrapper" >
                                 <div class="form-group col-md-3">
                                     <label>
                                         <input type="checkbox" name="pages_dragger_required" value="1"
-                                            id="pages-dragger-checkbox" {{ $pricingRule->pages_dragger_required ? 'checked' : '' }}>
-                                        Enable Pages Dragger Dependency
+                                            id="pages-dragger-checkbox" {{ $pricingRule->pages_dragger_required ? 'checked' : '' }}> Enable Pages Dragger Dependency
                                     </label>
                                 </div>
 
@@ -95,6 +102,11 @@
                                     </select>
                                 </div>
 
+                                <div class="form-group col-md-3" id="default-pages-group"  style="{{ $pricingRule->pages_dragger_required ? '' : 'display:none;' }}">
+                                    <label for="default_pages">Default Number of Pages</label>
+                                    <input type="number" id="default_pages" name="default_pages" class="form-control" placeholder="e.g. 1"
+                                    min="1"   value="{{ $pricingRule->default_pages }}">
+                                </div>
                             </div>
 
                             <hr>
@@ -123,8 +135,7 @@
                                             </label>
                                             <select class="form-control" name="rows[{{ $index }}][attribute_id]">
                                                 @foreach($subcategoryAttributes as $attr)
-                                                    <option value="{{ $attr['id'] }}" {{ $attr['id'] == $mod->attribute_id ? 'selected' : '' }}> {{ $attr['name'] }}
-                                                    </option>
+                                                    <option value="{{ $attr['id'] }}" {{ $attr['id'] == $mod->attribute_id ? 'selected' : '' }}> {{ $attr['name'] }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -140,8 +151,7 @@
                                                 data-selected="{{ $mod->value_id }}"
                                                 data-dependencies='@json($selectedDepValues)'>
                                                 @foreach($selectedAttr->values ?? [] as $val)
-                                                    <option value="{{ $val['id'] }}" {{ $val['id'] == $mod->value_id ? 'selected' : '' }}> {{ $val['value'] }}
-                                                    </option>
+                                                    <option value="{{ $val['id'] }}" {{ $val['id'] == $mod->value_id ? 'selected' : '' }}> {{ $val['value'] }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -166,8 +176,7 @@
                                                     name="rows[{{ $index }}][base_charges_type]" style="max-width: 100px;">
                                                     <option value="">Select Type</option>
                                                     <option value="amount" {{ $mod->base_charges_type === 'amount' ? 'selected' : '' }}>Amount</option>
-                                                    <option value="percentage" {{ $mod->base_charges_type === 'percentage' ? 'selected' : '' }}>%</option>
-                                                </select>
+                                                    <option value="percentage" {{ $mod->base_charges_type === 'percentage' ? 'selected' : '' }}>%</option></select>
                                             </div>
                                         </div>
 
@@ -198,8 +207,7 @@
                                         <div class="form-group col-md-1 d-flex align-items-center justify-content-center mt-2">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="default_{{ $index }}"
-                                                    name="rows[{{ $index }}][is_default]" value="1" {{ $mod->is_default ? 'checked' : '' }}>
-                                                <label class="custom-control-label" for="default_{{ $index }}"
+                                                    name="rows[{{ $index }}][is_default]" value="1" {{ $mod->is_default ? 'checked' : '' }}><label class="custom-control-label" for="default_{{ $index }}"
                                                     title="Mark this value as default">
                                                     Default
                                                 </label>
@@ -265,7 +273,6 @@
             const attrOptions = subcategoryAttributes.map(attr => `<option value="${attr.id}">${attr.name}</option>`).join('');
             const defaultValues = subcategoryAttributes[0]?.values || [];
             const valueOptions = defaultValues.map(val => `<option value="${val.id}">${val.value}</option>`).join('');
-
             const row = document.createElement('div');
             row.className = 'form-row attribute-row border rounded p-2 mb-2 position-relative';
             row.dataset.index = index;
@@ -381,7 +388,7 @@
             });
         }
 
-        function handleAttributeChange(row) {
+       function handleAttributeChange(row, isInitial = false) {
             const attributeSelect = row.querySelector('select[name*="[attribute_id]"]');
             const attrId = attributeSelect?.value;
             const selectedAttr = subcategoryAttributes.find(attr => attr.id == attrId);
@@ -446,12 +453,23 @@
             }
 
             // Per Page Pricing
-            const perPageSection = row.querySelector('.per-page-container');
-            if (['per_page', 'per_product'].includes(selectedAttr?.pricing_basis)) {
-                perPageSection.style.display = 'none'; // Start hidden, toggle to show
-            } else {
-                perPageSection.style.display = 'none';
-            }
+         const perPageSection = row.querySelector('.per-page-container');
+    const toggleButton = row.querySelector('.toggle-pricing');
+
+    if (['per_page', 'per_product'].includes(selectedAttr?.pricing_basis)) {
+        // Only show directly if it's a newly added row
+        if (!isInitial) {
+            perPageSection.style.display = 'block';
+            if (toggleButton) toggleButton.textContent = '- ';
+        } else {
+            // Keep hidden but allow toggling
+            perPageSection.style.display = 'none';
+            if (toggleButton) toggleButton.textContent = '+ ';
+        }
+    } else {
+        perPageSection.style.display = 'none';
+        if (toggleButton) toggleButton.textContent = '+ ';
+    }
 
             const extraCopySection = row.querySelector('.extra-copy-group');
             const modifierGroup = row.querySelector('.modifier-type-group');
@@ -472,6 +490,7 @@
                 const nextIndex = container.querySelectorAll('.attribute-row').length;
                 const row = createAttributeRow(nextIndex);
                 container.appendChild(row);
+                
                 updateButtons('#attribute-modifier-container', 'attribute-row', 'add-modifier', 'remove-modifier', '.modifier-buttons');
             }
             if (e.target.classList.contains('remove-modifier')) {
@@ -556,12 +575,15 @@
 
         document.getElementById('pages-dragger-checkbox').addEventListener('change', function () {
             const dependencyGroup = document.getElementById('pages-dragger-dependency-group');
+              const PageGroup = document.getElementById('default-pages-group');
             if (this.checked) {
                 dependencyGroup.style.display = 'block';
+                 PageGroup.style.display = 'block';
 
                 // Fill attribute options if needed dynamically (optional since already loaded in Blade)
             } else {
                 dependencyGroup.style.display = 'none';
+                 PageGroup.style.display = 'none';
                 document.getElementById('pages-dragger-dependency').value = '';
             }
         });
@@ -570,7 +592,7 @@
             updateButtons('#attribute-modifier-container', 'attribute-row', 'add-modifier', 'remove-modifier', '.modifier-buttons');
 
             document.querySelectorAll('.attribute-row').forEach(row => {
-                handleAttributeChange(row);
+                handleAttributeChange(row, true);
             });
         });
     </script>

@@ -13,7 +13,9 @@ class PricingRule extends Model
         'category_id',
         'subcategory_id',
         'pages_dragger_required',
-        'pages_dragger_dependency'
+        'pages_dragger_dependency',
+        'default_quantity',
+        'default_pages',
     ];
 
     public function category()

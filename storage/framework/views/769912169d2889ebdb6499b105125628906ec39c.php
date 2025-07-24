@@ -71,11 +71,18 @@
                                     <div class="form-control-plaintext"><?php echo e($pricingRule->subcategory->name); ?></div>
                                     <input type="hidden" name="subcategory_id" value="<?php echo e($pricingRule->subcategory_id); ?>">
                                 </div>
+
+                                <div class="form-group col-md-3">
+                                    <label for="default_quantity">Default Quantity</label>
+                                    <input type="number" name="default_quantity" id="default_quantity" class="form-control"
+                                    placeholder="e.g. 1" min="1"  value="<?php echo e($pricingRule->default_quantity); ?>">
+                                </div>
+                            </div>
+                            <div class="form-row" id="pages-dragger-checkbox-wrapper" >
                                 <div class="form-group col-md-3">
                                     <label>
                                         <input type="checkbox" name="pages_dragger_required" value="1"
-                                            id="pages-dragger-checkbox" <?php echo e($pricingRule->pages_dragger_required ? 'checked' : ''); ?>>
-                                        Enable Pages Dragger Dependency
+                                            id="pages-dragger-checkbox" <?php echo e($pricingRule->pages_dragger_required ? 'checked' : ''); ?>> Enable Pages Dragger Dependency
                                     </label>
                                 </div>
 
@@ -96,6 +103,11 @@
                                     </select>
                                 </div>
 
+                                <div class="form-group col-md-3" id="default-pages-group"  style="<?php echo e($pricingRule->pages_dragger_required ? '' : 'display:none;'); ?>">
+                                    <label for="default_pages">Default Number of Pages</label>
+                                    <input type="number" id="default_pages" name="default_pages" class="form-control" placeholder="e.g. 1"
+                                    min="1"   value="<?php echo e($pricingRule->default_pages); ?>">
+                                </div>
                             </div>
 
                             <hr>
@@ -124,9 +136,7 @@
                                             </label>
                                             <select class="form-control" name="rows[<?php echo e($index); ?>][attribute_id]">
                                                 <?php $__currentLoopData = $subcategoryAttributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($attr['id']); ?>" <?php echo e($attr['id'] == $mod->attribute_id ? 'selected' : ''); ?>> <?php echo e($attr['name']); ?>
-
-                                                    </option>
+                                                    <option value="<?php echo e($attr['id']); ?>" <?php echo e($attr['id'] == $mod->attribute_id ? 'selected' : ''); ?>> <?php echo e($attr['name']); ?></option>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
@@ -142,9 +152,7 @@
                                                 data-selected="<?php echo e($mod->value_id); ?>"
                                                 data-dependencies='<?php echo json_encode($selectedDepValues, 15, 512) ?>'>
                                                 <?php $__currentLoopData = $selectedAttr->values ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($val['id']); ?>" <?php echo e($val['id'] == $mod->value_id ? 'selected' : ''); ?>> <?php echo e($val['value']); ?>
-
-                                                    </option>
+                                                    <option value="<?php echo e($val['id']); ?>" <?php echo e($val['id'] == $mod->value_id ? 'selected' : ''); ?>> <?php echo e($val['value']); ?></option>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </select>
                                         </div>
@@ -169,8 +177,7 @@
                                                     name="rows[<?php echo e($index); ?>][base_charges_type]" style="max-width: 100px;">
                                                     <option value="">Select Type</option>
                                                     <option value="amount" <?php echo e($mod->base_charges_type === 'amount' ? 'selected' : ''); ?>>Amount</option>
-                                                    <option value="percentage" <?php echo e($mod->base_charges_type === 'percentage' ? 'selected' : ''); ?>>%</option>
-                                                </select>
+                                                    <option value="percentage" <?php echo e($mod->base_charges_type === 'percentage' ? 'selected' : ''); ?>>%</option></select>
                                             </div>
                                         </div>
 
@@ -201,8 +208,7 @@
                                         <div class="form-group col-md-1 d-flex align-items-center justify-content-center mt-2">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="default_<?php echo e($index); ?>"
-                                                    name="rows[<?php echo e($index); ?>][is_default]" value="1" <?php echo e($mod->is_default ? 'checked' : ''); ?>>
-                                                <label class="custom-control-label" for="default_<?php echo e($index); ?>"
+                                                    name="rows[<?php echo e($index); ?>][is_default]" value="1" <?php echo e($mod->is_default ? 'checked' : ''); ?>><label class="custom-control-label" for="default_<?php echo e($index); ?>"
                                                     title="Mark this value as default">
                                                     Default
                                                 </label>
@@ -268,7 +274,6 @@
             const attrOptions = subcategoryAttributes.map(attr => `<option value="${attr.id}">${attr.name}</option>`).join('');
             const defaultValues = subcategoryAttributes[0]?.values || [];
             const valueOptions = defaultValues.map(val => `<option value="${val.id}">${val.value}</option>`).join('');
-
             const row = document.createElement('div');
             row.className = 'form-row attribute-row border rounded p-2 mb-2 position-relative';
             row.dataset.index = index;
@@ -384,7 +389,7 @@
             });
         }
 
-        function handleAttributeChange(row) {
+       function handleAttributeChange(row, isInitial = false) {
             const attributeSelect = row.querySelector('select[name*="[attribute_id]"]');
             const attrId = attributeSelect?.value;
             const selectedAttr = subcategoryAttributes.find(attr => attr.id == attrId);
@@ -449,12 +454,23 @@
             }
 
             // Per Page Pricing
-            const perPageSection = row.querySelector('.per-page-container');
-            if (['per_page', 'per_product'].includes(selectedAttr?.pricing_basis)) {
-                perPageSection.style.display = 'none'; // Start hidden, toggle to show
-            } else {
-                perPageSection.style.display = 'none';
-            }
+         const perPageSection = row.querySelector('.per-page-container');
+    const toggleButton = row.querySelector('.toggle-pricing');
+
+    if (['per_page', 'per_product'].includes(selectedAttr?.pricing_basis)) {
+        // Only show directly if it's a newly added row
+        if (!isInitial) {
+            perPageSection.style.display = 'block';
+            if (toggleButton) toggleButton.textContent = '- ';
+        } else {
+            // Keep hidden but allow toggling
+            perPageSection.style.display = 'none';
+            if (toggleButton) toggleButton.textContent = '+ ';
+        }
+    } else {
+        perPageSection.style.display = 'none';
+        if (toggleButton) toggleButton.textContent = '+ ';
+    }
 
             const extraCopySection = row.querySelector('.extra-copy-group');
             const modifierGroup = row.querySelector('.modifier-type-group');
@@ -475,6 +491,7 @@
                 const nextIndex = container.querySelectorAll('.attribute-row').length;
                 const row = createAttributeRow(nextIndex);
                 container.appendChild(row);
+                
                 updateButtons('#attribute-modifier-container', 'attribute-row', 'add-modifier', 'remove-modifier', '.modifier-buttons');
             }
             if (e.target.classList.contains('remove-modifier')) {
@@ -559,12 +576,15 @@
 
         document.getElementById('pages-dragger-checkbox').addEventListener('change', function () {
             const dependencyGroup = document.getElementById('pages-dragger-dependency-group');
+              const PageGroup = document.getElementById('default-pages-group');
             if (this.checked) {
                 dependencyGroup.style.display = 'block';
+                 PageGroup.style.display = 'block';
 
                 // Fill attribute options if needed dynamically (optional since already loaded in Blade)
             } else {
                 dependencyGroup.style.display = 'none';
+                 PageGroup.style.display = 'none';
                 document.getElementById('pages-dragger-dependency').value = '';
             }
         });
@@ -573,7 +593,7 @@
             updateButtons('#attribute-modifier-container', 'attribute-row', 'add-modifier', 'remove-modifier', '.modifier-buttons');
 
             document.querySelectorAll('.attribute-row').forEach(row => {
-                handleAttributeChange(row);
+                handleAttributeChange(row, true);
             });
         });
     </script>

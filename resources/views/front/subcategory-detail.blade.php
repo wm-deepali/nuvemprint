@@ -128,15 +128,7 @@ Nuvem Prints
 				</div>
 		</div>
 		<div class="container py-5">
-@include('front.calculator', 
-[
-    'subcategory' => $subcategory,
-    'attributeGroups' => $attributeGroups,
-	'conditionsMap' => $conditionsMap,
-    'pagesDraggerRequired'=> $pagesDraggerRequired,
-	'pagesDraggerAttributeId' => $pagesDraggerAttributeId,
-	'compositeMap' => $compositeMap,
-])
+@include('front.calculator')
 
     <div class="tab-container">
        <div class="tab-buttons">

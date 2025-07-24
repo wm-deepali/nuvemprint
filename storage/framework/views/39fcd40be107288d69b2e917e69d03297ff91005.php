@@ -128,15 +128,7 @@ Nuvem Prints
 				</div>
 		</div>
 		<div class="container py-5">
-<?php echo $__env->make('front.calculator', 
-[
-    'subcategory' => $subcategory,
-    'attributeGroups' => $attributeGroups,
-	'conditionsMap' => $conditionsMap,
-    'pagesDraggerRequired'=> $pagesDraggerRequired,
-	'pagesDraggerAttributeId' => $pagesDraggerAttributeId,
-	'compositeMap' => $compositeMap,
-], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<?php echo $__env->make('front.calculator', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <div class="tab-container">
        <div class="tab-buttons">

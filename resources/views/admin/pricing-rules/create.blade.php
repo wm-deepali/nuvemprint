@@ -41,6 +41,7 @@
         @endforeach
           </select>
           </div>
+
           <div class="form-group col-md-3">
           <label>Subcategory</label>
           <select class="form-control" id="subcategory-select" name="subcategory_id" required>
@@ -48,12 +49,25 @@
           </select>
           </div>
 
-          <div class="form-group col-md-3" id="pages-dragger-checkbox-wrapper" style="display: none;">
+          <div class="form-group col-md-3">
+          <label for="default_quantity">Default Quantity</label>
+          <input type="number" name="default_quantity" id="default_quantity" class="form-control"
+            placeholder="e.g. 1" min="1">
+          </div>
+        </div>
+
+        <!-- New row just for the checkbox -->
+        <div class="form-row" id="pages-dragger-checkbox-wrapper" style="display: none;">
+          <div class="form-group col-md-3">
           <label>
             <input type="checkbox" id="pages-dragger-checkbox" name="pages_dragger_required">
             Number of Pages Dragger Required
           </label>
           </div>
+        </div>
+
+        <!-- Another row for dependency and default pages -->
+        <div class="form-row">
           <div class="form-group col-md-3" id="pages-dragger-dependency-group" style="display: none;">
           <label for="pages-dragger-dependency">Dependency Attribute</label>
           <select id="pages-dragger-dependency" class="form-control" name="pages_dragger_dependency">
@@ -61,7 +75,13 @@
           </select>
           </div>
 
+          <div class="form-group col-md-3" id="default-pages-group" style="display: none;">
+          <label for="default_pages">Default Number of Pages</label>
+          <input type="number" id="default_pages" name="default_pages" class="form-control" placeholder="e.g. 1"
+            min="1">
+          </div>
         </div>
+
         <hr>
 
         {{-- Attribute Modifiers --}}
@@ -100,9 +120,11 @@
 
     document.getElementById('pages-dragger-checkbox').addEventListener('change', function () {
     const dependencyGroup = document.getElementById('pages-dragger-dependency-group');
+    const PageGroup = document.getElementById('default-pages-group');
     if (this.checked) {
-  
+
       dependencyGroup.style.display = 'block';
+      PageGroup.style.display = 'block';
 
       const select = document.getElementById('pages-dragger-dependency');
       select.innerHTML = '<option value="">-- Select Attribute --</option>';
@@ -116,6 +138,7 @@
       });
     } else {
       dependencyGroup.style.display = 'none';
+      PageGroup.style.display = 'none';
     }
     });
 
