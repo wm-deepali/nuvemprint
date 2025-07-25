@@ -123,8 +123,10 @@
             <li><a class="dropdown-item d-flex align-items-center"
                 href="{{ route('admin.pricing-rules.index') }}"><span>Pricing Rules
                 </span></a></li>
+                
           </ul>
         </li>
+
          <li class="dropdown nav-item" data-menu="dropdown">
           <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
             <span>Customer & Orders</span>
@@ -141,6 +143,7 @@
             </li>
           </ul>
         </li>
+
          <li class="dropdown nav-item" data-menu="dropdown">
           <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
             <span>Content Management</span>
@@ -161,97 +164,17 @@
           </ul>
         </li>
 
-        <!--<li class="dropdown nav-item" data-menu="dropdown">-->
-        <!--  <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">-->
-        <!--    <span>Book Options</span>-->
-        <!--  </a>-->
-        <!--  <ul class="dropdown-menu">-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-book-type.index') }}"><span>Manage Book Type</span></a></li>-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-print-colour.index') }}"><span>Manage Page Printing Colour</span></a>-->
-        <!--    </li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-orientation.index') }}"><span>Manage Orientation</span></a></li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-paper-size.index') }}"><span>Manage Paper Size</span></a></li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-paper-type.index') }}"><span>Manage Paper Type</span></a></li>-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-paper-weight.index') }}"><span>Manage Paper Weight</span></a></li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-binding.index') }}"><span>Manage Binding</span></a></li>-->
-        <!--  </ul>-->
-        <!--</li>-->
-
-        <!--<li class="dropdown nav-item" data-menu="dropdown">-->
-        <!--  <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">-->
-        <!--    <span>Cover Options</span>-->
-        <!--  </a>-->
-        <!--  <ul class="dropdown-menu">-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-cover-type.index') }}"><span>Manage Cover Type</span></a></li>-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-cover-weight.index') }}"><span>Manage Cover Weight</span></a></li>-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-cover-print-colour.index') }}"><span>Manage Cover Printing-->
-        <!--          Colour</span></a></li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-cover-finish.index') }}"><span>Manage Cover Finish</span></a></li>-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-endpaper-colour.index') }}"><span>Choose Endpaper Colour</span></a></li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-cover-foiling.index') }}"><span>Manage Cover Foiling</span></a></li>-->
-        <!--  </ul>-->
-        <!--</li>-->
-
-        <!--<li class="dropdown nav-item" data-menu="dropdown">-->
-        <!--  <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">-->
-        <!--    <span>Dust Options</span>-->
-        <!--  </a>-->
-        <!--  <ul class="dropdown-menu">-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-dust-jacket-colour.index') }}"><span>Manage Dust Jacket Colour</span></a>-->
-        <!--    </li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-dust-jacket-finish.index') }}"><span>Manage Dust Jacket Finish</span></a>-->
-        <!--    </li>-->
-        <!--  </ul>-->
-        <!--</li>-->
-
-        <!--<li class="dropdown nav-item" data-menu="dropdown">-->
-        <!--  <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">-->
-        <!--    <span>Other Options</span>-->
-        <!--  </a>-->
-        <!--  <ul class="dropdown-menu">-->
-        <!--    <li><a class=" dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-bookmark-ribbon.index') }}"><span>Manage BookMark Ribbon</span></a>-->
-        <!--    </li>-->
-        <!--    <li><a class="dropdown-item d-flex align-items-center"-->
-        <!--        href="{{ route('admin.manage-head-tail-band.index') }}"><span>Manage Head and Tail Band</span></a>-->
-        <!--    </li>-->
-        <!--  </ul>-->
-        <!--</li>-->
-
-        <!--<li class="dropdown nav-item" data-menu="dropdown">-->
-        <!--  <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">-->
-        <!--    <span>Pricing Rules</span>-->
-        <!--  </a>-->
-        <!--  <ul class="dropdown-menu">-->
-        <!--    <li>-->
-        <!--      <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.pricing-rules.index') }}">-->
-        <!--        <span>Pricing Rules</span>-->
-        <!--      </a>-->
-        <!--    </li>-->
-        <!--    <li>-->
-        <!--      <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.quotes.index') }}">-->
-        <!--        <span>View Quote Request</span>-->
-        <!--      </a>-->
-        <!--    </li>-->
-
-        <!--  </ul>-->
-
-        <!--</li>-->
+         <li class="nav-item">
+          <a class="nav-link d-flex align-items-center" href="{{ route('admin.proof-reading.index') }}">
+            <span>Proof Reading</span>
+          </a>
+        </li>
+      
+         <li class="nav-item">
+          <a class="nav-link d-flex align-items-center" href="{{ route('admin.delivery-charges.index') }}">
+            <span>Delivery Charges</span>
+          </a>
+        </li>
 
         <li class="nav-item">
           <a class="nav-link d-flex align-items-center" href="{{ route('admin.manage.department') }}">

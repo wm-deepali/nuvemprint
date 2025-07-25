@@ -16,7 +16,16 @@ class PricingRule extends Model
         'pages_dragger_dependency',
         'default_quantity',
         'default_pages',
+        'proof_reading_required',
+        'delivery_charges_required',
     ];
+
+    protected $casts = [
+        'pages_dragger_required' => 'boolean',
+        'proof_reading_required' => 'boolean',
+        'delivery_charges_required' => 'boolean',
+    ];
+
 
     public function category()
     {

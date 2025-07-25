@@ -57,30 +57,53 @@
         </div>
 
         <!-- New row just for the checkbox -->
-        <div class="form-row" id="pages-dragger-checkbox-wrapper" style="display: none;">
-          <div class="form-group col-md-3">
-          <label>
-            <input type="checkbox" id="pages-dragger-checkbox" name="pages_dragger_required">
-            Number of Pages Dragger Required
-          </label>
-          </div>
-        </div>
+        <div class="form-row d-flex align-items-end" style="display: flex;">
 
-        <!-- Another row for dependency and default pages -->
-        <div class="form-row">
-          <div class="form-group col-md-3" id="pages-dragger-dependency-group" style="display: none;">
+          <div class="form-group col-md-2">
+          <label for="proof_reading_required">Proof Reading Required</label>
+          <select class="form-control" name="proof_reading_required" id="proof_reading_required" required>
+            <option value="">-- Select --</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+          </div>
+
+          <div class="form-group col-md-2">
+          <label for="delivery_charges_required">Delivery Charges Required</label>
+          <select class="form-control" name="delivery_charges_required" id="delivery_charges_required" required>
+            <option value="">-- Select --</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+          </div>
+
+          <div class="form-group col-md-2" id="pages_dragger_required-wrapper" style="display: none;">
+          <label for="pages_dragger_required">Pages Dragger Required</label>
+          <select class="form-control" name="pages_dragger_required" id="pages_dragger_required">
+            <option value="">-- Select --</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+          </div>
+
+          <div class="form-group col-md-2" id="pages-dragger-dependency-group" style="display: none;">
           <label for="pages-dragger-dependency">Dependency Attribute</label>
           <select id="pages-dragger-dependency" class="form-control" name="pages_dragger_dependency">
             <option value="">-- Select Attribute --</option>
           </select>
           </div>
 
-          <div class="form-group col-md-3" id="default-pages-group" style="display: none;">
+          <div class="form-group col-md-2" id="default-pages-group" style="display: none;">
           <label for="default_pages">Default Number of Pages</label>
           <input type="number" id="default_pages" name="default_pages" class="form-control" placeholder="e.g. 1"
             min="1">
           </div>
+
         </div>
+
+
+
+
 
         <hr>
 
@@ -118,11 +141,11 @@
     document.getElementById('attribute-modifier-container').innerHTML = '<p class="text-muted">Select a subcategory to load attributes.</p>';
     });
 
-    document.getElementById('pages-dragger-checkbox').addEventListener('change', function () {
+    document.getElementById('pages_dragger_required').addEventListener('change', function () {
     const dependencyGroup = document.getElementById('pages-dragger-dependency-group');
     const PageGroup = document.getElementById('default-pages-group');
-    if (this.checked) {
 
+    if (this.value === '1') {
       dependencyGroup.style.display = 'block';
       PageGroup.style.display = 'block';
 
@@ -143,6 +166,7 @@
     });
 
 
+
     document.getElementById('subcategory-select').addEventListener('change', function () {
     const subcategoryId = this.value;
     if (!subcategoryId) return;
@@ -154,10 +178,10 @@
       renderAttributeRows();
 
       // 👇 Show the checkbox now that attributes are available
-      document.getElementById('pages-dragger-checkbox-wrapper').style.display = 'block';
+      document.getElementById('pages_dragger_required-wrapper').style.display = 'block';
 
       // Optionally reset previous selection
-      document.getElementById('pages-dragger-checkbox').checked = false;
+      document.getElementById('pages_dragger_required').checked = false;
       document.getElementById('pages-dragger-dependency-group').style.display = 'none';
       });
 

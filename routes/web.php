@@ -25,6 +25,8 @@ use App\Http\Controllers\Admin\AttributeConditionController;
 use App\Http\Controllers\Admin\PricingRuleController;
 use App\Http\Controllers\Admin\QuoteController;
 
+use App\Http\Controllers\DeliveryChargeController;
+use App\Http\Controllers\ProofReadingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\{
     HomeController,
@@ -358,35 +360,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('attributes/{id}/values', [AttributeValueController::class, 'getValues']);
         Route::get('subcategories/{id}/attributes', [AttributeConditionController::class, 'getSubcategoryAttributes']);
 
+        Route::resource('proof-reading', ProofReadingController::class);
+        Route::resource('delivery-charges', DeliveryChargeController::class);
 
-
-
-        // ===== Book Pages MANAGEMENT ROUTES ===== //
-
-        Route::resource('manage-book-type', BookTypeController::class);
-        Route::resource('manage-print-colour', PrintingColourController::class);
-        Route::resource('manage-orientation', OrientationController::class);
-        Route::resource('manage-paper-size', ManagePaperSizeController::class);
-        Route::resource('manage-paper-type', PaperTypeController::class);
-        Route::resource('manage-paper-weight', PaperWeightController::class);
-        Route::resource('manage-binding', BindingController::class);
-
-        // ===== Cover MANAGEMENT ROUTES ===== //
-        Route::resource('manage-cover-type', CoverTypeController::class);
-        Route::resource('manage-cover-weight', CoverWeightController::class);
-        Route::resource('manage-cover-print-colour', CoverPrintingColourController::class);
-        Route::resource('manage-cover-finish', CoverFinishController::class);
-        Route::resource('manage-endpaper-colour', EndpaperColourController::class);
-        Route::resource('manage-cover-foiling', CoverFoilingController::class);
-
-        // ===== Dust MANAGEMENT ROUTES ===== //
-        Route::resource('manage-dust-jacket-colour', DustJacketColourController::class);
-        Route::resource('manage-dust-jacket-finish', DustJacketFinishController::class);
-
-
-        // ===== Dust MANAGEMENT ROUTES ===== //
-        Route::resource('manage-bookmark-ribbon', BookmarkRibbonController::class);
-        Route::resource('manage-head-tail-band', HeadAndTailBandController::class);
 
         // ===== Quote Pricing ===== //
         Route::resource('quote-pricing', QuotePricingController::class);

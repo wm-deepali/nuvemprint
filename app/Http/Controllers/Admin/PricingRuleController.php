@@ -51,18 +51,20 @@ class PricingRuleController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
             'pages_dragger_required' => 'nullable',
             'pages_dragger_dependency' => 'nullable|numeric',
             'default_quantity' => 'required|integer|min:1',
+            'proof_reading_required' => 'nullable|boolean',
+            'delivery_charges_required' => 'nullable|boolean',
             'default_pages' => [
                 'nullable',
                 'integer',
                 'min:1',
-                Rule::requiredIf($request->pages_dragger_required == 'on'),
+                Rule::requiredIf($request->pages_dragger_required == '1'),
             ],
 
             'rows' => 'array',
@@ -70,7 +72,6 @@ class PricingRuleController extends Controller
             'rows.*.value_id' => 'required|exists:attribute_values,id',
             'rows.*.dependency_value_ids' => 'nullable|array',
             'rows.*.dependency_value_ids.*' => 'nullable|exists:attribute_values,id',
-
             'rows.*.modifier_type' => 'nullable|in:add,multiply',
             'rows.*.modifier_value' => 'nullable|numeric',
             'rows.*.base_charges_type' => 'nullable|in:amount,percentage',
@@ -91,10 +92,12 @@ class PricingRuleController extends Controller
             $pricingRule = PricingRule::create([
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
-                'pages_dragger_required' => $request->has('pages_dragger_required') ? 1 : 0,
-                'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null, // Add this line
+                'pages_dragger_required' => (int) $request->pages_dragger_required,
+                'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null,
                 'default_quantity' => $request->default_quantity ?? null,
                 'default_pages' => $request->default_pages ?? null,
+                'proof_reading_required' => (int) $request->proof_reading_required,
+                'delivery_charges_required' => (int) $request->delivery_charges_required,
             ]);
 
 
@@ -206,6 +209,8 @@ class PricingRuleController extends Controller
             'pages_dragger_required' => 'nullable|boolean',
             'pages_dragger_dependency' => 'nullable|numeric',
             'default_quantity' => 'required|integer|min:1',
+            'proof_reading_required' => 'nullable|boolean',
+            'delivery_charges_required' => 'nullable|boolean',
             'default_pages' => [
                 'nullable',
                 'integer',
@@ -232,7 +237,7 @@ class PricingRuleController extends Controller
             'rows.*.per_page_pricing.*.quantity_to' => 'nullable|integer|min:1',
             'rows.*.per_page_pricing.*.price' => 'nullable|numeric|min:0',
         ]);
-
+        // dd((int) $request->delivery_charges_required);
         DB::beginTransaction();
 
         try {
@@ -240,11 +245,14 @@ class PricingRuleController extends Controller
             $pricingRule->update([
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
-                'pages_dragger_required' => isset($request->pages_dragger_required) && $request->pages_dragger_required ? 1 : 0,
+                'pages_dragger_required' => filter_var($request->pages_dragger_required, filter: FILTER_VALIDATE_BOOLEAN),
                 'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null,
                 'default_quantity' => $request->default_quantity ?? null,
                 'default_pages' => $request->default_pages ?? null,
+                'proof_reading_required' => filter_var($request->proof_reading_required, filter: FILTER_VALIDATE_BOOLEAN),
+                'delivery_charges_required' => filter_var($request->delivery_charges_required, filter: FILTER_VALIDATE_BOOLEAN),
             ]);
+
 
 
             $existingIds = $pricingRule->attributes()->pluck('id')->toArray();

@@ -78,15 +78,36 @@
                                     placeholder="e.g. 1" min="1"  value="<?php echo e($pricingRule->default_quantity); ?>">
                                 </div>
                             </div>
-                            <div class="form-row" id="pages-dragger-checkbox-wrapper" >
-                                <div class="form-group col-md-3">
-                                    <label>
-                                        <input type="checkbox" name="pages_dragger_required" value="1"
-                                            id="pages-dragger-checkbox" <?php echo e($pricingRule->pages_dragger_required ? 'checked' : ''); ?>> Enable Pages Dragger Dependency
-                                    </label>
+                             <div class="form-row d-flex align-items-end" style="display: flex;">
+
+                               <div class="form-group col-md-2">
+                                    <label for="proof_reading_required">Proof Reading Required</label>
+                                    <select class="form-control" name="proof_reading_required" id="proof_reading_required" required>
+                                        <option value="">-- Select --</option>
+                                        <option value="1" <?php echo e($pricingRule->proof_reading_required ? 'selected' : ''); ?>>Yes</option>
+                                        <option value="0" <?php echo e(!$pricingRule->proof_reading_required ? 'selected' : ''); ?>>No</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group col-md-2">
+                                    <label for="delivery_charges_required">Delivery Charges Required</label>
+                                    <select class="form-control" name="delivery_charges_required" id="delivery_charges_required" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="1" <?php echo e($pricingRule->delivery_charges_required ? 'selected' : ''); ?>>Yes</option>
+                                    <option value="0" <?php echo e(!$pricingRule->delivery_charges_required ? 'selected' : ''); ?>>No</option>
+                                    </select>
                                 </div>
 
-                                <div class="form-group col-md-3" id="pages-dragger-dependency-group"
+                                <div class="form-group col-md-2" id="pages_dragger_required-wrapper" >
+                                    <label for="pages_dragger_required">Pages Dragger Required</label>
+                                    <select class="form-control" name="pages_dragger_required" id="pages_dragger_required">
+                                    <option value="">-- Select --</option>
+                                    <option value="1" <?php echo e($pricingRule->pages_dragger_required ? 'selected' : ''); ?>>Yes</option>
+                                    <option value="0" <?php echo e(!$pricingRule->pages_dragger_required ? 'selected' : ''); ?>>No</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-2" id="pages-dragger-dependency-group"
                                     style="<?php echo e($pricingRule->pages_dragger_required ? '' : 'display:none;'); ?>">
                                     <label for="pages-dragger-dependency">Dependent Attribute</label>
                                     <select name="pages_dragger_dependency" id="pages-dragger-dependency"
@@ -103,13 +124,14 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group col-md-3" id="default-pages-group"  style="<?php echo e($pricingRule->pages_dragger_required ? '' : 'display:none;'); ?>">
+                                  <div class="form-group col-md-2" id="default-pages-group"  style="<?php echo e($pricingRule->pages_dragger_required ? '' : 'display:none;'); ?>">
                                     <label for="default_pages">Default Number of Pages</label>
                                     <input type="number" id="default_pages" name="default_pages" class="form-control" placeholder="e.g. 1"
                                     min="1"   value="<?php echo e($pricingRule->default_pages); ?>">
                                 </div>
-                            </div>
 
+                               </div>
+                          
                             <hr>
 
                             
@@ -574,7 +596,7 @@
             }
         });
 
-        document.getElementById('pages-dragger-checkbox').addEventListener('change', function () {
+        document.getElementById('pages_dragger_required').addEventListener('change', function () {
             const dependencyGroup = document.getElementById('pages-dragger-dependency-group');
               const PageGroup = document.getElementById('default-pages-group');
             if (this.checked) {
