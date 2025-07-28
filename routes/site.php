@@ -41,9 +41,9 @@ Route::get('cart', function () {
 })->name('shop-cart');
 
 
-Route::get('artwork', function () {
+Route::get('checkout', function () {
     return view('front.artwork');
-})->name('artwork');
+})->name('checkout');
 
 
 Route::get('order-tracking', function () {

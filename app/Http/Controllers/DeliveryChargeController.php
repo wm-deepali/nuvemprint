@@ -32,6 +32,8 @@ class DeliveryChargeController extends Controller
             'delivery_charges.*.no_of_days' => 'required|numeric|min:0',
             'delivery_charges.*.details' => 'nullable|string|max:255',
             'delivery_charges.*.price' => 'required|numeric|min:0',
+            'delivery_charges.*.title' => 'required|string|max:255',
+            'delivery_charges.*.is_default' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -43,6 +45,8 @@ class DeliveryChargeController extends Controller
                 'no_of_days' => $valueData['no_of_days'],
                 'details' => $valueData['details'],
                 'price' => $valueData['price'],
+                'title' => $valueData['title'],
+                'is_default' => !empty($valueData['is_default']) ? 1 : 0,
             ];
             // Save record
             DeliveryCharge::create($data);
@@ -73,6 +77,8 @@ class DeliveryChargeController extends Controller
             'no_of_days' => 'required|numeric|min:0',
             'details' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',
+            'title' => 'required|string|max:255',
+            'is_default' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -82,13 +88,18 @@ class DeliveryChargeController extends Controller
         $data = $request->only([
             'no_of_days',
             'price',
-            'details'
+            'details',
+            'title',
         ]);
+
+        // Handle the checkbox - if it's missing, treat it as unchecked (false)
+        $data['is_default'] = $request->has('is_default') ? true : false;
 
         $DeliveryCharge->update($data);
 
         return $this->respondSuccess($request, 'Delivery Charges updated successfully.');
     }
+
 
 
     public function destroy(DeliveryCharge $deliveryCharge)

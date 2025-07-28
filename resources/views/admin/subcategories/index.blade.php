@@ -42,6 +42,7 @@
               <th>Categories</th>
               <th>Name</th>
               <th>Slug</th>
+              <th>Calculator Required</th>
               <th>Status</th>
               <th width="100px">Action</th>
             </tr>
@@ -57,6 +58,11 @@
             </td>
             <td>{{ $subcategory->name }}</td>
             <td>{{ $subcategory->slug }}</td>
+             <td>
+            <span class="badge badge-{{ $subcategory->calculator_required ? 'success' : 'secondary' }}">
+            {{ $subcategory->calculator_required ? 'Yes' : 'No' }}
+            </span>
+            </td>
             <td>{{ ucfirst($subcategory->status) }}</td>
             <td>
             <ul class="list-inline">

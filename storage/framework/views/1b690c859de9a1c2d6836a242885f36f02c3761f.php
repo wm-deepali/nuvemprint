@@ -42,6 +42,7 @@
               <th>Categories</th>
               <th>Name</th>
               <th>Slug</th>
+              <th>Calculator Required</th>
               <th>Status</th>
               <th width="100px">Action</th>
             </tr>
@@ -57,6 +58,12 @@
             </td>
             <td><?php echo e($subcategory->name); ?></td>
             <td><?php echo e($subcategory->slug); ?></td>
+             <td>
+            <span class="badge badge-<?php echo e($subcategory->calculator_required ? 'success' : 'secondary'); ?>">
+            <?php echo e($subcategory->calculator_required ? 'Yes' : 'No'); ?>
+
+            </span>
+            </td>
             <td><?php echo e(ucfirst($subcategory->status)); ?></td>
             <td>
             <ul class="list-inline">

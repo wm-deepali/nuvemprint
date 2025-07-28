@@ -13,5 +13,11 @@ class DeliveryCharge extends Model
         'price',
         'details',
         'no_of_days',
+        'title',
+        'is_default'
+    ];
+
+      protected $casts = [
+        'is_default' => 'boolean'
     ];
 }

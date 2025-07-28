@@ -38,6 +38,7 @@ class PricingRuleController extends Controller
         // Get those attributes and key them by ID
         $dependencyAttrs = Attribute::whereIn('id', $dependencyAttrIds)->get()->keyBy('id');
 
+        // dd($rules->toArray());
         return view('admin.pricing-rules.index', compact('rules', 'dependencyAttrs'));
     }
 
@@ -51,7 +52,7 @@ class PricingRuleController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
@@ -107,7 +108,7 @@ class PricingRuleController extends Controller
                     'attribute_id' => $row['attribute_id'],
                     'value_id' => $row['value_id'],
                     // 'dependency_value_id' => $row['dependency_value_id'] ?? null,
-                    'price_modifier_type' => $row['modifier_type'],
+                    'price_modifier_type' => $row['modifier_type'] ?? 'add',
                     'price_modifier_value' => $row['modifier_value'] ?? 0,
                     'is_default' => isset($row['is_default']) && $row['is_default'] ? 1 : 0,
                     'base_charges_type' => $row['base_charges_type'] ?? null,
@@ -253,17 +254,12 @@ class PricingRuleController extends Controller
                 'delivery_charges_required' => filter_var($request->delivery_charges_required, filter: FILTER_VALIDATE_BOOLEAN),
             ]);
 
-
-
-            $existingIds = $pricingRule->attributes()->pluck('id')->toArray();
-            $submittedIds = [];
-
             foreach ($request->input('rows', []) as $row) {
                 $data = [
                     'attribute_id' => $row['attribute_id'],
                     'value_id' => $row['value_id'],
                     // 'dependency_value_id' => $row['dependency_value_id'] ?? null,
-                    'price_modifier_type' => $row['modifier_type'],
+                    'price_modifier_type' => $row['modifier_type'] ?? 'add',
                     'price_modifier_value' => $row['modifier_value'] ?? 0,
                     'is_default' => isset($row['is_default']) ? 1 : 0,
                     'base_charges_type' => $row['base_charges_type'] ?? null,
@@ -274,19 +270,18 @@ class PricingRuleController extends Controller
 
                 if (!empty($row['id'])) {
                     // Update existing attribute
-                    $submittedIds[] = $row['id'];
                     $attribute = $pricingRule->attributes()->where('id', $row['id'])->first();
                     $attribute->update($data);
                 } else {
                     // Create new attribute
                     $attribute = $pricingRule->attributes()->create($data);
-                    $submittedIds[] = $attribute->id;
                 }
 
                 // Handle per_page_pricing
                 $submittedRangeIds = [];
 
                 if (!empty($row['per_page_pricing']) && is_array($row['per_page_pricing'])) {
+                    // dd($row['per_page_pricing']);
                     foreach ($row['per_page_pricing'] as $range) {
                         if (!empty($range['quantity_from']) && !empty($range['quantity_to']) && isset($range['price'])) {
                             if (!empty($range['id'])) {
@@ -319,7 +314,6 @@ class PricingRuleController extends Controller
                 }
 
                 if (!empty($row['dependency_value_ids'])) {
-                    $existingDeps = PricingRuleAttributeDependency::where('pricing_rule_attribute_id', $attribute->id)->get();
                     $submittedDepKeys = [];
 
                     foreach ($row['dependency_value_ids'] as $parentAttrId => $valueId) {
@@ -345,12 +339,28 @@ class PricingRuleController extends Controller
 
             }
 
-            // Delete removed attributes
-            $toDelete = array_diff($existingIds, $submittedIds);
-            if (!empty($toDelete)) {
-                PricingRuleAttributeQuantity::whereIn('pricing_rule_attribute_id', $toDelete)->delete();
-                $pricingRule->attributes()->whereIn('id', $toDelete)->delete();
+            // 1. Handle deleted rows
+            $rawDeletedIds = $request->input('deleted_ids', []);
+            $deletedIds = [];
+
+            foreach ($rawDeletedIds as $item) {
+                if (is_string($item) && str_starts_with($item, '[')) {
+                    $decoded = json_decode($item, true);
+                    if (is_array($decoded)) {
+                        $deletedIds = array_merge($deletedIds, $decoded);
+                    }
+                } else {
+                    $deletedIds[] = $item;
+                }
             }
+
+            if (!empty($deletedIds)) {
+                PricingRuleAttributeQuantity::whereIn('pricing_rule_attribute_id', $deletedIds)->delete();
+                PricingRuleAttributeDependency::whereIn('pricing_rule_attribute_id', $deletedIds)->delete();
+                $pricingRule->attributes()->whereIn('id', $deletedIds)->delete();
+            }
+
+
 
             DB::commit();
 

@@ -20,11 +20,13 @@ class Subcategory extends Model
         'thumbnail',
         'gallery',
         'is_premium',
-        'status'
+        'status',
+        'calculator_required'
     ];
 
     protected $casts = [
         'gallery' => 'array',
+        'calculator_required' => 'boolean'
     ];
 
     public function getSlugOptions(): SlugOptions

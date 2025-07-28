@@ -1,6 +1,47 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
     body {
         background-color: #f8f9fa !important;
+    }
+
+    .dropdown-menu {
+        -webkit-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+        border: 0 solid #e9ecef !important;
+        font-size: 14px !important;
+        margin: 8px 0 0 !important;
+        border-radius: 0px !important;
+        background-color: rgb(30 30 30 / 90%) !important;
+    }
+
+    .dropdown-toggle::after {
+        display: none !important;
+    }
+
+    .primary-menu .navbar .dropdown-large-menu ul li {
+        background: black;
+    }
+
+    .list-group-item.active {
+        background-color: #656565 !important;
+        border-color: #656565 !important;
+    }
+
+    .nav-item a {
+        color: gray !important;
     }
 
     .reset-card {
@@ -51,8 +92,9 @@
     .print-color {
         width: 100%;
         height: 38px;
-        border-radius: 5px;
-        border: 1px solid rgb(185, 185, 185);
+        border: 2px solid #e0e0e0 !important;
+
+        border-radius: .375rem !important;
         display: flex;
         align-items: center;
         cursor: pointer;
@@ -61,10 +103,14 @@
     .print-color.active,
     .print-color:focus {
         color: #495057;
-        background-color: #fff;
-        border-color: #80bdff;
+        background-color: #f8f3f3;
+        border: 2px solid #6bd3cc !important;
         outline: 0;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        /*box-shadow: 0 0 0 0.1rem #6bd3cc !important;*/
+    }
+
+    .print-color:hover {
+        box-shadow: 0 0 0 0.2rem #6bd3cc82 !important;
     }
 
     .print-color p {
@@ -186,6 +232,9 @@
         font-size: 11px;
         cursor: pointer;
         margin-left: 5px;
+        padding-left: 2px;
+        padding-top: 1px;
+
     }
 
     .s-row label {
@@ -194,8 +243,11 @@
     }
 
     .form-label {
+        display: flex;
+        align-items: center;
         font-size: 14px;
         font-weight: 600;
+        gap: 5px;
     }
 
     .page-slider {
@@ -295,7 +347,20 @@
         background-color: white;
         box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         padding: 20px 20px;
+        position: sticky;
+        top: 0px;
     }
+
+    .estimate-card.active {
+        border: 2px solid #6bd3cc;
+        background-color: #f8f3f3;
+    }
+
+    .estimate-card.active .circle-point {
+        border: 2px solid #6bd3cc;
+        background-color: white;
+    }
+
 
     .estimate-card {
         width: 100%;
@@ -354,13 +419,17 @@
 
     .addtobtn button {
         width: 100%;
-        background-color: #ffc107;
-        color: black;
+        background-color: #c48e3d;
+        color: #fff;
         font-weight: 600;
         border: none;
         border-radius: 4px;
         height: 40px;
         font-size: 18px;
+    }
+
+    .addtobtn button:hover {
+        background-color: #e0aa0b;
     }
 
     .note-dis {
@@ -505,6 +574,51 @@
     .btn-link {
         background-color: transparent !important;
     }
+
+    .btn {
+        border: none !important;
+    }
+
+    .selectable-proof-option {
+        transition: 0.2s ease-in-out;
+        border-radius: 12px;
+        /* curved edges */
+        border: 1px solid #ccc;
+    }
+
+    .selectable-proof-option.active {
+        border-color: #6bd3cc !important;
+        background-color: #f8f3f3 !important;
+    }
+
+    input[type="checkbox"].form-check-input {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .form-check-input:checked {
+        background-color: #6bd3cc;
+        border: 1px solid #17a2b8 !important;
+    }
+
+    .attribute-wrapper.disabled .attribute-values {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .attribute-wrapper .attribute-condition-note {
+        color: #ff0000 !important;
+        /* Bootstrap 'danger' red */
+        font-size: 0.8rem;
+        margin-bottom: 0px;
+        margin-top: 0.25rem;
+        /* aligns with checkbox/label spacing */
+    }
+
+    .attribute-wrapper.disabled label {
+        color: #888 !important;
+    }
 </style>
 
 
@@ -528,8 +642,8 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="quantityInput" class="form-label d-flex align-items-center"
-                                style="gap: 5px;">Quantity <span class="help-circle" data-label="Quantity"
+                            <label for="quantityInput" class="form-label"
+                               >Quantity <span class="help-circle" data-label="Quantity"
                                     data-toggle="modal" data-target="#helpModal">?</span></label>
                             <input type="number" class="form-control" id="quantityInput" placeholder="100" value=<?php echo e($defaultQuantity ?? '100'); ?>>
                         </div>
@@ -580,9 +694,10 @@
                     <div class="calculation-card mt-3">
                         <?php if($isToggleable): ?>
                             
+
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input group-toggle" type="checkbox" id="toggle_<?php echo e($groupKey); ?>"
-                                    data-target="#section_<?php echo e($groupKey); ?>">
+                                <input class="form-check-input group-toggle" style="border: 1px solid #212529" type="checkbox"
+                                    id="toggle_<?php echo e($groupKey); ?>" data-target="#section_<?php echo e($groupKey); ?>">
                                 <label class="form-check-label" for="toggle_<?php echo e($groupKey); ?>"><?php echo e($group['group_name']); ?></label>
                             </div>
                         <?php else: ?>
@@ -604,74 +719,97 @@
     </div>
     <div class="col-md-5">
         <div class="right-side-section">
-            <h5>Choose Price & Delivery Date</h5>
-            <div class="estimate-card" style="background-color: #454f5b ;     border: 3px solid #58b0aa;">
-                <div class="circle-point" style=" border: 3px solid #58b0aa; background-color: #fff;"></div>
-                <div class="est-card">
-                    <div class="estimate-div">
-                        <div class="ast-active">
-                            <p class="m-0 text-white">Estimated Delivery:</p>
-                            <h4 class=" text-white">Thu, 17th Jul</h4>
-                        </div>
-                        <div class="line-y"></div>
-                        <div class="">
-                            <h4 class="text-white final-price">£0.00</h4>
+            <?php
+                use Carbon\Carbon;
+            ?>
+
+            <?php if($deliveryChargesRequired): ?>
+                <h5>Choose Price & Delivery Date</h5>
+                <?php $__currentLoopData = $deliveryCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
+                        $deliveryDate = Carbon::now()->addDays($option['no_of_days']);
+                        $formattedDate = $deliveryDate->format('D, jS M');
+                        $detailsHtml = $option['details'] ?? null;
+                        $title = $option['title'] ?? null;
+                    ?>
+
+                    <div class="estimate-card estimate-option <?php echo e($option['is_default'] ? 'active' : 'mt-3'); ?>"
+                        data-price="<?php echo e($option['price']); ?>" data-date="<?php echo e($formattedDate); ?>">
+
+                        <div class="circle-point"></div>
+                        <div class="est-card">
+
+                            <div class="estimate-div">
+                                <div class="<?php echo e($option['is_default'] ? 'ast-active' : ''); ?>">
+
+                                    <p class="m-0 text-black">Estimated Delivery:</p>
+                                    <h4 class="text-black mb-1"><?php echo e($formattedDate); ?></h4>
+                                    <?php if($title): ?>
+                                        <div class="title text-muted small d-none"><?php echo e($title); ?></div>
+                                    <?php endif; ?>
+
+                                </div>
+                                <div class="line-y"></div>
+                                <div>
+                                    <h4 class="text-black final-price">
+                                        £<?php echo e(number_format($option['price'], 2)); ?></h4>
+                                </div>
+                            </div>
+
+                            <?php if(!empty($detailsHtml)): ?>
+                                <div class="line-x detail-section d-none"></div>
+                                <div class="disci text-black detail-section d-none">
+                                    <?php echo $detailsHtml; ?>
+
+                                </div>
+                            <?php endif; ?>
+
                         </div>
                     </div>
-                    <div class="line-x"></div>
-                    <div class="disci">
-                        <p class=" m-0 text-white"><i class="fa-solid fa-check"></i> Printed on a Canon iX </p>
-                        <p class=" m-0 text-white"><i class="fa-solid fa-check"></i> High Quality Digital
-                            Printing</p>
-                        <p class=" m-0 text-white"><i class="fa-solid fa-check"></i> Print-on-Demand from £5.00
-                        </p>
-                        <p class=" m-0 text-white"><i class="fa-solid fa-check"></i> Flexible Payment Options
-                            Available</p>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php else: ?>
+                <div class="text-black mb-3">
+                    <h4 class="final-price">£0.00</h4>
+                </div>
+            <?php endif; ?>
+
+            <?php if($proofReadingRequired && !empty($proofReadings)): ?>
+                <div class="form-row-section1 mt-3">
+                    <div class="s-row mb-3">
+                        <label for="proof-reading">Proof Reading</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <?php $__currentLoopData = $proofReadings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if(!empty($option['proof_type']) && isset($option['price'])): ?>
+                                    <div class="selectable-proof-option border rounded p-2 text-center"
+                                        data-value="<?php echo e($option['proof_type']); ?>" data-price="<?php echo e($option['price']); ?>"
+                                        style="width: 140px; cursor: pointer; background-color: #f9f9f9;">
+                                        <strong style="font-size: 13px;"><?php echo e($option['proof_type']); ?></strong>
+                                        <div class="text-muted" style="font-size: 12px;">
+                                            £<?php echo e(number_format($option['price'], 2)); ?>
+
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="estimate-card mt-3">
-                <div class="circle-point"></div>
-                <div class="est-card">
-                    <div class="estimate-div">
-                        <div>
-                            <p class="m-0">Estimated Delivery:</p>
-                            <h4>Thu, 17th Jul</h4>
-                        </div>
-                        <div class="line-y"></div>
-                        <div class="">
-                            <h4 class="final-price">£0.00</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-row-section1 mt-3">
-                <div class="s-row mb-3">
-                    <label for="binding">Design Option </label>
-                    <div class="color-print1">
-                        <div class="choose-binding" data-value="Staple">
-                            <img
-                                src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/binding/thumbnails/stapled.png">
-                            <p class="text-center" style="font-size: 12px;">Upload Own Artwork</p>
-                        </div>
-                        <div class="choose-binding" data-value="Perfect (PUR)">
-                            <img
-                                src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/binding/thumbnails/stapled.png">
-                            <p class="text-center" style="font-size: 12px;">Design Online</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="addtobtn">
+            <?php endif; ?>
+
+
+
+
+            <div class="addtobtn mt-3">
                 <button id="addToCartBtn" data-route="<?php echo e(route('shop-cart')); ?>">Add to Cart</button>
-                <div class="note-dis">
-                    <p>Delivery dates are estimated.</p>
-                    <p>Total Order Weight: 1.60 kg</p>
-                </div>
+                <?php if($deliveryChargesRequired): ?>
+                    <div class="note-dis">
+                        <p>Delivery dates are estimated.</p>
+                    </div>
+                <?php endif; ?>
+
             </div>
-
-
         </div>
+
         <div class="extra-card mt-3">
             <img
                 src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />
@@ -713,6 +851,23 @@
     </div>
 </div>
 
+
+<!-- Image Zoom Modal -->
+<div class="modal fade" id="imageZoomModal" tabindex="-1" aria-labelledby="imageZoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageZoomModalLabel">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="zoomedImage" src="" class="img-fluid" alt="Zoomed Image" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     const attributeConditions = <?php echo json_encode($conditionsMap, 15, 512) ?>;
     const debouncedCalculateTotalPrice = debounce(calculateTotalPrice, 300);
@@ -720,6 +875,13 @@
     const compositeDraggerValues = <?php echo json_encode($compositeDraggerValues ?? [], 15, 512) ?>;
     const attributeQuantityRanges = <?php echo json_encode($attributeQuantityRanges, 15, 512) ?>;
     // const defaultPages = $defaultPages;
+
+    // to zoom the image section
+    $(document).on('click', '.zoomicon', function () {
+        const imageUrl = $(this).data('image');
+        $('#zoomedImage').attr('src', imageUrl);
+    });
+
 
     function getRangeConsideringDependencies(defaultPages = null) {
         let selectedValueIds = [];
@@ -775,7 +937,7 @@
 
         // Ensure valid fallback values
         min = min || 1;
-        max = max || 1;
+        max = max || 100;
 
         const $slider = $('#pageSlider');
         const $pageValue = $('#pageValue');
@@ -785,15 +947,30 @@
 
         // ✅ Use defaultPages if provided, else keep current value, fallback to min
         let val = defaultPages !== null ? parseInt(defaultPages) : parseInt($slider.val());
-// console.log($slider.val());
+        // console.log($slider.val());
 
         if (isNaN(val) || val < min) val = min;
         if (val > max) val = max;
 
         $slider.val(val);
         $pageValue.text(val);
-
+        forceSliderRedraw($slider);
         return { min, max };
+    }
+
+    function forceSliderRedraw($slider) {
+        const slider = $slider[0]; // get DOM element
+        const value = parseFloat($slider.val()) || 0;
+        const min = parseFloat($slider.attr('min')) || 0;
+        const max = parseFloat($slider.attr('max')) || 100;
+
+        const percent = ((value - min) / (max - min)) * 100;
+
+        // Method 1: For CSS using --value
+        slider.style.setProperty('--value', `${percent}%`);
+
+        // Method 2: For CSS using background linear-gradient directly
+        slider.style.background = `linear-gradient(to right, #007bff 0%, #007bff ${percent}%, #ddd ${percent}%, #ddd 100%)`;
     }
 
 
@@ -804,11 +981,6 @@
             timer = setTimeout(() => func.apply(this, args), delay);
         };
     }
-
-    $(document).ready(function () {
-        calculateTotalPrice(); // or bind to event
-        getRangeConsideringDependencies();
-    });
 
     function calculateTotalPrice() {
         const quantity = parseInt($('#quantityInput').val()) || 1;
@@ -868,7 +1040,6 @@
                 });
 
                 compositePages[compositeValueId] = pageBreakdown;
-                console.log('here', pageBreakdown);
             }
         } else {
             pages = parseInt($('#pageSlider').val()) || 32;
@@ -888,51 +1059,29 @@
             },
             success: function (res) {
                 if (res.success) {
-                    $('.final-price').text(res.formatted_price);
+                    const calculatedPrice = parseFloat(res.total_price) || 0;
+
+                    $('.estimate-card').each(function () {
+                        const card = $(this);
+                        const deliveryCharge = parseFloat(card.data('price')) || 0;
+
+                        const selectedProofOption = $('.selectable-proof-option.active');
+                        const proofPrice = parseFloat(selectedProofOption.data('price')) || 0;
+
+                        const total = deliveryCharge + calculatedPrice + proofPrice;
+                        const formattedTotal = '£' + total.toFixed(2);
+
+                        card.find('.final-price').text(formattedTotal);
+                    });
                 }
             },
+
             error: function (xhr) {
                 console.error(xhr.responseText);
             }
         });
     }
 
-    function handleAttributeConditions(selectedAttrId, selectedValueId) {
-        $('.attribute-wrapper').removeClass('d-none');
-        $('.attribute-condition-note').remove();
-        $('.attribute-values').show();
-        $('.attribute-values [data-value-id]').show();
-
-        attributeConditions.forEach(condition => {
-            const $affected = $(`[data-attribute-id="${condition.affected_attribute_id}"]`);
-            const match = +condition.parent_attribute_id === +selectedAttrId && +condition.parent_value_id === +selectedValueId;
-
-            if (condition.action === 'show') {
-                if (match) {
-                    $affected.removeClass('d-none').find('.attribute-values').show();
-                } else {
-                    $affected.removeClass('d-none').find('.attribute-values').hide();
-                    const parentWrapper = $(`[data-attribute-id="${condition.parent_attribute_id}"]`);
-                    const parentName = parentWrapper.find('label').clone().children().remove().end().text().trim();
-                    const parentValueLabel = parentWrapper.find(`[data-value-id="${condition.parent_value_id}"]`).text().trim()
-                        || parentWrapper.find(`option[data-value-id="${condition.parent_value_id}"]`).text().trim();
-                    $affected.append(`<p class="attribute-condition-note text-danger mt-2">
-                        Only available when <strong>${parentName}</strong> is set to <strong>${parentValueLabel}</strong>.
-                    </p>`);
-                }
-            }
-
-            if (condition.action === 'hide' && match) {
-                if (condition.all_values_affected) {
-                    $affected.addClass('d-none');
-                } else {
-                    condition.affected_value_ids.forEach(valId => {
-                        $affected.find(`[data-value-id="${valId}"]`).hide();
-                    });
-                }
-            }
-        });
-    }
 
     $(function () {
         const compositeMap = <?php echo json_encode($compositeMap ?? [], 15, 512) ?>;
@@ -1012,7 +1161,31 @@
         $(document).on('click', '.attr-select, .print-color, .choose-binding', function () {
             const $this = $(this);
             const $wrapper = $this.closest('.attribute-wrapper');
+            const isRequired = $wrapper.data('is-required');
 
+            const wasActive = $this.hasClass('active');
+
+            // If already selected and NOT required → unselect
+            if (wasActive && !isRequired) {
+                $this.removeClass('active').removeAttr('data-selected');
+
+                const attrId = $wrapper.data('attribute-id');
+
+                // Clear image preview if exists
+                const previewImgSelector = `#preview-image-${attrId}`;
+                if ($(previewImgSelector).length) {
+                    $(previewImgSelector).attr('src', '<?php echo e(asset("storage/default-preview.png")); ?>');
+                }
+
+                handleAttributeConditions(attrId, null);
+                renderCompositeFromCurrentSelection();
+                calculateTotalPrice();
+                getRangeConsideringDependencies();
+
+                return; // Exit early
+            }
+
+            // If required OR not active → select normally
             $wrapper.find('.attr-select, .print-color, .choose-binding')
                 .removeClass('active')
                 .removeAttr('data-selected');
@@ -1022,6 +1195,13 @@
             const attrId = $wrapper.data('attribute-id');
             const valueId = $this.data('value-id');
 
+            // ✅ Update image preview if exists
+            const previewImgSelector = `#preview-image-${attrId}`;
+            const newImage = $this.data('image');
+            if (newImage && $(previewImgSelector).length) {
+                $(previewImgSelector).attr('src', newImage);
+            }
+
             handleAttributeConditions(attrId, valueId);
             renderCompositeFromCurrentSelection();
             calculateTotalPrice();
@@ -1029,15 +1209,43 @@
         });
 
         $(document).on('change', 'select.custom-select', function () {
-            const selected = $(this).find('option:selected');
-            const attrId = selected.data('attribute-id');
-            const valueId = selected.data('value-id');
+            const $select = $(this);
+            const $wrapper = $select.closest('.attribute-wrapper');
+            const isRequired = $wrapper.data('is-required');
 
+            const $option = $select.find('option:selected');
+            const attrId = $option.data('attribute-id');
+            const valueId = $option.data('value-id');
+            const selectedValue = $option.val();
+
+            // If user selected the empty "-- Select --" option
+            if (selectedValue === '') {
+                if (isRequired) {
+                    // Revert to first valid value
+                    const $firstReal = $select.find('option[data-value-id]').first();
+                    $firstReal.prop('selected', true);
+
+                    handleAttributeConditions(attrId, $firstReal.data('value-id'));
+                    renderCompositeFromCurrentSelection();
+                    calculateTotalPrice();
+                    getRangeConsideringDependencies();
+                } else {
+                    // Optional → treat as no selection
+                    handleAttributeConditions(attrId, null);
+                    renderCompositeFromCurrentSelection();
+                    calculateTotalPrice();
+                    getRangeConsideringDependencies();
+                }
+                return;
+            }
+
+            // If a valid value was selected
             handleAttributeConditions(attrId, valueId);
             renderCompositeFromCurrentSelection();
             calculateTotalPrice();
             getRangeConsideringDependencies();
         });
+
 
         $('#quantityInput').on('input', calculateTotalPrice);
 
@@ -1185,4 +1393,207 @@
             handleAttributeConditions(attrId, valueId);
         });
     });
+
+    function calculatedAttributeRow() {
+        let colSum = 0;
+
+        // Select all attribute blocks inside the row (adjust selector if needed)
+        const $attributeBlocks = $('.row .attribute-wrapper');
+
+        $attributeBlocks.each(function (index) {
+            const $col = $(this);
+            const colClass = $col.attr('class');
+
+            // Extract the number after col-md-
+            const match = colClass.match(/col-md-(\d+)/);
+            const colWidth = match ? parseInt(match[1]) : 12;
+
+            colSum += colWidth;
+
+            if (colSum >= 12) {
+                // Only insert <hr> if it's not the last one
+                if (index !== $attributeBlocks.length - 1) {
+                    $col.after('<div class="col-md-12"><hr style="height: 0.8px; opacity: 0.25; color: inherit; border: 0; "></div>');
+                }
+                colSum = 0;
+            }
+        });
+    }
+
+
+    function handleAttributeConditions(selectedAttrId, selectedValueId) {
+        $('.attribute-condition-note').remove();
+
+        attributeConditions.forEach(condition => {
+            if (condition.action !== 'hide') return;
+            if (+condition.parent_attribute_id !== +selectedAttrId) return;
+
+            const parentAttrId = +condition.parent_attribute_id;
+            const parentValueId = +condition.parent_value_id;
+            const affectedAttrId = +condition.affected_attribute_id;
+
+            const $parentWrapper = $(`[data-attribute-id="${parentAttrId}"]`);
+            const $affectedWrapper = $(`[data-attribute-id="${affectedAttrId}"]`);
+
+            const shouldShow = +selectedValueId === parentValueId;
+
+            if (shouldShow) {
+                $affectedWrapper.removeClass('disabled');
+                $affectedWrapper.find('.attribute-values').show();
+            } else {
+                console.log('here');
+
+                $affectedWrapper.addClass('disabled');
+                $affectedWrapper.find('.attribute-values').hide();
+                const parentValueLabel =
+                    $parentWrapper.find(`[data-value-id="${parentValueId}"]`).text().trim() ||
+                    $parentWrapper.find(`option[data-value-id="${parentValueId}"]`).text().trim();
+                $affectedWrapper.append(`
+        <p class="attribute-condition-note text-danger mt-2">
+            Only available for ${parentValueLabel}.
+        </p>
+    `);
+            }
+
+        });
+    }
+
+
+    function applyInitialHideConditions() {
+        $('.attribute-wrapper').removeClass('d-none');
+        $('.attribute-condition-note').remove();
+        $('.attribute-values').show();
+        $('.attribute-values [data-value-id]').show(); // ensure all values shown initially
+
+        attributeConditions.forEach(condition => {
+            if (condition.action === 'hide') {
+                const parentAttrId = +condition.parent_attribute_id;
+                const parentValueId = +condition.parent_value_id;
+                const affectedAttrId = +condition.affected_attribute_id;
+
+                const $parentWrapper = $(`[data-attribute-id="${parentAttrId}"]`);
+                const $affectedWrapper = $(`[data-attribute-id="${affectedAttrId}"]`);
+
+                // Get selected value ID from parent
+                let selectedValueId = null;
+
+                const $active = $parentWrapper.find('.attribute-values .active[data-value-id]');
+                if ($active.length) {
+                    selectedValueId = +$active.data('value-id');
+                } else {
+                    const $select = $parentWrapper.find('select');
+                    if ($select.length && $select.val()) {
+                        selectedValueId = +$select.find('option:selected').data('value-id');
+                    }
+                }
+
+                const shouldShow = selectedValueId === parentValueId;
+
+                if (shouldShow) {
+                    $affectedWrapper.removeClass('disabled');
+                    $affectedWrapper.find('.attribute-values').show();
+                } else {
+                    $affectedWrapper.addClass('disabled');
+                    $affectedWrapper.find('.attribute-values').hide();
+
+                    const parentValueLabel =
+                        $parentWrapper.find(`[data-value-id="${parentValueId}"]`).text().trim() ||
+                        $parentWrapper.find(`option[data-value-id="${parentValueId}"]`).text().trim();
+                    $affectedWrapper.append(`
+                            <p class="attribute-condition-note text-danger mt-2">
+                                Only available for ${parentValueLabel}.
+                            </p>
+                        `);
+                }
+            }
+
+            if (condition.action === 'change_option' || condition.action === 'change_options') {
+                const affectedAttrId = +condition.affected_attribute_id;
+                const $affected = $(`[data-attribute-id="${affectedAttrId}"]`);
+                const $valuesPart = $affected.find('.attribute-values');
+                const $label = $affected.find('label').first();
+                const attributeLabel = $label.clone().children().remove().end().text().trim();
+
+                // Hide values and disable inputs
+                $valuesPart.hide().find('input, select, button').prop('disabled', true);
+
+                // Only insert checkbox if not already there
+                if (!$affected.find('.change-option-checkbox').length) {
+                    console.log($label);
+                    
+                    $label.hide(); // Hide original label
+
+                    const checkboxHTML = `
+            <div class="form-check d-flex mb-2">
+                <input class="form-check-input change-option-checkbox" type="checkbox" id="toggle-${affectedAttrId}" data-affected-id="${affectedAttrId}" style="border: 1px solid #212529">
+                <label class="form-label" for="toggle-${affectedAttrId}" style="margin-bottom:0px">
+                    ${attributeLabel}
+                </label>
+            </div>
+        `;
+
+                    $label.before(checkboxHTML);
+                }
+            }
+
+        });
+    }
+
+
+    $(document).on('change', '.change-option-checkbox', function () {
+        const affectedAttrId = $(this).data('affected-id');
+        const $wrapper = $(`[data-attribute-id="${affectedAttrId}"]`);
+        const $values = $wrapper.find('.attribute-values');
+
+        if ($(this).is(':checked')) {
+            $values.slideDown().find('input, select, button').prop('disabled', false);
+        } else {
+            $values.slideUp().find('input, select, button').prop('disabled', true);
+        }
+    });
+
+
+    $(document).ready(function () {
+        applyInitialHideConditions();
+        calculateTotalPrice();
+        getRangeConsideringDependencies();
+        calculatedAttributeRow();
+
+
+        $('.estimate-option').on('click', function () {
+            $('.estimate-option').removeClass('active');
+            $('.estimate-option .ast-active').removeClass('ast-active');
+
+            $('.detail-section').addClass('d-none');
+            $('.title').addClass('d-none');
+
+            $(this).addClass('active');
+            $(this).find('div').first().addClass('ast-active');
+
+            $(this).find('.detail-section').removeClass('d-none');
+            $(this).find('.title').removeClass('d-none');
+        });
+
+        // Show details for the initially active card (based on is_default)
+        const $initial = $('.estimate-option.active');
+        $initial.find('.detail-section').removeClass('d-none');
+        $initial.find('.title').removeClass('d-none');
+
+        $('.selectable-proof-option').on('click', function () {
+            const $this = $(this);
+            // If already active → unselect
+            if ($this.hasClass('active')) {
+                $this.removeClass('active');
+            } else {
+                // Otherwise, make it active and unselect others
+                $('.selectable-proof-option').removeClass('active');
+                $this.addClass('active');
+            }
+
+            calculateTotalPrice(); // always recalculate
+        });
+
+    });
+
+
 </script><?php /**PATH D:\web-mingo-project\new\resources\views/front/calculator.blade.php ENDPATH**/ ?>

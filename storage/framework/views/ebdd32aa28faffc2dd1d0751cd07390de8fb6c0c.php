@@ -1,3 +1,18 @@
+<style>
+    .form-control {
+        border: 2px solid #e0e0e0 !important;
+        color: black !important;
+        border-radius: .375rem !important;
+    }
+
+    .custom-select {
+        border: 2px solid #e0e0e0 !important;
+        color: black !important;
+        border-radius: .375rem !important;
+    }
+</style>
+
+
 <?php
     $inputType = $attribute['input_type'] ?? 'radio';
     $values = $attribute['values'] ?? [];
@@ -8,7 +23,7 @@
 <?php if($inputType === 'radio' && $supportImage): ?>
     <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="<?php echo e($attribute['id']); ?>"
         data-is-required="<?php echo e($attribute['is_required']); ?>">
-        <label class="form-label d-flex align-items-center" style="gap: 5px;">
+        <label class="form-label">
             <?php echo e($attribute['name']); ?>
 
             <span class="help-circle" data-label="<?php echo e($attribute['name']); ?>" data-toggle="modal"
@@ -19,7 +34,7 @@
                 <div class="paper-type-section">
                     <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <button type="button"
-                            class="btn btn-light radio-button text-start <?php echo e($value['is_default'] ? 'active' : ''); ?>"
+                            class="btn btn-light print-color text-start <?php echo e($value['is_default'] ? 'active' : ''); ?>"
                             data-attribute-id="<?php echo e($attribute['id']); ?>" data-value-id="<?php echo e($value['id']); ?>"
                             data-image="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default-preview.png'))); ?>" <?php echo e($value['is_default'] ? 'data-selected=true' : ''); ?>>
                             <?php echo e($value['value']); ?>
@@ -28,14 +43,19 @@
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
+            <?php
+                $imagePath = asset('storage/' . ($value['image_path'] ?? 'default-preview.png'));
+            ?>
+
             <div class="col-md-6 d-flex align-items-center justify-content-center">
                 <div class="border rounded overflow-hidden" style="width: 100%; height: 200px; padding: 3px;">
                     <img id="preview-image-<?php echo e($attribute['id']); ?>"
                         src="<?php echo e(asset('storage/' . ($attribute['values'][0]['image_path'] ?? 'default-preview.png'))); ?>"
                         class="img-fluid h-100 w-100 object-fit-cover" alt="Preview">
+
                     <div class="zoom-section">
                         <div class="zoomicon" data-bs-toggle="modal" data-bs-target="#imageZoomModal"
-                            style="cursor: pointer;">
+                            data-image="<?php echo e($imagePath); ?>"  style="cursor: pointer;">
                             <i class="fa-solid fa-magnifying-glass-plus"></i>
                         </div>
                     </div>
@@ -43,6 +63,7 @@
             </div>
         </div>
     </div>
+
 
     
 <?php elseif($inputType === 'radio'): ?>
@@ -79,8 +100,8 @@
                 <div class="choose-binding <?php echo e($value['is_default'] ? 'active' : ''); ?>" data-value="<?php echo e($value['value']); ?>"
                     data-attribute-id="<?php echo e($attribute['id']); ?>" data-value-id="<?php echo e($value['id']); ?>">
                     <div>
-                        <img src="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default.png'))); ?>"
-                            alt="<?php echo e($value['value']); ?>" />
+                        <img src="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default.png'))); ?>" alt="<?php echo e($value['value']); ?>"
+                            style="height:133px;" />
                         <div class="zoom-section1">
                             <div class="zoomicon">
                                 <i class="fa-solid fa-magnifying-glass-plus"></i>
@@ -91,6 +112,7 @@
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
+       
     </div>
 
     
@@ -104,7 +126,7 @@
                 <span class="help-circle" data-label="<?php echo e($attribute['name']); ?>" data-toggle="modal"
                     data-target="#helpModal">?</span>
             </label>
-            <button type="button" class="btn btn-link p-0">Custom Size</button>
+            <!--<button type="button" class="btn btn-link p-0">Custom Size</button>-->
         </div>
         <div class="attribute-values">
             <select class="custom-select" id="dropdown_<?php echo e($attribute['id']); ?>" name="attributes[<?php echo e($attribute['id']); ?>]">

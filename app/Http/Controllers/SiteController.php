@@ -1,7 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\DeliveryCharge;
 use App\Models\PricingRule;
+use App\Models\ProofReading;
 use App\Models\Subcategory;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -33,202 +35,216 @@ class SiteController extends Controller
 
         $subcategoryId = $subcategory->id;
 
-        $defaultQuantity = PricingRule::where('subcategory_id', $subcategoryId)->value('default_quantity');
-        $pagesDraggerRequired = PricingRule::where('subcategory_id', $subcategoryId)->value('pages_dragger_required');
-        $defaultPages = PricingRule::where('subcategory_id', $subcategoryId)->value('default_pages');
+        // NEW: Check if calculator is required
+        $calculatorRequired = $subcategory->calculator_required;
 
-        // Set the dragger attribute ID only if required
+        $attributeGroups = collect();
+        $conditionsMap = collect();
+        $pagesDraggerRequired = null;
         $pagesDraggerAttributeId = null;
-        if ($pagesDraggerRequired) {
-            $pagesDraggerAttributeId = PricingRule::where('subcategory_id', $subcategoryId)
-                ->value('pages_dragger_dependency');
-        }
-
-        $compositeDraggerValues = [];
-
-        if ($pagesDraggerAttributeId) {
-            $attribute = \App\Models\Attribute::find($pagesDraggerAttributeId);
-            if ($attribute && $attribute->is_composite) {
-                $compositeDraggerValues = \App\Models\SubcategoryAttributeValue::with('value.components')
-                    ->where('subcategory_id', $subcategoryId)
-                    ->where('attribute_id', $pagesDraggerAttributeId)
-                    ->get()
-                    ->filter(fn($sav) => $sav->value->is_composite_value)
-                    ->map(function ($sav) {
-                        return [
-                            'id' => $sav->value->id,
-                            'value' => $sav->value->value,
-                            'component_count' => $sav->value->components->count(),
-                            'components' => $sav->value->components->pluck('value')->toArray(), // or use entire object if needed
-                        ];
-                    })
-                    ->values();
-            }
-        }
-
-        // dd($compositeDraggerValues);
-
-
-        $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
-        // Get all attributes with quantity ranges
-        $attributesWithRanges = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)
-            ->with('quantityRanges') // eager load
-            ->get();
+        $compositeDraggerValues = collect();
+        $compositeMap = collect();
+        $defaultQuantity = null;
+        $defaultPages = null;
         $attributeQuantityRanges = [];
+        $deliveryCharges = collect();
+        $deliveryChargesRequired = false;
+        $proofReadingRequired = false;
+        $proofReadings = collect();
 
-        foreach ($attributesWithRanges as $attribute) {
-            $basis = $attribute->attribute->pricing_basis ?? null;
+        if ($calculatorRequired) {
+            $defaultQuantity = PricingRule::where('subcategory_id', $subcategoryId)->value('default_quantity');
+            $pagesDraggerRequired = PricingRule::where('subcategory_id', $subcategoryId)->value('pages_dragger_required');
+            $defaultPages = PricingRule::where('subcategory_id', $subcategoryId)->value('default_pages');
 
-            if ($basis !== 'per_page') {
-                continue;
+            // Set the dragger attribute ID only if required
+            if ($pagesDraggerRequired) {
+                $pagesDraggerAttributeId = PricingRule::where('subcategory_id', $subcategoryId)
+                    ->value('pages_dragger_dependency');
             }
 
-            $valueId = $attribute->value_id;
-            $dependency = $attribute->dependencies->first();
-            $key = $dependency ? $dependency->parent_value_id : 'default';
-
-            $minFrom = null;
-            $maxTo = null;
-
-            foreach ($attribute->quantityRanges as $range) {
-                if (is_null($minFrom) || $range->quantity_from < $minFrom) {
-                    $minFrom = $range->quantity_from;
-                }
-
-                if (is_null($maxTo) || $range->quantity_to > $maxTo) {
-                    $maxTo = $range->quantity_to;
-                }
-            }
-
-            if (!is_null($minFrom) && !is_null($maxTo)) {
-                $attributeQuantityRanges[$valueId][$key] = [
-                    'min' => $minFrom,
-                    'max' => $maxTo,
-                ];
-            }
-        }
-
-
-        // dd($attributeQuantityRanges);
-
-        $attributeValues = \App\Models\SubcategoryAttributeValue::with('value')
-            ->where('subcategory_id', $subcategoryId)
-            ->get()
-            ->groupBy('attribute_id');
-
-        $groupAssignments = \App\Models\AttributeGroupSubcategoryAssignment::with(['group', 'group.attributes'])
-            ->where('subcategory_id', $subcategoryId)
-            ->orderBy('sort_order', 'asc')
-            ->get();
-
-        $subcategoryAttributes = \App\Models\SubcategoryAttribute::with('attribute')
-            ->where('subcategory_id', $subcategoryId)
-            ->orderBy('sort_order')
-            ->get();
-
-        // Create a map for quick lookup of is_required by attribute_id
-        $subcategoryAttrMap = $subcategoryAttributes->keyBy('attribute_id');
-
-        // Function to map a single attribute to structured array
-        $mapAttributeData = function ($attribute, $is_required) use ($attributeValues) {
-            $values = $attributeValues[$attribute->id] ?? collect();
-
-            return [
-                'id' => $attribute->id,
-                'name' => $attribute->name,
-                'input_type' => $attribute->input_type,
-                'has_image' => $attribute->has_image,
-                'is_composite' => $attribute->is_composite,
-                'is_required' => (bool) $is_required,
-                'values' => $values->map(function ($sav) use ($attribute) {
-                    $valueId = $sav->value->id;
-
-                    $isDefault = PricingRuleAttribute::where(function ($q) use ($attribute, $valueId) {
-                        $q->where('attribute_id', $attribute->id)
-                            ->where('value_id', $valueId);
-                    })
-                        ->orWhereHas('dependencies', function ($q) use ($attribute, $valueId) {
-                            $q->where('parent_attribute_id', $attribute->id)
-                                ->where('parent_value_id', $valueId);
+            if ($pagesDraggerAttributeId) {
+                $attribute = \App\Models\Attribute::find($pagesDraggerAttributeId);
+                if ($attribute && $attribute->is_composite) {
+                    $compositeDraggerValues = \App\Models\SubcategoryAttributeValue::with('value.components')
+                        ->where('subcategory_id', $subcategoryId)
+                        ->where('attribute_id', $pagesDraggerAttributeId)
+                        ->get()
+                        ->filter(fn($sav) => $sav->value->is_composite_value)
+                        ->map(function ($sav) {
+                            return [
+                                'id' => $sav->value->id,
+                                'value' => $sav->value->value,
+                                'component_count' => $sav->value->components->count(),
+                                'components' => $sav->value->components->pluck('value')->toArray(),
+                            ];
                         })
-                        ->value('is_default');
+                        ->values();
+                }
+            }
+
+            $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
+
+            if ($pricingRule) {
+                $attributesWithRanges = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)
+                    ->with('quantityRanges')
+                    ->get();
+
+                foreach ($attributesWithRanges as $attribute) {
+                    $basis = $attribute->attribute->pricing_basis ?? null;
+
+                    if ($basis !== 'per_page') {
+                        continue;
+                    }
+
+                    $valueId = $attribute->value_id;
+                    $dependency = $attribute->dependencies->first();
+                    $key = $dependency ? $dependency->parent_value_id : 'default';
+
+                    $minFrom = null;
+                    $maxTo = null;
+
+                    foreach ($attribute->quantityRanges as $range) {
+                        if (is_null($minFrom) || $range->quantity_from < $minFrom) {
+                            $minFrom = $range->quantity_from;
+                        }
+
+                        if (is_null($maxTo) || $range->quantity_to > $maxTo) {
+                            $maxTo = $range->quantity_to;
+                        }
+                    }
+
+                    if (!is_null($minFrom) && !is_null($maxTo)) {
+                        $attributeQuantityRanges[$valueId][$key] = [
+                            'min' => $minFrom,
+                            'max' => $maxTo,
+                        ];
+                    }
+                }
+
+                $deliveryChargesRequired = $pricingRule->delivery_charges_required;
+                if ($deliveryChargesRequired) {
+                    $deliveryCharges = DeliveryCharge::orderByDesc('is_default')
+                        ->orderBy('no_of_days')
+                        ->get();
+                }
+
+                $proofReadingRequired = $pricingRule->proof_reading_required;
+                if ($proofReadingRequired) {
+                    $proofReadings = ProofReading::get();
+                }
+            }
 
 
-                    return [
-                        'id' => $valueId,
-                        'value' => $sav->value->value,
-                        'image_path' => $sav->value->image_path,
-                        'is_default' => (bool) $isDefault,
-                        'is_composite_value' => $sav->value->is_composite_value,
-                    ];
-                }),
-            ];
-        };
+            // Fetch attribute groups and mappings
+            $attributeValues = \App\Models\SubcategoryAttributeValue::with('value')
+                ->where('subcategory_id', $subcategoryId)
+                ->get()
+                ->groupBy('attribute_id');
 
-        // Grouped attributes
-        $attributeGroups = $groupAssignments->map(function ($assignment) use ($mapAttributeData, $subcategoryAttrMap) {
-            return [
-                'group_name' => $assignment->group->name,
-                'sort_order' => $assignment->sort_order,
-                'is_toggleable' => $assignment->is_toggleable,
-                'attributes' => $assignment->group->attributes->map(function ($attr) use ($mapAttributeData, $subcategoryAttrMap) {
-                    $is_required = $subcategoryAttrMap[$attr->id]->is_required ?? false;
-                    return $mapAttributeData($attr, $is_required);
-                }),
-            ];
-        });
+            $groupAssignments = \App\Models\AttributeGroupSubcategoryAssignment::with(['group', 'group.attributes'])
+                ->where('subcategory_id', $subcategoryId)
+                ->orderBy('sort_order', 'asc')
+                ->get();
 
-        // Ungrouped attributes
-        $groupedAttributeIds = $groupAssignments
-            ->flatMap(fn($ga) => $ga->group->attributes->pluck('id'))
-            ->unique()
-            ->toArray();
+            $subcategoryAttributes = \App\Models\SubcategoryAttribute::with('attribute')
+                ->where('subcategory_id', $subcategoryId)
+                ->orderBy('sort_order')
+                ->get();
 
-        $ungroupedAttributes = $subcategoryAttributes
-            ->filter(function ($sa) use ($groupedAttributeIds) {
-                return !in_array($sa->attribute_id, $groupedAttributeIds);
-            })
-            ->map(fn($sa) => $mapAttributeData($sa->attribute, $sa->is_required));
+            $subcategoryAttrMap = $subcategoryAttributes->keyBy('attribute_id');
 
-        if ($ungroupedAttributes->isNotEmpty()) {
-            $attributeGroups->prepend([
-                'group_name' => 'Main Attributes',
-                'sort_order' => 0,
-                'is_toggleable' => false,
-                'attributes' => $ungroupedAttributes->values(),
-            ]);
-        }
+            $mapAttributeData = function ($attribute, $is_required) use ($attributeValues) {
+                $values = $attributeValues[$attribute->id] ?? collect();
 
-        // Attribute conditions
-        $attributeConditions = \App\Models\AttributeCondition::with(['parentAttribute', 'parentValue', 'affectedAttribute', 'affectedValues'])
-            ->where('subcategory_id', $subcategoryId)
-            ->get();
+                return [
+                    'id' => $attribute->id,
+                    'name' => $attribute->name,
+                    'input_type' => $attribute->input_type,
+                    'has_image' => $attribute->has_image,
+                    'is_composite' => $attribute->is_composite,
+                    'is_required' => (bool) $is_required,
+                    'values' => $values->map(function ($sav) use ($attribute) {
+                        $valueId = $sav->value->id;
 
-        $conditionsMap = $attributeConditions->map(function ($cond) use ($subcategoryId) {
-            $affectedValueIds = $cond->affectedValues->pluck('id')->toArray();
+                        $isDefault = PricingRuleAttribute::where(function ($q) use ($attribute, $valueId) {
+                            $q->where('attribute_id', $attribute->id)
+                                ->where('value_id', $valueId);
+                        })
+                            ->orWhereHas('dependencies', function ($q) use ($attribute, $valueId) {
+                                $q->where('parent_attribute_id', $attribute->id)
+                                    ->where('parent_value_id', $valueId);
+                            })
+                            ->value('is_default');
 
-            $allValueIds = \App\Models\SubcategoryAttributeValue::where('subcategory_id', $subcategoryId)
-                ->where('attribute_id', $cond->affected_attribute_id)
-                ->pluck('attribute_value_id')
+                        return [
+                            'id' => $valueId,
+                            'value' => $sav->value->value,
+                            'image_path' => $sav->value->image_path,
+                            'is_default' => (bool) $isDefault,
+                            'is_composite_value' => $sav->value->is_composite_value,
+                        ];
+                    }),
+                ];
+            };
+
+            $attributeGroups = $groupAssignments->map(function ($assignment) use ($mapAttributeData, $subcategoryAttrMap) {
+                return [
+                    'group_name' => $assignment->group->name,
+                    'sort_order' => $assignment->sort_order,
+                    'is_toggleable' => $assignment->is_toggleable,
+                    'attributes' => $assignment->group->attributes->map(function ($attr) use ($mapAttributeData, $subcategoryAttrMap) {
+                        $is_required = $subcategoryAttrMap[$attr->id]->is_required ?? false;
+                        return $mapAttributeData($attr, $is_required);
+                    }),
+                ];
+            });
+
+            $groupedAttributeIds = $groupAssignments
+                ->flatMap(fn($ga) => $ga->group->attributes->pluck('id'))
+                ->unique()
                 ->toArray();
 
-            return [
-                'parent_attribute_id' => $cond->parent_attribute_id,
-                'parent_value_id' => $cond->parent_value_id,
-                'affected_attribute_id' => $cond->affected_attribute_id,
-                'affected_value_ids' => $affectedValueIds,
-                'all_values_affected' => !array_diff($allValueIds, $affectedValueIds),
-                'action' => $cond->action,
-            ];
-        });
+            $ungroupedAttributes = $subcategoryAttributes
+                ->filter(function ($sa) use ($groupedAttributeIds) {
+                    return !in_array($sa->attribute_id, $groupedAttributeIds);
+                })
+                ->map(fn($sa) => $mapAttributeData($sa->attribute, $sa->is_required));
 
-        $compositeMap = collect($compositeDraggerValues)->pluck('component_count', 'id');
+            if ($ungroupedAttributes->isNotEmpty()) {
+                $attributeGroups->prepend([
+                    'group_name' => 'Main Attributes',
+                    'sort_order' => 0,
+                    'is_toggleable' => false,
+                    'attributes' => $ungroupedAttributes->values(),
+                ]);
+            }
 
-        // Always ensure "-- Select --" is present even if there are no values
-        $compositeMap = $compositeMap->prepend('-- Select --', '');
+            $attributeConditions = \App\Models\AttributeCondition::with(['parentAttribute', 'parentValue', 'affectedAttribute', 'affectedValues'])
+                ->where('subcategory_id', $subcategoryId)
+                ->get();
 
+            $conditionsMap = $attributeConditions->map(function ($cond) use ($subcategoryId) {
+                $affectedValueIds = $cond->affectedValues->pluck('id')->toArray();
 
-        // dd($compositeDraggerValues->toArray());
+                $allValueIds = \App\Models\SubcategoryAttributeValue::where('subcategory_id', $subcategoryId)
+                    ->where('attribute_id', $cond->affected_attribute_id)
+                    ->pluck('attribute_value_id')
+                    ->toArray();
+                    return [
+                        'parent_attribute_id' => $cond->parent_attribute_id,
+                        'parent_value_id' => $cond->parent_value_id,
+                        'affected_attribute_id' => $cond->affected_attribute_id,
+                        'affected_value_ids' => $affectedValueIds,
+                        'all_values_affected' => !array_diff($allValueIds, $affectedValueIds),
+                        'action' => $cond->action,
+                ];
+            });
+
+            $compositeMap = collect($compositeDraggerValues)->pluck('component_count', 'id');
+            $compositeMap = $compositeMap->prepend('-- Select --', '');
+        }
+
         return view('front.subcategory-detail', compact(
             'subcategory',
             'attributeGroups',
@@ -239,8 +255,13 @@ class SiteController extends Controller
             'compositeMap',
             'defaultQuantity',
             'defaultPages',
-            'attributeQuantityRanges'
+            'attributeQuantityRanges',
+            'deliveryChargesRequired',
+            'deliveryCharges',
+            'proofReadingRequired',
+            'proofReadings'
         ));
+
     }
 
     public function shopCategories()

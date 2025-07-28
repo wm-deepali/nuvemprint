@@ -1,11 +1,42 @@
 
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 <?php $__env->startSection('title'); ?>
     Nuvem Prints
 <?php $__env->stopSection(); ?>
- <link href="assets/css/app.css" rel="stylesheet">
+<link href="assets/css/app.css" rel="stylesheet">
 <?php $__env->startPush('after-styles'); ?>
     <style>
+        .dropdown-menu {
+            -webkit-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+            border: 0 solid #e9ecef !important;
+            font-size: 14px !important;
+            margin: 8px 0 0 !important;
+            border-radius: 0px !important;
+            background-color: rgb(30 30 30 / 90%) !important;
+        }
+
+        .dropdown-toggle::after {
+            display: none !important;
+        }
+
+        .primary-menu .navbar .dropdown-large-menu ul li {
+            background: black;
+        }
+
+        .list-group-item.active {
+            background-color: #656565 !important;
+            border-color: #656565 !important;
+        }
+
+        .nav-item a {
+            color: gray !important;
+        }
+
         .page-wrapper {
             height: auto;
         }
@@ -153,6 +184,18 @@
             background: #00aaa5;
         }
     </style>
+    <style>
+        .custom-op {
+            border: 2px solid #6bd3cc !important;
+            color: black !important;
+            border-radius: .375rem !important;
+        }
+
+        input::placeholder {
+            color: #000 !important;
+            opacity: 1 !important;
+        }
+    </style>
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -167,9 +210,9 @@
                         <div>Cart</div>
                     </a>
 
-                    <a href="<?php echo e(route('artwork')); ?>" class="custom-stepper-step" data-path="<?php echo e(route('artwork')); ?>">
+                    <a href="/checkout" class="custom-stepper-step" data-path="/checkout">
                         <div class="custom-stepper-circle"><span>2</span></div>
-                        <div>Artwork</div>
+                        <div>Checkout</div>
                     </a>
 
                     <a href="/payment" class="custom-stepper-step" data-path="/payment">
@@ -197,7 +240,7 @@
 
             <!--start breadcrumb-->
             <section class="py-3 border-bottom d-none d-md-flex" style="background: #f1f2f7;
-                  padding: 40px 0;">
+          padding: 40px 0;">
                 <!--end shop cart-->
                 <div class="container" style="max-width: 900px;">
                     <div class="row g-4">
@@ -205,7 +248,10 @@
                         <div class="col-md-7">
                             <div class="cart-box">
                                 <!-- <div class="section-title">Shopping Cart</div> -->
-                                <p><strong>Shipping Estimate:</strong> Monday, 21st July 2025</p>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <p><strong>Shipping:</strong> Monday, 21st July 2025</p>
+                                    <h5><strong>Subtotal:</strong> £15.00 </h5>
+                                </div>
 
                                 <div class="d-flex align-items-start mb-3">
                                     <img src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/boundSubstrateTypeId/thumbnails/3.png"
@@ -216,8 +262,8 @@
                                         <p class="mb-1">Full-colour printing (outside), 130gsm Silk</p>
                                         <a href="#">Want Multiple Delivery Addresses?</a>
                                         <div class="d-flex justify-content-between mb-3 mt-3 ">
-                                            <span>Subtotal:</span>
-                                            <span>£15.00 <br><span>VAT: £3.00</span></span>
+                                            <!-- <span>Subtotal:</span>
+              <span>£15.00 <br><span>VAT: £3.00</span></span> -->
 
 
                                         </div>
@@ -229,9 +275,9 @@
                                 <hr />
                                 <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
 
-                                    <button class="btn-info  "><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn-info trash "><i class="fa-solid fa-trash"></i></button>
                                     <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                                    <button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>
+                                    <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
                                 </div>
 
                                 <div class="upgrade-box mb-3">
@@ -240,7 +286,7 @@
                                     <button class="btn btn-custom btn-sm">Get Deal</button>
                                 </div>
 
-                                <p>Enter your Postcode to get delivery rates</p>
+                                <!--<p>Enter your Postcode to get delivery rates</p>-->
                                 <p><strong>Delivery Weight:</strong> 2.00 kg</p>
                             </div>
                         </div>
@@ -249,11 +295,11 @@
                         <div class="col-md-5">
                             <div class="quote-box">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <strong>Your Quote</strong>
-                                    <button class="btn btn-light btn-sm">📧</button>
+                                    <h5>Quote Number:<strong> #4545666</strong></h5>
+
                                 </div>
 
-                                <p class="mb-1"><small>Quote Reference: 1667893</small></p>
+                                <!--<p class="mb-1"><small>Quote Reference: 1667893</small></p>-->
 
                                 <div class="d-flex justify-content-between">
                                     <span><strong>Art Prints x 500 Copies</strong></span>
@@ -269,28 +315,29 @@
 
                                 <p><strong>Total Weight:</strong> 2.00 kg</p>
 
-                                <div class="mb-2">
-                                    <label class="form-label">Calculate Shipping & Delivery:</label>
-                                    <select class="form-select">
+                                <div class="mb42">
+                                    <label class="form-label" style="font-size:16px; font-weight:600;">Calculate Shipping &
+                                        Delivery:</label>
+                                    <select class="form-select custom-op">
                                         <option>United Kingdom</option>
                                     </select>
                                 </div>
 
-                                <div class="input-group mb-2">
+                                <div class="input-group mb-2 " style="margin-top:30px;">
                                     <input type="text" class="form-control" placeholder="Enter Postcode">
                                     <button class="btn btn-custom">Apply</button>
                                 </div>
 
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="plainPackage">
-                                    <label class="form-check-label" for="plainPackage">Use Plain Packaging</label>
-                                </div>
 
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control"
-                                        placeholder="Enter discount code if you have one">
-                                    <button class="btn btn-custom">Apply</button>
-                                </div>
+                                <!--<div class="form-check form-switch mb-3">-->
+                                <!--  <input class="form-check-input" type="checkbox" id="plainPackage">-->
+                                <!--  <label class="form-check-label" for="plainPackage">Use Plain Packaging</label>-->
+                                <!--</div>-->
+
+                                <!--<div class="input-group mb-3">-->
+                                <!--  <input type="text" class="form-control" placeholder="Enter discount code if you have one">-->
+                                <!--  <button class="btn btn-custom">Apply</button>-->
+                                <!--</div>-->
                                 <hr>
                                 <div class="d-flex justify-content-between">
                                     <span>Subtotal:</span>
@@ -312,8 +359,7 @@
                                     <span><strong>£18.00</strong></span>
                                 </div>
                                 <hr>
-                                <button class="continue-class" data-route="<?php echo e(route('artwork')); ?>">Continue</button>
-
+                                <button class="continue-class">Continue</button>
                                 <button class="start-new">Start New Qoute</button>
                             </div>
                         </div>

@@ -1,3 +1,18 @@
+<style>
+    .form-control {
+        border: 2px solid #e0e0e0 !important;
+        color: black !important;
+        border-radius: .375rem !important;
+    }
+
+    .custom-select {
+        border: 2px solid #e0e0e0 !important;
+        color: black !important;
+        border-radius: .375rem !important;
+    }
+</style>
+
+
 @php
     $inputType = $attribute['input_type'] ?? 'radio';
     $values = $attribute['values'] ?? [];
@@ -8,7 +23,7 @@
 @if ($inputType === 'radio' && $supportImage)
     <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="{{ $attribute['id'] }}"
         data-is-required="{{ $attribute['is_required'] }}">
-        <label class="form-label d-flex align-items-center" style="gap: 5px;">
+        <label class="form-label">
             {{ $attribute['name'] }}
             <span class="help-circle" data-label="{{ $attribute['name'] }}" data-toggle="modal"
                 data-target="#helpModal">?</span>
@@ -18,7 +33,7 @@
                 <div class="paper-type-section">
                     @foreach ($values as $value)
                         <button type="button"
-                            class="btn btn-light radio-button text-start {{ $value['is_default'] ? 'active' : '' }}"
+                            class="btn btn-light print-color text-start {{ $value['is_default'] ? 'active' : '' }}"
                             data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
                             data-image="{{ asset('storage/' . ($value['image_path'] ?? 'default-preview.png')) }}" {{ $value['is_default'] ? 'data-selected=true' : '' }}>
                             {{ $value['value'] }}
@@ -26,14 +41,19 @@
                     @endforeach
                 </div>
             </div>
+            @php
+                $imagePath = asset('storage/' . ($value['image_path'] ?? 'default-preview.png'));
+            @endphp
+
             <div class="col-md-6 d-flex align-items-center justify-content-center">
                 <div class="border rounded overflow-hidden" style="width: 100%; height: 200px; padding: 3px;">
                     <img id="preview-image-{{ $attribute['id'] }}"
-                        src="{{ asset('storage/' . ($attribute['values'][0]['image_path'] ?? 'default-preview.png')) }}"
+                        src="{{   asset('storage/' . ($attribute['values'][0]['image_path'] ?? 'default-preview.png'))}}"
                         class="img-fluid h-100 w-100 object-fit-cover" alt="Preview">
+
                     <div class="zoom-section">
                         <div class="zoomicon" data-bs-toggle="modal" data-bs-target="#imageZoomModal"
-                            style="cursor: pointer;">
+                            data-image="{{ $imagePath  }}" {{-- Add this --}} style="cursor: pointer;">
                             <i class="fa-solid fa-magnifying-glass-plus"></i>
                         </div>
                     </div>
@@ -41,6 +61,7 @@
             </div>
         </div>
     </div>
+
 
     {{-- ========== PLAIN RADIO ========== --}}
 @elseif ($inputType === 'radio')
@@ -75,8 +96,8 @@
                 <div class="choose-binding {{ $value['is_default'] ? 'active' : '' }}" data-value="{{ $value['value'] }}"
                     data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}">
                     <div>
-                        <img src="{{ asset('storage/' . ($value['image_path'] ?? 'default.png')) }}"
-                            alt="{{ $value['value'] }}" />
+                        <img src="{{ asset('storage/' . ($value['image_path'] ?? 'default.png')) }}" alt="{{ $value['value'] }}"
+                            style="height:133px;" />
                         <div class="zoom-section1">
                             <div class="zoomicon">
                                 <i class="fa-solid fa-magnifying-glass-plus"></i>
@@ -87,6 +108,7 @@
                 </div>
             @endforeach
         </div>
+       
     </div>
 
     {{-- ========== DROPDOWN SELECT ========== --}}
@@ -99,7 +121,7 @@
                 <span class="help-circle" data-label="{{ $attribute['name'] }}" data-toggle="modal"
                     data-target="#helpModal">?</span>
             </label>
-            <button type="button" class="btn btn-link p-0">Custom Size</button>
+            <!--<button type="button" class="btn btn-link p-0">Custom Size</button>-->
         </div>
         <div class="attribute-values">
             <select class="custom-select" id="dropdown_{{ $attribute['id'] }}" name="attributes[{{ $attribute['id'] }}]">

@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\AttributeConditionController;
 use App\Http\Controllers\Admin\PricingRuleController;
 use App\Http\Controllers\Admin\QuoteController;
 
+use App\Http\Controllers\Admin\VatController;
 use App\Http\Controllers\DeliveryChargeController;
 use App\Http\Controllers\ProofReadingController;
 use Illuminate\Support\Facades\Route;
@@ -362,6 +363,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::resource('proof-reading', ProofReadingController::class);
         Route::resource('delivery-charges', DeliveryChargeController::class);
+        Route::resource('manage-vat', VatController::class);
 
 
         // ===== Quote Pricing ===== //

@@ -39,7 +39,7 @@ class PricingRule extends Model
 
     public function quantities()
     {
-        return $this->hasMany(PricingRuleQuantity::class);
+        return $this->hasMany(PricingRuleQuantity::class)->orderBy('created_at');
     }
 
     public function attributes()

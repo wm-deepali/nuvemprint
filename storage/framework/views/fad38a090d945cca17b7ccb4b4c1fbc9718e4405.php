@@ -38,9 +38,11 @@
             <thead>
             <tr>
               <th>#</th>
+              <th>Title</th>
+              <th>No. of Days</th>
               <th>Price</th>
               <th>Details</th>
-              <th>No. of Days</th>
+              <th>Default</th>
               <th>Created At</th>
               <th width="100px">Action</th>
             </tr>
@@ -49,13 +51,19 @@
             <?php $__empty_1 = true; $__currentLoopData = $deliverCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
         <tr>
           <td><?php echo e($index + 1); ?></td>
+          <td><?php echo e($item->title); ?></td>
+          <td><?php echo e($item->no_of_days); ?></td>
           <td>$<?php echo e(number_format($item->price, 2)); ?></td>
           <td title="<?php echo e(strip_tags($item->details)); ?>">
           <?php echo e(\Illuminate\Support\Str::limit(strip_tags($item->details), 50)); ?>
 
           </td>
+          <td>
+            <span class="badge badge-<?php echo e($item->is_default ? 'success' : 'secondary'); ?>">
+            <?php echo e($item->is_default ? 'Yes' : 'No'); ?>
 
-          <td><?php echo e($item->no_of_days); ?></td>
+            </span>
+            </td>
           <td><?php echo e($item->created_at->format('Y-m-d')); ?></td>
           <td>
           <div class="d-flex">

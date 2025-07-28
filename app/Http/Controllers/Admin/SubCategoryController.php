@@ -61,6 +61,7 @@ class SubCategoryController extends Controller
             'status' => 'required|in:active,inactive',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'calculator_required' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -95,6 +96,7 @@ class SubCategoryController extends Controller
                 'thumbnail' => $thumbnailPath,
                 'gallery' => $galleryPaths,
                 'status' => $request->status,
+                'calculator_required' => $request->calculator_required ?? 0,
             ]);
 
             // Attach multiple categories
@@ -163,6 +165,7 @@ class SubCategoryController extends Controller
             'status' => 'required|in:active,inactive',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'calculator_required' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -211,6 +214,7 @@ class SubCategoryController extends Controller
                 'status' => $request->status,
                 'thumbnail' => $subcategory->thumbnail,
                 'gallery' => array_values($existingGallery), // reset keys
+                'calculator_required' => $request->calculator_required ?? 0,
             ]);
 
             $subcategory->categories()->sync($request->category_ids);

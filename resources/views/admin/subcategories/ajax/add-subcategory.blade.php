@@ -8,37 +8,42 @@
             <form id="subcategory-form" enctype="multipart/form-data">
                 @csrf
 
-                {{-- Categories --}}
-                <div class="form-group">
-                    <label>Select Categories</label>
-                    <div class="form-control" style="height:150px; overflow-y:scroll;">
-                        @foreach($categories as $category)
-                            <div class="form-check">
-                                <input type="checkbox" name="category_ids[]" value="{{ $category->id }}" class="form-check-input">
-                                <label class="form-check-label">{{ $category->name }}</label>
-                            </div>
-                        @endforeach
+                <div class="form-row">
+                    {{-- Categories --}}
+                    <div class="form-group col-md-6">
+                        <label>Select Categories</label>
+                        <div class="form-control" style="height:150px; overflow-y:scroll;">
+                            @foreach($categories as $category)
+                                <div class="form-check">
+                                    <input type="checkbox" name="category_ids[]" value="{{ $category->id }}"
+                                        class="form-check-input">
+                                    <label class="form-check-label">{{ $category->name }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="text-danger validation-err" id="category_ids-err"></div>
                     </div>
-                    <div class="text-danger validation-err" id="category_ids-err"></div>
+
+                    {{-- Description --}}
+                    <div class="form-group col-md-6">
+                        <label>Description</label>
+                        <textarea name="description" id="description" class="form-control" rows="3"
+                            style="height:110px;"></textarea>
+                    </div>
                 </div>
 
-                {{-- Name --}}
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" id="name" class="form-control">
-                    <div class="text-danger validation-err" id="name-err"></div>
-                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Name</label>
+                        <input type="text" name="name" id="name" class="form-control">
+                        <div class="text-danger validation-err" id="name-err"></div>
+                    </div>
 
-                {{-- Description --}}
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" id="description" class="form-control" rows="3"></textarea>
-                </div>
-
-                {{-- Thumbnail --}}
-                <div class="form-group">
-                    <label>Thumbnail</label>
-                    <input type="file" name="thumbnail" class="form-control">
+                    {{-- Thumbnail --}}
+                    <div class="form-group col-md-6">
+                        <label>Thumbnail</label>
+                        <input type="file" name="thumbnail" class="form-control">
+                    </div>
                 </div>
 
                 {{-- Gallery --}}
@@ -79,14 +84,28 @@
                     </div>
                 </div>
 
-                {{-- Status --}}
-                <div class="form-group pt-1">
-                    <label>Status</label>
-                    <select name="status" id="status" class="form-control">
-                        <option value="active" selected>Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                <div class="form-row pt-1">
+                    {{-- Calculator Required --}}
+                    <div class="form-group col-md-6">
+                        <label>Calculator Required</label>
+                        <select name="calculator_required" id="calculator_required" class="form-control">
+                            <option value="0" selected>No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                        <div class="text-danger validation-err" id="calculator_required-err"></div>
+                    </div>
+
+                    {{-- Status --}}
+                    <div class="form-group col-md-6">
+                        <label>Status</label>
+                        <select name="status" id="status" class="form-control">
+                            <option value="active" selected>Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <div class="text-danger validation-err" id="status-err"></div>
+                    </div>
                 </div>
+
 
                 <button type="button" class="btn btn-primary" id="add-subcategory-btn">Save</button>
             </form>

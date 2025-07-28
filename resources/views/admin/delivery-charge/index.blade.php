@@ -38,9 +38,11 @@
             <thead>
             <tr>
               <th>#</th>
+              <th>Title</th>
+              <th>No. of Days</th>
               <th>Price</th>
               <th>Details</th>
-              <th>No. of Days</th>
+              <th>Default</th>
               <th>Created At</th>
               <th width="100px">Action</th>
             </tr>
@@ -49,12 +51,17 @@
             @forelse ($deliverCharges as $index => $item)
         <tr>
           <td>{{ $index + 1 }}</td>
+          <td>{{ $item->title }}</td>
+          <td>{{ $item->no_of_days }}</td>
           <td>${{ number_format($item->price, 2) }}</td>
           <td title="{{ strip_tags($item->details) }}">
           {{ \Illuminate\Support\Str::limit(strip_tags($item->details), 50) }}
           </td>
-
-          <td>{{ $item->no_of_days }}</td>
+          <td>
+            <span class="badge badge-{{ $item->is_default ? 'success' : 'secondary' }}">
+            {{ $item->is_default ? 'Yes' : 'No' }}
+            </span>
+            </td>
           <td>{{ $item->created_at->format('Y-m-d') }}</td>
           <td>
           <div class="d-flex">

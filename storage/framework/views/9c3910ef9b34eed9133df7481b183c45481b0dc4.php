@@ -1,4 +1,3 @@
-
 <nav class="header-navbar navbar-expand-lg navbar navbar-fixed align-items-center navbar-brand-center"
   data-nav="brand-center">
   <div class="navbar-header d-xl-block d-none">
@@ -124,28 +123,28 @@
             <li><a class="dropdown-item d-flex align-items-center"
                 href="<?php echo e(route('admin.pricing-rules.index')); ?>"><span>Pricing Rules
                 </span></a></li>
-                
+
           </ul>
         </li>
 
-         <li class="dropdown nav-item" data-menu="dropdown">
+        <li class="dropdown nav-item" data-menu="dropdown">
           <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
             <span>Customer & Orders</span>
           </a>
           <ul class="dropdown-menu">
-            <li><a class=" dropdown-item d-flex align-items-center"
-                href="<?php echo e(route('admin.customers')); ?>"><span> Customers</span></a>
+            <li><a class=" dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.customers')); ?>"><span>
+                  Customers</span></a>
             </li>
-              <li><a class="dropdown-item d-flex align-items-center"
-                href="<?php echo e(route('admin.quote.request')); ?>"><span> Quote Request</span></a>
+            <li><a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.quote.request')); ?>"><span>
+                  Quote Request</span></a>
             </li>
-            <li><a class="dropdown-item d-flex align-items-center"
-                href="<?php echo e(route('admin.quote.request')); ?>"><span> Orders</span></a>
+            <li><a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.quote.request')); ?>"><span>
+                  Orders</span></a>
             </li>
           </ul>
         </li>
 
-         <li class="dropdown nav-item" data-menu="dropdown">
+        <li class="dropdown nav-item" data-menu="dropdown">
           <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
             <span>Content Management</span>
           </a>
@@ -153,8 +152,8 @@
             <li><a class=" dropdown-item d-flex align-items-center"
                 href="<?php echo e(route('admin.content.blogs')); ?>"><span>Manage Blogs</span></a>
             </li>
-            <li><a class="dropdown-item d-flex align-items-center"
-                href="<?php echo e(route('admin.content.faq')); ?>"><span>Manage FAQ</span></a>
+            <li><a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.content.faq')); ?>"><span>Manage
+                  FAQ</span></a>
             </li>
             <li><a class="dropdown-item d-flex align-items-center"
                 href="<?php echo e(route('admin.content.dynamic.pages')); ?>"><span>Dynamic Page Creations</span></a>
@@ -165,17 +164,25 @@
           </ul>
         </li>
 
-         <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link d-flex align-items-center" href="<?php echo e(route('admin.proof-reading.index')); ?>">
             <span>Proof Reading</span>
           </a>
         </li>
-      
-         <li class="nav-item">
+
+        <li class="nav-item">
           <a class="nav-link d-flex align-items-center" href="<?php echo e(route('admin.delivery-charges.index')); ?>">
             <span>Delivery Charges</span>
           </a>
         </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center" href="<?php echo e(route('admin.manage-vat.index')); ?>">
+            <span>Manage Vat</span>
+          </a>
+        </li>
+
 
         <li class="nav-item">
           <a class="nav-link d-flex align-items-center" href="<?php echo e(route('admin.manage.department')); ?>">

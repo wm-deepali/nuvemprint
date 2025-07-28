@@ -40,7 +40,7 @@ class PricingRuleAttribute extends Model
 
     public function quantityRanges()
     {
-        return $this->hasMany(PricingRuleAttributeQuantity::class);
+        return $this->hasMany(PricingRuleAttributeQuantity::class)->orderBy('created_at');
     }
 
     public function dependencies()
