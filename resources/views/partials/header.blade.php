@@ -105,23 +105,23 @@
                 href="{{ route('admin.manage-categories.index') }}"><span>Categories</span></a></li>
 
             <li><a class="dropdown-item d-flex align-items-center"
-                href="{{ route('admin.manage-subcategories.index') }}"><span>Subcategories</span></a></li>
+                href="{{ route('admin.manage-subcategories.index') }}"><span>Sub Categories</span></a></li>
 
             <li><a class="dropdown-item d-flex align-items-center"
                 href="{{ route('admin.attributes.index') }}"><span>Attributes</span></a></li>
             <li><a class="dropdown-item d-flex align-items-center"
-                href="{{ route('admin.attribute-groups.index') }}"><span>Attribute Groups</span></a></li>
+                href="{{ route('admin.attribute-values.index') }}"><span>Attributes Values</span></a></li>
             <li><a class="dropdown-item d-flex align-items-center"
-                href="{{ route('admin.attribute-values.index') }}"><span>Attribute Values</span></a></li>
+                href="{{ route('admin.subcategory-attributes.index') }}"><span>Attributes Mapping</span></a></li>
             <li><a class="dropdown-item d-flex align-items-center"
-                href="{{ route('admin.subcategory-attributes.index') }}"><span>Attribute Mapping</span></a></li>
-            <li><a class="dropdown-item d-flex align-items-center"
-                href="{{ route('admin.group-assignments.index') }}"><span>Group Assignments</span></a></li>
-            <li><a class="dropdown-item d-flex align-items-center"
-                href="{{ route('admin.attribute-conditions.index') }}"><span>Attribute Conditions</span></a></li>
-            <li><a class="dropdown-item d-flex align-items-center"
-                href="{{ route('admin.pricing-rules.index') }}"><span>Pricing Rules
+                href="{{ route('admin.pricing-rules.index') }}"><span>Price Rule Setting
                 </span></a></li>
+            <li><a class="dropdown-item d-flex align-items-center"
+                href="{{ route('admin.attribute-groups.index') }}"><span>Attributes Grouping</span></a></li>
+            <li><a class="dropdown-item d-flex align-items-center"
+                href="{{ route('admin.group-assignments.index') }}"><span>Attributes Group Mapping</span></a></li>
+            <li><a class="dropdown-item d-flex align-items-center"
+                href="{{ route('admin.attribute-conditions.index') }}"><span>Attributes Conditions</span></a></li>
 
           </ul>
         </li>
@@ -169,12 +169,19 @@
           </a>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="{{ route('admin.delivery-charges.index') }}">
-            <span>Delivery Charges</span>
-          </a>
-        </li>
 
+        <li class="dropdown nav-item" data-menu="dropdown">
+          <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
+            <span>Shipping & Delivery</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item d-flex align-items-center"
+                href="{{ route('admin.delivery-charges.index') }}"><span>Delivery Charges</span></a></li>
+
+            <li><a class="dropdown-item d-flex align-items-center"
+                href="{{ route('admin.postal-codes.index') }}"><span>Postal codes</span></a></li>
+          </ul>
+        </li>
 
         <li class="nav-item">
           <a class="nav-link d-flex align-items-center" href="{{ route('admin.manage-vat.index') }}">

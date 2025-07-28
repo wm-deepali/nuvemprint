@@ -53,7 +53,6 @@
                 <label><strong>Action <span class="text-danger">*</span></strong></label>
                 <select name="conditions[0][action]" class="form-control">
                   <option value="">-- Select Action --</option>
-                  <option value="show">Show</option>
                   <option value="hide">Hide</option>
                   <option value="change_options">Change Options</option>
                 </select>

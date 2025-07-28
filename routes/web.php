@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\QuoteController;
 
 use App\Http\Controllers\Admin\VatController;
 use App\Http\Controllers\DeliveryChargeController;
+use App\Http\Controllers\PostalCodeController;
 use App\Http\Controllers\ProofReadingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\{
@@ -363,6 +364,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::resource('proof-reading', ProofReadingController::class);
         Route::resource('delivery-charges', DeliveryChargeController::class);
+        Route::resource('postal-codes', PostalCodeController::class);
         Route::resource('manage-vat', VatController::class);
 
 

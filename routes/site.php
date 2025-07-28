@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
@@ -35,10 +36,10 @@ Route::get('/', [SiteController::class, 'index'])->name('home');
 Route::get('{slug}/details', [SiteController::class, 'subcateDetails'])->name('subcategory-details');
 Route::post('/calculate-price', [SiteController::class, 'calculate'])->name('calculate.price');
 
-
-Route::get('cart', function () {
-    return view('front.shop-cart');
-})->name('shop-cart');
+Route::get('cart', [CartController::class, 'showCart'])->name('shop-cart');
+Route::post('cart/store', [CartController::class, 'addToCart'])->name('shop-cart.store');
+Route::post('/check-postcode', [CartController::class, 'check'])->name('check.postcode');
+Route::post('/get-vat', [CartController::class, 'getByTitle'])->name('get.vat.by.title');
 
 
 Route::get('checkout', function () {

@@ -36,7 +36,6 @@
         <div class="form-group">
           <label><strong>Action</strong></label>
           <select name="action" class="form-control">
-            <option value="show" {{ $condition->action == 'show' ? 'selected' : '' }}>Show</option>
             <option value="hide" {{ $condition->action == 'hide' ? 'selected' : '' }}>Hide</option>
             <option value="change_options" {{ $condition->action == 'change_options' ? 'selected' : '' }}>Change Options</option>
           </select>

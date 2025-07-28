@@ -1,11 +1,13 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Attribute;
 use App\Models\DeliveryCharge;
 use App\Models\PricingRule;
 use App\Models\ProofReading;
 use App\Models\Subcategory;
 use App\Models\Category;
+use App\Models\Vat;
 use Illuminate\Http\Request;
 use App\Models\PricingRuleAttribute;
 use App\Models\AttributeValue;
@@ -231,13 +233,13 @@ class SiteController extends Controller
                     ->where('attribute_id', $cond->affected_attribute_id)
                     ->pluck('attribute_value_id')
                     ->toArray();
-                    return [
-                        'parent_attribute_id' => $cond->parent_attribute_id,
-                        'parent_value_id' => $cond->parent_value_id,
-                        'affected_attribute_id' => $cond->affected_attribute_id,
-                        'affected_value_ids' => $affectedValueIds,
-                        'all_values_affected' => !array_diff($allValueIds, $affectedValueIds),
-                        'action' => $cond->action,
+                return [
+                    'parent_attribute_id' => $cond->parent_attribute_id,
+                    'parent_value_id' => $cond->parent_value_id,
+                    'affected_attribute_id' => $cond->affected_attribute_id,
+                    'affected_value_ids' => $affectedValueIds,
+                    'all_values_affected' => !array_diff($allValueIds, $affectedValueIds),
+                    'action' => $cond->action,
                 ];
             });
 

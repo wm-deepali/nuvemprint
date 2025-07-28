@@ -85,83 +85,15 @@
             <td><?php echo e($rule->default_quantity ?? '-'); ?></td>
 
             <td>
-            <?php $__empty_2 = true; $__currentLoopData = $rule->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
-          <div class="mb-1">
-            <div>
-            <strong><?php echo e($attr->attribute->name ?? '-'); ?></strong>:
-            <?php echo e($attr->value->value ?? '-'); ?>
+            <?php echo e($rule->attributes->count()); ?> Attribute<?php echo e($rule->attributes->count() !== 1 ? 's' : ''); ?>
 
-            <?php if($attr->is_default): ?>
-          <span class="badge badge-pill badge-primary ml-1" title="Default value">Default</span>
-          <?php endif; ?>
-            </div>
-            
-            <div class="small text-muted ml-1">
-            <em>
-            (<?php echo e(ucfirst($attr->price_modifier_type)); ?>
-
-            <?php echo e($attr->price_modifier_type === 'multiply' ? '×' : ''); ?>
-
-            <?php echo e(rtrim(rtrim(number_format($attr->price_modifier_value, 4, '.', ''), '0'), '.')); ?>
-
-            <?php echo e($attr->base_charges_type === 'percentage' ? '%' : ''); ?>
-
-            <?php echo e($attr->extra_copy_charge ? '| Extra: ' . rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.') : ''); ?>
-
-            <?php echo e($attr->extra_copy_charge_type === 'percentage' ? '%' : ''); ?>)
-            </em>
-            </div>
-
-            
-            <?php if($attr->dependencies && $attr->dependencies->isNotEmpty()): ?>
-          <div class="small text-danger ml-1 mt-1">
-          <u><strong>Depends on:</strong></u>
-          <ul class="mb-0 pl-3">
-          <?php $__currentLoopData = $attr->dependencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dep): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-          <li>
-          <strong><?php echo e($dep->parentAttribute->name ?? 'Attribute #' . $dep->parent_attribute_id); ?></strong>
-          =
-          <span
-          class="text-dark"><?php echo e($dep->parentValue->value ?? 'Value #' . $dep->parent_value_id); ?></span>
-          </li>
-          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-          </ul>
-          </div>
-          <?php endif; ?>
-
-            
-            <?php if($attr->quantityRanges->isNotEmpty()): ?>
-          <div class="ml-1 text-muted small mt-1">
-          <u>
-          <?php echo e($attr->attribute->pricing_basis === 'per_product' ? 'Per Product Pricing:' : 'Per Page Pricing:'); ?>
-
-          </u>
-          <ul class="mb-0 pl-3">
-          <?php $__currentLoopData = $attr->quantityRanges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $range): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-          <li>
-          From <strong><?php echo e($range->quantity_from); ?></strong> to
-          <strong><?php echo e($range->quantity_to); ?></strong>:
-          ₹<?php echo e(rtrim(rtrim(number_format($range->price, 4, '.', ''), '0'), '.')); ?>
-
-          </li>
-          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-          </ul>
-          </div>
-          <?php endif; ?>
-            <?php if($attr->is_fixed_per_page && $attr->fixed_per_page_price): ?>
-          <div class="ml-1 text-muted small mt-1">
-          <u>Fixed Per Page Price:</u>
-          ₹<?php echo e(rtrim(rtrim(number_format($attr->fixed_per_page_price, 4, '.', ''), '0'), '.')); ?>
-
-          </div>
-          <?php endif; ?>
-          </div>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
-          <span class="text-muted">No Modifiers</span>
-        <?php endif; ?>
             </td>
 
+
             <td>
+            <a href="<?php echo e(route('admin.pricing-rules.show', $rule->id)); ?>" class="btn btn-sm btn-info">
+            <i class="fas fa-eye"></i> View
+            </a>
             <a href="<?php echo e(route('admin.pricing-rules.edit', $rule->id)); ?>" class="btn btn-sm btn-primary">
             <i class="fas fa-edit"></i> Edit
             </a>
@@ -169,6 +101,7 @@
             <i class="fas fa-trash"></i> Delete
             </button>
             </td>
+
 
 
           </tr>

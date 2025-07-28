@@ -1,4 +1,7 @@
 @extends('layouts.new-master')
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -195,6 +198,11 @@
             color: #000 !important;
             opacity: 1 !important;
         }
+
+        .form-select option {
+            background-color: #fff;
+            color: #000;
+        }
     </style>
 @endpush
 
@@ -240,7 +248,7 @@
 
             <!--start breadcrumb-->
             <section class="py-3 border-bottom d-none d-md-flex" style="background: #f1f2f7;
-          padding: 40px 0;">
+                                                                              padding: 40px 0;">
                 <!--end shop cart-->
                 <div class="container" style="max-width: 900px;">
                     <div class="row g-4">
@@ -248,121 +256,168 @@
                         <div class="col-md-7">
                             <div class="cart-box">
                                 <!-- <div class="section-title">Shopping Cart</div> -->
-                                <div class="d-flex justify-content-between mb-3">
-                                    <p><strong>Shipping:</strong> Monday, 21st July 2025</p>
-                                    <h5><strong>Subtotal:</strong> £15.00 </h5>
-                                </div>
+                                @php
+                                    use Carbon\Carbon;
 
-                                <div class="d-flex align-items-start mb-3">
-                                    <img src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/boundSubstrateTypeId/thumbnails/3.png"
-                                        class="img-thumb me-3 " alt="Product Image">
-                                    <div class="col-9">
-                                        <p class="mb-1"><strong>500 Art Prints</strong></p>
-                                        <p class="mb-1">Size: A5 (148 mm x 210 mm)</p>
-                                        <p class="mb-1">Full-colour printing (outside), 130gsm Silk</p>
-                                        <a href="#">Want Multiple Delivery Addresses?</a>
-                                        <div class="d-flex justify-content-between mb-3 mt-3 ">
-                                            <!-- <span>Subtotal:</span>
-              <span>£15.00 <br><span>VAT: £3.00</span></span> -->
-
-
-                                        </div>
+                                    $formattedDate = isset($cartData['delivery']['date']) ? Carbon::parse($cartData['delivery']['date'])->translatedFormat('l, jS F Y') : '';
+                                @endphp
+                                @if ($cartData)
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <p><strong>Shipping:</strong> {{ $formattedDate }}</p>
+                                        <h5><strong>Subtotal:</strong> £{{ $cartData['subtotal'] }} </h5>
                                     </div>
 
-                                </div>
+                                    <div class="d-flex align-items-start mb-3">
+                                        @if($cartData['subcategory_thumbnail'])
+                                            <img src="{{ asset('storage/' . $cartData['subcategory_thumbnail']) }}"
+                                                alt="Product Thumbnail" class="img-thumb me-3">
+                                        @else
+                                            <img src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/boundSubstrateTypeId/thumbnails/3.png"
+                                                class="img-thumb me-3 " alt="Product Image">
+                                        @endif
+                                        <div class="col-9">
+                                            <p class="mb-1"><strong>{{ $cartData['quantity'] }}
+                                                    {{ $cartData['subcategory_name'] }}</strong></p>
+                                            @foreach ($cartData['attributes_resolved'] as $attr)
+                                                <p class="mb-1">
+                                                    {{ $attr['attribute_name'] }}: {{ $attr['value_name'] }}
+                                                    @if (!empty($attr['value_description']))
+                                                        ({{ $attr['value_description'] }})
+                                                    @endif
+                                                </p>
+                                            @endforeach
+                                            <!-- <div class="d-flex justify-content-between mb-3 mt-3 ">
+                                                                                                        <span>Subtotal:</span>
+                                                                                              <span>£15.00 <br><span>VAT: £3.00</span></span>
 
 
-                                <hr />
-                                <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
+                                                                                                    </div> -->
+                                        </div>
 
-                                    <button class="btn-info trash "><i class="fa-solid fa-trash"></i></button>
-                                    <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                                    <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
-                                </div>
+                                    </div>
 
-                                <div class="upgrade-box mb-3">
-                                    <p class="mb-2">Upgrade to 1,000 copies for just £13.00 extra and save £0.00 on each
-                                        copy</p>
-                                    <button class="btn btn-custom btn-sm">Get Deal</button>
-                                </div>
 
-                                <!--<p>Enter your Postcode to get delivery rates</p>-->
-                                <p><strong>Delivery Weight:</strong> 2.00 kg</p>
+                                    <hr />
+                                    <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
+
+                                        <!-- <button class="btn-info trash "><i class="fa-solid fa-trash"></i></button>
+                                                        <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
+                                        <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
+                                    </div>
+
+
+
+                                    <!--<p>Enter your Postcode to get delivery rates</p>-->
+                                    <p><strong>Delivery Weight:</strong> {{ $cartData['paper_total_weight'] }} kg</p>
+
+                                @else
+                                    <div class="text-center py-5">
+                                        <h4>Your cart is empty</h4>
+                                        <a href="/" class="btn btn-primary mt-3">Add Order</a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
                         <!-- Right Section -->
-                        <div class="col-md-5">
-                            <div class="quote-box">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5>Quote Number:<strong> #4545666</strong></h5>
+                        @if ($cartData)
+                            <div class="col-md-5">
+                                <div class="quote-box">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5>Quote Number:<strong> #{{ $cartData['quote_id'] }}</strong></h5>
+
+                                    </div>
+
+                                    <!--<p class="mb-1"><small>Quote Reference: 1667893</small></p>-->
+
+                                    <div class="d-flex justify-content-between">
+                                        <span><strong>{{ $cartData['subcategory_name'] }} x {{ $cartData['quantity'] }}
+                                                Copies</strong></span>
+                                        <span>£{{ $cartData['subtotal'] }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <span>Delivery Cost</span>
+                                        <span class="delivery_charge">£{{ $cartData['delivery']['price'] }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <span>Proof Reading Cost</span>
+                                        <span>£{{ $cartData['proof']['price'] }}</span>
+                                    </div>
+
+                                    <hr>
+
+                                    <p><strong>Total Weight:</strong> {{ $cartData['paper_total_weight'] }} kg</p>
+
+
+                                    <div class="mb42">
+                                        <label class="form-label" style="font-size:16px; font-weight:600;">
+                                            Calculate Shipping & Delivery:
+                                        </label>
+                                        <select class="form-select custom-op" id="deliverySelect" name="delivery[id]">
+                                            @foreach($allDeliveryCharges->groupBy('continent') as $continent => $charges)
+                                                <optgroup label="{{ ucfirst($continent) }}">
+                                                    @foreach ($charges as $charge)
+                                                        <option value="{{ $charge->id }}" data-title="{{ $charge->title }}"
+                                                            data-price="{{ $charge->price }}" {{ $cartData['delivery_title'] == $charge->title ? 'selected' : '' }}>
+                                                            {{ $charge->title }}
+                                                        </option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+
+                                    <div class="input-group mb-2 " style="margin-top:30px;">
+                                        <input type="text" class="form-control" placeholder="Enter Postcode" id="postcodeInput">
+                                        <button class="btn btn-custom" id="applyPostcodeBtn">Apply</button>
+                                    </div>
+                                    <p id="postcodeStatus" class="mt-2"></p>
+
+
+                                    <!--<div class="form-check form-switch mb-3">-->
+                                    <!--  <input class="form-check-input" type="checkbox" id="plainPackage">-->
+                                    <!--  <label class="form-check-label" for="plainPackage">Use Plain Packaging</label>-->
+                                    <!--</div>-->
+
+                                    <!--<div class="input-group mb-3">-->
+                                    <!--  <input type="text" class="form-control" placeholder="Enter discount code if you have one">-->
+                                    <!--  <button class="btn btn-custom">Apply</button>-->
+                                    <!--</div>-->
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Subtotal:</span>
+                                        <span id="subtotal">£{{ $cartData['subtotal'] }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <span>Total Delivery Cost:</span>
+                                        <span class="delivery_charge">£{{ $cartData['delivery']['price'] }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <span>Total Proof Reading Cost:</span>
+                                        <span>£{{ $cartData['proof']['price'] }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <span>VAT:</span>
+                                        <span>£{{$cartData['vat_amount']  }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between  mt-2">
+                                        <span><strong>Grand Total</strong></span>
+                                        <span><strong id="grandTotalAmount">£{{ $cartData['grand_total'] }}</strong></span>
+                                    </div>
+                                    <hr>
+                                    <button class="continue-class">Continue</button>
+                                    <button class="start-new">Start New Qoute</button>
 
                                 </div>
-
-                                <!--<p class="mb-1"><small>Quote Reference: 1667893</small></p>-->
-
-                                <div class="d-flex justify-content-between">
-                                    <span><strong>Art Prints x 500 Copies</strong></span>
-                                    <span>£15.00</span>
-                                </div>
-
-                                <div class="d-flex justify-content-between">
-                                    <span>Delivery Cost</span>
-                                    <span>£0.00</span>
-                                </div>
-
-                                <hr>
-
-                                <p><strong>Total Weight:</strong> 2.00 kg</p>
-
-                                <div class="mb42">
-                                    <label class="form-label" style="font-size:16px; font-weight:600;">Calculate Shipping &
-                                        Delivery:</label>
-                                    <select class="form-select custom-op">
-                                        <option>United Kingdom</option>
-                                    </select>
-                                </div>
-
-                                <div class="input-group mb-2 " style="margin-top:30px;">
-                                    <input type="text" class="form-control" placeholder="Enter Postcode">
-                                    <button class="btn btn-custom">Apply</button>
-                                </div>
-
-
-                                <!--<div class="form-check form-switch mb-3">-->
-                                <!--  <input class="form-check-input" type="checkbox" id="plainPackage">-->
-                                <!--  <label class="form-check-label" for="plainPackage">Use Plain Packaging</label>-->
-                                <!--</div>-->
-
-                                <!--<div class="input-group mb-3">-->
-                                <!--  <input type="text" class="form-control" placeholder="Enter discount code if you have one">-->
-                                <!--  <button class="btn btn-custom">Apply</button>-->
-                                <!--</div>-->
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <span>Subtotal:</span>
-                                    <span>£15.00</span>
-                                </div>
-
-                                <div class="d-flex justify-content-between">
-                                    <span>Total Delivery Cost:</span>
-                                    <span>£0.00</span>
-                                </div>
-
-                                <div class="d-flex justify-content-between">
-                                    <span>VAT:</span>
-                                    <span>£3.00</span>
-                                </div>
-
-                                <div class="d-flex justify-content-between  mt-2">
-                                    <span><strong>Grand Total</strong></span>
-                                    <span><strong>£18.00</strong></span>
-                                </div>
-                                <hr>
-                                <button class="continue-class">Continue</button>
-                                <button class="start-new">Start New Qoute</button>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -373,29 +428,83 @@
 @endsection
 
 <script>
-    document.querySelector('.continue-class')?.addEventListener('click', function () {
-        const route = this.dataset.route;
-        if (route) {
-            window.location.href = route;
-        }
+    $(document).ready(function () {
+        $('#deliverySelect').on('change', function () {
+            let selected = $(this).find('option:selected');
+            let price = parseFloat(selected.data('price')) || 0;
+            let deliveryTitle = selected.data('title') || '';
+
+            // Update delivery cost in UI
+            $('.delivery_charge').text('£' + price.toFixed(2));
+
+            // Fetch updated VAT from server
+            fetch('{{ route('get.vat.by.title') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ title: deliveryTitle })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const vatPercentage = parseFloat(data.vat_percentage) || 0;
+                    const subtotal = parseFloat("{{ $cartData['subtotal'] ?? 0 }}") || 0;
+                    const proof = parseFloat("{{ $cartData['proof']['price'] ?? 0 }}") || 0;
+
+                    const vatAmount = (subtotal + proof + price) * vatPercentage / 100;
+                    const grandTotal = subtotal + proof + price + vatAmount;
+
+                    // Update VAT and Grand Total in UI
+                    $('[id="grandTotalAmount"]').text('£' + grandTotal.toFixed(2));
+                    $('[id="subtotal"]').text('£' + subtotal.toFixed(2));
+                    $('span:contains("VAT:")').next().text('£' + vatAmount.toFixed(2));
+                });
+        });
+
     });
 
-    const currentPath = window.location.pathname;
-    const steps = document.querySelectorAll('.custom-stepper-step');
+    document.addEventListener('DOMContentLoaded', function () {
+        const applyBtn = document.getElementById('applyPostcodeBtn');
+        const postcodeInput = document.getElementById('postcodeInput');
+        const status = document.getElementById('postcodeStatus');
 
-    let activeIndex = -1;
+        if (applyBtn && postcodeInput && status) {
+            applyBtn.addEventListener('click', function () {
+                const postcode = postcodeInput.value.trim();
 
-    steps.forEach((step, index) => {
-        if (step.dataset.path === currentPath) {
-            activeIndex = index;
+                fetch('{{ route('check.postcode') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ postcode: postcode })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        status.innerText = data.message;
+                        status.style.color = data.exists ? 'green' : 'red';
+                    })
+                    .catch(() => {
+                        status.innerText = 'Something went wrong.';
+                        status.style.color = 'red';
+                    });
+            });
         }
-    });
 
-    steps.forEach((step, index) => {
-        if (index < activeIndex) {
-            step.classList.add('completed');
-        } else if (index === activeIndex) {
-            step.classList.add('active');
-        }
+        // Highlight current step
+        const currentPath = window.location.pathname;
+        const steps = document.querySelectorAll('.custom-stepper-step');
+        let activeIndex = -1;
+
+        steps.forEach((step, index) => {
+            if (step.dataset.path === currentPath) activeIndex = index;
+        });
+
+        steps.forEach((step, index) => {
+            if (index < activeIndex) step.classList.add('completed');
+            else if (index === activeIndex) step.classList.add('active');
+        });
     });
 </script>

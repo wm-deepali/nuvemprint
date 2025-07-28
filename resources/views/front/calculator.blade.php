@@ -620,7 +620,23 @@
         color: #888 !important;
     }
 </style>
-
+<style>
+    @media only screen and (max-width: 600px) {
+ .tab-buttons {
+    display: flex !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    overflow: scroll !important;
+}
+.tab-buttons::-webkit-scrollbar{
+    display:none !important;
+  
+}
+.primary-menu .navbar{
+    display:none;
+}
+}
+</style>
 
 <div class="row">
     <div class="col-md-7">
@@ -641,10 +657,9 @@
                 <div class="calculation-card mt-3">
                     {{-- Display attributes with values --}}
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="quantityInput" class="form-label"
-                               >Quantity <span class="help-circle" data-label="Quantity"
-                                    data-toggle="modal" data-target="#helpModal">?</span></label>
+ <div class="col-md-6 mb-3">
+                            <label for="quantityInput" class="form-label">Quantity <span class="help-circle"
+                                    data-label="Quantity" data-toggle="modal" data-target="#helpModal">?</span></label>
                             <input type="number" class="form-control" id="quantityInput" placeholder="100" value={{ $defaultQuantity ?? '100' }}>
                         </div>
 
@@ -732,9 +747,9 @@
                         $title = $option['title'] ?? null;
                     @endphp
 
-                    <div class="estimate-card estimate-option {{ $option['is_default'] ? 'active' : 'mt-3' }}"
-                        data-price="{{ $option['price'] }}" data-date="{{ $formattedDate }}">
-
+                 
+<div class="estimate-card estimate-option {{ $option['is_default'] ? 'active' : 'mt-3' }}"
+                        data-price="{{ $option['price'] }}" data-date="{{ $formattedDate }}" data-id="{{ $option['id'] }}">
                         <div class="circle-point"></div>
                         <div class="est-card">
 
@@ -774,12 +789,13 @@
             @if ($proofReadingRequired && !empty($proofReadings))
                 <div class="form-row-section1 mt-3">
                     <div class="s-row mb-3">
-                        <label for="proof-reading">Proof Reading</label>
+                        <label for="proof-reading" style="    font-size: 1.25rem;">Proof Reading</label>
                         <div class="d-flex flex-wrap gap-3">
                             @foreach ($proofReadings as $index => $option)
                                 @if (!empty($option['proof_type']) && isset($option['price']))
                                     <div class="selectable-proof-option border rounded p-2 text-center"
-                                        data-value="{{ $option['proof_type'] }}" data-price="{{ $option['price'] }}"
+                                        data-id="{{ $option['id'] }}" data-value="{{ $option['proof_type'] }}"
+                                        data-price="{{ $option['price'] }}"
                                         style="width: 140px; cursor: pointer; background-color: #f9f9f9;">
                                         <strong style="font-size: 13px;">{{ $option['proof_type'] }}</strong>
                                         <div class="text-muted" style="font-size: 12px;">
@@ -795,9 +811,9 @@
 
 
 
-
-            <div class="addtobtn mt-3">
-                <button id="addToCartBtn" data-route="{{ route('shop-cart') }}">Add to Cart</button>
+<div class="addtobtn mt-3">
+                <button id="addToCartBtn" data-route="{{ route("shop-cart.store") }}"
+                    data-subcategory-id="{{ $subcategory->id }}">Add to Cart</button>
                 @if ($deliveryChargesRequired)
                     <div class="note-dis">
                         <p>Delivery dates are estimated.</p>
@@ -805,26 +821,27 @@
                 @endif
 
             </div>
+          
         </div>
 
-        <div class="extra-card mt-3">
-            <img
-                src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />
-            <div class="extra-card-details">
-                <h6 class="m-0">Print on Demand</h6>
-                <p>Download the free PDF template we created for your specifications.</p>
-                <a href="">Get a Qoute</a>
-            </div>
-        </div>
-        <div class="extra-card mt-3">
-            <img
-                src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />
-            <div class="extra-card-details">
-                <h6 class="m-0">Print on Demand</h6>
-                <p>Download the free PDF template we created for your specifications.</p>
-                <a href="">Get a Qoute</a>
-            </div>
-        </div>
+        <!--<div class="extra-card mt-3">-->
+        <!--    <img-->
+        <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
+        <!--    <div class="extra-card-details">-->
+        <!--        <h6 class="m-0">Print on Demand</h6>-->
+        <!--        <p>Download the free PDF template we created for your specifications.</p>-->
+        <!--        <a href="">Get a Qoute</a>-->
+        <!--    </div>-->
+        <!--</div>-->
+        <!--<div class="extra-card mt-3">-->
+        <!--    <img-->
+        <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
+        <!--    <div class="extra-card-details">-->
+        <!--        <h6 class="m-0">Print on Demand</h6>-->
+        <!--        <p>Download the free PDF template we created for your specifications.</p>-->
+        <!--        <a href="">Get a Qoute</a>-->
+        <!--    </div>-->
+        <!--</div>-->
     </div>
 </div>
 
@@ -1340,38 +1357,7 @@
 
 
 
-        $('#addToCartBtn').on('click', function () {
-            let isValid = true;
-            let missingFields = [];
-
-            $('.attribute-wrapper').each(function () {
-                const $wrapper = $(this);
-                const isRequired = $wrapper.data('is-required');
-
-                if (isRequired) {
-                    const hasActive = $wrapper.find('.attr-select.active, .print-color.active, .choose-binding.active').length > 0;
-                    const hasSelect = $wrapper.find('select.custom-select option:selected').filter(function () {
-                        return $(this).val() !== '';
-                    }).length > 0;
-
-                    if (!hasActive && !hasSelect) {
-                        isValid = false;
-
-                        const label = $wrapper.find('label').clone().children().remove().end().text().trim();
-                        missingFields.push(label || 'Required attribute');
-                    }
-                }
-            });
-
-            if (!isValid) {
-                alert(`Please select the following required options:\n- ${missingFields.join('\n- ')}`);
-                return;
-            }
-
-            const route = $(this).data('route');
-            if (route) window.location.href = route;
-        });
-
+      
         updateSliderFill();
 
         calculateTotalPrice();
@@ -1391,11 +1377,14 @@
         });
     });
 
-    function calculatedAttributeRow() {
+     function calculatedAttributeRow() {
         let colSum = 0;
 
-        // Select all attribute blocks inside the row (adjust selector if needed)
-        const $attributeBlocks = $('.row .attribute-wrapper');
+        // Select only visible attribute blocks
+        const $attributeBlocks = $('.row .attribute-wrapper:visible');
+
+        // First, remove any existing hr-wrapper divs
+        $('.hr-wrapper').remove();
 
         $attributeBlocks.each(function (index) {
             const $col = $(this);
@@ -1410,7 +1399,11 @@
             if (colSum >= 12) {
                 // Only insert <hr> if it's not the last one
                 if (index !== $attributeBlocks.length - 1) {
-                    $col.after('<div class="col-md-12"><hr style="height: 0.8px; opacity: 0.25; color: inherit; border: 0; "></div>');
+                    $col.after(`
+                    <div class="col-md-12 hr-wrapper" data-hr-for-index="${index}">
+                        <hr style="height: 0.8px; opacity: 0.25; color: inherit; border: 0;">
+                    </div>
+                `);
                 }
                 colSum = 0;
             }
@@ -1436,12 +1429,15 @@
 
             if (shouldShow) {
                 $affectedWrapper.removeClass('disabled');
-                $affectedWrapper.find('.attribute-values').show();
+                $affectedWrapper.show();
+                calculatedAttributeRow();
             } else {
-                console.log('here');
+
 
                 $affectedWrapper.addClass('disabled');
-                $affectedWrapper.find('.attribute-values').hide();
+                $affectedWrapper.hide();
+                calculatedAttributeRow();
+
                 const parentValueLabel =
                     $parentWrapper.find(`[data-value-id="${parentValueId}"]`).text().trim() ||
                     $parentWrapper.find(`option[data-value-id="${parentValueId}"]`).text().trim();
@@ -1488,10 +1484,13 @@
 
                 if (shouldShow) {
                     $affectedWrapper.removeClass('disabled');
-                    $affectedWrapper.find('.attribute-values').show();
+                    $affectedWrapper.show();
+                    calculatedAttributeRow();
                 } else {
                     $affectedWrapper.addClass('disabled');
-                    $affectedWrapper.find('.attribute-values').hide();
+                    // $affectedWrapper.find('.attribute-values').hide();
+                    $affectedWrapper.hide();
+                    calculatedAttributeRow();
 
                     const parentValueLabel =
                         $parentWrapper.find(`[data-value-id="${parentValueId}"]`).text().trim() ||
@@ -1517,7 +1516,7 @@
                 // Only insert checkbox if not already there
                 if (!$affected.find('.change-option-checkbox').length) {
                     console.log($label);
-                    
+
                     $label.hide(); // Hide original label
 
                     const checkboxHTML = `
@@ -1593,4 +1592,150 @@
     });
 
 
+ $('#addToCartBtn').on('click', function () {
+        let isValid = true;
+        let missingFields = [];
+
+        $('.attribute-wrapper').each(function () {
+            const $wrapper = $(this);
+            const isRequired = $wrapper.data('is-required');
+
+            if (isRequired) {
+                const hasActive = $wrapper.find('.attr-select.active, .print-color.active, .choose-binding.active').length > 0;
+                const hasSelect = $wrapper.find('select.custom-select option:selected').filter(function () {
+                    return $(this).val() !== '';
+                }).length > 0;
+
+                if (!hasActive && !hasSelect) {
+                    isValid = false;
+
+                    const label = $wrapper.find('label').clone().children().remove().end().text().trim();
+                    missingFields.push(label || 'Required attribute');
+                }
+            }
+        });
+
+        if (!isValid) {
+            alert(`Please select the following required options:\n- ${missingFields.join('\n- ')}`);
+            return;
+        }
+
+        const route = $(this).data('route');
+        console.log(route, 'route');
+        // return
+
+        const quantity = parseInt($('#quantityInput').val()) || 1;
+        let pages = parseInt($('#pageSlider').val()) || 32;
+        let compositePages = {};
+
+        const selectedAttributes = {};
+
+        $('.attribute-wrapper .active').each(function () {
+            const attrId = $(this).data('attribute-id');
+            const valueId = $(this).data('value-id');
+            if (attrId && valueId) selectedAttributes[attrId] = valueId;
+        });
+
+        $('select.custom-select').each(function () {
+            const selected = $(this).find('option:selected');
+            const attrId = selected.data('attribute-id');
+            const valueId = selected.data('value-id');
+            if (attrId && valueId) selectedAttributes[attrId] = valueId;
+        });
+
+        // Handle composite pages
+        if ($('.composite-slider').length > 0) {
+            let compositeValueId = null;
+
+            $('.attribute-wrapper .active').each(function () {
+                const valueId = $(this).data('value-id');
+                if (compositeMap[valueId]) {
+                    compositeValueId = valueId;
+                }
+            });
+
+            $('select.custom-select').each(function () {
+                const selected = $(this).find('option:selected');
+                const valueId = selected.data('value-id');
+                if (compositeMap[valueId]) {
+                    compositeValueId = valueId;
+                }
+            });
+
+            const valueObj = compositeDraggerValues.find(val => val.id === compositeValueId);
+            const components = valueObj?.components || [];
+
+            let pageBreakdown = {};
+            $('.composite-slider').each(function () {
+                const index = parseInt($(this).data('index'));
+                const label = components[index - 1] || `Part ${index}`;
+                const value = parseInt($(this).val()) || 0;
+                pageBreakdown[label] = value;
+            });
+
+            compositePages[compositeValueId] = pageBreakdown;
+            pages = 0; // composite overrides
+        }
+
+        // Get selected delivery option
+        const selectedDelivery = $('.estimate-option.active');
+        const deliveryDate = selectedDelivery.data('date') || null;
+        const deliveryPrice = parseFloat(selectedDelivery.data('price')) || 0;
+        const deliveryId = parseInt(selectedDelivery.data('id')) || null;
+
+        // Get selected proof reading option
+        const proofOption = $('.selectable-proof-option.active');
+        const proofType = proofOption.data('value') || null;
+        const proofPrice = parseFloat(proofOption.data('price')) || 0;
+        const proofId = parseInt(proofOption.data('id')) || null;
+
+        const subcategory_id = $(this).data('subcategory-id');
+
+        const selectedCard = $('.estimate-card.active'); // or use `.selected`, however your logic marks it
+
+        if (selectedCard.length === 0) {
+            const finalPriceText = $('.final-price').first().text();
+        }
+
+        const finalPriceText = selectedCard.find('.final-price').text(); // e.g., "£27.50"
+        const totalPrice = parseFloat(finalPriceText.replace('£', '')) || 0;
+
+
+        // Send AJAX to backend
+        $.ajax({
+            url: route,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                quantity,
+                pages,
+                subcategory_id,
+                totalPrice: totalPrice,
+                attributes: selectedAttributes,
+                composite_pages: compositePages,
+                delivery: {
+                    id: deliveryId,
+                    date: deliveryDate,
+                    price: deliveryPrice,
+                },
+                proof: {
+                    id: proofId,
+                    proof_type: proofType,
+                    price: proofPrice,
+                }
+            },
+            success: function (response) {
+                if (response.success && response.redirect_url) {
+                    window.location.href = response.redirect_url;
+                } else {
+                    alert('Something went wrong while adding to cart.');
+                }
+            },
+            error: function (xhr) {
+                alert('Error occurred while adding to cart.');
+                console.error(xhr.responseText);
+            }
+        });
+    });
+    
 </script>

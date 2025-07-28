@@ -42,6 +42,27 @@ class PricingRuleController extends Controller
         return view('admin.pricing-rules.index', compact('rules', 'dependencyAttrs'));
     }
 
+    public function show($id)
+    {
+        $rule = PricingRule::with([
+            'category',
+            'subcategory',
+            'attributes.attribute',
+            'attributes.value',
+            'attributes.quantityRanges',
+            'attributes.dependencies.parentAttribute',
+            'attributes.dependencies.parentValue',
+        ])->latest()->find($id);
+
+        // Collect all non-null pages_dragger_dependency IDs
+        $dependencyAttrIds = $rule->pluck('pages_dragger_dependency')->filter()->unique();
+
+        // Get those attributes and key them by ID
+        $dependencyAttrs = Attribute::whereIn('id', $dependencyAttrIds)->get()->keyBy('id');
+
+        // dd($rules->toArray());
+        return view('admin.pricing-rules.view', compact('rule', 'dependencyAttrs'));
+    }
 
     public function create()
     {
