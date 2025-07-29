@@ -622,20 +622,22 @@
 </style>
 <style>
     @media only screen and (max-width: 600px) {
- .tab-buttons {
-    display: flex !important;
-    gap: 0.5rem !important;
-    margin-bottom: 1rem !important;
-    overflow: scroll !important;
-}
-.tab-buttons::-webkit-scrollbar{
-    display:none !important;
-  
-}
-.primary-menu .navbar{
-    display:none;
-}
-}
+        .tab-buttons {
+            display: flex !important;
+            gap: 0.5rem !important;
+            margin-bottom: 1rem !important;
+            overflow: scroll !important;
+        }
+
+        .tab-buttons::-webkit-scrollbar {
+            display: none !important;
+
+        }
+
+        .primary-menu .navbar {
+            display: none;
+        }
+    }
 </style>
 
 <div class="row">
@@ -657,11 +659,21 @@
                 <div class="calculation-card mt-3">
                     {{-- Display attributes with values --}}
                     <div class="row">
- <div class="col-md-6 mb-3">
-                            <label for="quantityInput" class="form-label">Quantity <span class="help-circle"
-                                    data-label="Quantity" data-toggle="modal" data-target="#helpModal">?</span></label>
-                            <input type="number" class="form-control" id="quantityInput" placeholder="100" value={{ $defaultQuantity ?? '100' }}>
+                        <div class="col-md-6 mb-3">
+                            <label for="quantityInput" class="form-label">
+                                Quantity
+                                <span class="help-circle" data-label="Quantity" data-toggle="modal"
+                                    data-target="#helpModal">?</span>
+                            </label>
+                            <input type="number" class="form-control" id="quantityInput" placeholder="100"
+                                value="{{ $quantityDefaults['default'] ?? 100 }}" min="{{ $quantityDefaults['min'] ?? 1 }}"
+                                max="{{ $quantityDefaults['max'] ?? 10000 }}">
+                            <div class="invalid-feedback d-none" id="quantityError">
+                                Quantity must be between {{ $quantityDefaults['min'] ?? 1 }} and
+                                {{ $quantityDefaults['max'] ?? 10000 }}.
+                            </div>
                         </div>
+
 
                         {{-- Main Group Attributes --}}
                         @isset($mainGroup['attributes'])
@@ -685,17 +697,19 @@
                                         data-target="#helpModal">?</span>
                                 </label>
                                 <div class="page-slider">
-                                    <input type="range" name="pages[]" min="1" max="840" value={{ $defaultPages ?? '1' }}
-                                        id="pageSlider">
+                                    <input type="range" name="pages[]" min="{{ $pagesDefaults['min'] ?? 1 }}"
+                                        max="{{ $pagesDefaults['max'] ?? 840 }}" value="{{ $pagesDefaults['default'] ?? 1 }}"
+                                        step="1" id="pageSlider">
                                     <div class="range-value">
                                         <button type="button">-</button>
-                                        <span id="pageValue">{{ $defaultPages ?? '1' }}</span>
+                                        <span id="pageValue">{{ $pagesDefaults['default'] ?? 1 }}</span>
                                         <button type="button">+</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @endif
+
 
                 </div>
                 {{-- OTHER GROUPS (With Group Header) --}}
@@ -747,8 +761,8 @@
                         $title = $option['title'] ?? null;
                     @endphp
 
-                 
-<div class="estimate-card estimate-option {{ $option['is_default'] ? 'active' : 'mt-3' }}"
+
+                    <div class="estimate-card estimate-option {{ $option['is_default'] ? 'active' : 'mt-3' }}"
                         data-price="{{ $option['price'] }}" data-date="{{ $formattedDate }}" data-id="{{ $option['id'] }}">
                         <div class="circle-point"></div>
                         <div class="est-card">
@@ -811,7 +825,7 @@
 
 
 
-<div class="addtobtn mt-3">
+            <div class="addtobtn mt-3">
                 <button id="addToCartBtn" data-route="{{ route("shop-cart.store") }}"
                     data-subcategory-id="{{ $subcategory->id }}">Add to Cart</button>
                 @if ($deliveryChargesRequired)
@@ -821,7 +835,7 @@
                 @endif
 
             </div>
-          
+
         </div>
 
         <!--<div class="extra-card mt-3">-->
@@ -887,7 +901,11 @@
     const debouncedCalculateTotalPrice = debounce(calculateTotalPrice, 300);
     const compositeMap = @json($compositeMap ?? []);
     const compositeDraggerValues = @json($compositeDraggerValues ?? []);
-    const attributeQuantityRanges = @json($attributeQuantityRanges);
+    const pageRangeConfig = {
+        min: {{ $pagesDefaults['min'] ?? 1 }},
+        max: {{ $pagesDefaults['max'] ?? 840 }},
+        default: {{ $pagesDefaults['default'] ?? 1 }}
+    };
     // const defaultPages = $defaultPages;
 
     // to zoom the image section
@@ -896,83 +914,25 @@
         $('#zoomedImage').attr('src', imageUrl);
     });
 
+    document.getElementById('quantityInput').addEventListener('input', function () {
+        const input = this;
+        const min = parseInt(input.min);
+        const max = parseInt(input.max);
+        const value = parseInt(input.value);
+        const errorDiv = document.getElementById('quantityError');
 
-    function getRangeConsideringDependencies(defaultPages = null) {
-        let selectedValueIds = [];
+        if (value < min || value > max) {
+            input.classList.add('is-invalid');
+            errorDiv.classList.remove('d-none');
+        } else {
+            input.classList.remove('is-invalid');
+            errorDiv.classList.add('d-none');
+        }
+    });
 
-        // Collect selected value IDs
-        $('.attribute-wrapper .active').each(function () {
-            const valueId = $(this).data('value-id');
-            if (valueId) selectedValueIds.push(valueId);
-        });
 
-        $('select.custom-select').each(function () {
-            const selected = $(this).find('option:selected');
-            const valueId = selected.data('value-id');
-            if (valueId) selectedValueIds.push(valueId);
-        });
-
-        let allRanges = [];
-
-        selectedValueIds.forEach(valueId => {
-            const rangeOptions = attributeQuantityRanges[valueId];
-            if (!rangeOptions) return;
-
-            let matchedDep = null;
-            for (const depId of selectedValueIds) {
-                if (depId !== valueId && rangeOptions.hasOwnProperty(depId)) {
-                    matchedDep = depId;
-                    break;
-                }
-            }
-
-            let range = null;
-            if (matchedDep) {
-                range = rangeOptions[matchedDep];
-            } else if (rangeOptions.default) {
-                range = rangeOptions.default;
-            }
-
-            if (range) allRanges.push(range);
-        });
-
-        // Calculate min and max
-        let min = null;
-        let max = null;
-
-        allRanges.forEach(r => {
-            if (r.min != null) {
-                min = min === null ? r.min : Math.min(min, r.min);
-            }
-            if (r.max != null) {
-                max = max === null ? r.max : Math.max(max, r.max);
-            }
-        });
-
-        // Ensure valid fallback values
-        min = min || 1;
-        max = max || 100;
-
+    function forceSliderRedraw() {
         const $slider = $('#pageSlider');
-        const $pageValue = $('#pageValue');
-
-        $slider.attr('min', min);
-        $slider.attr('max', max);
-
-        // ✅ Use defaultPages if provided, else keep current value, fallback to min
-        let val = defaultPages !== null ? parseInt(defaultPages) : parseInt($slider.val());
-        // console.log($slider.val());
-
-        if (isNaN(val) || val < min) val = min;
-        if (val > max) val = max;
-
-        $slider.val(val);
-        $pageValue.text(val);
-        forceSliderRedraw($slider);
-        return { min, max };
-    }
-
-    function forceSliderRedraw($slider) {
         const slider = $slider[0]; // get DOM element
         const value = parseFloat($slider.val()) || 0;
         const min = parseFloat($slider.attr('min')) || 0;
@@ -1122,28 +1082,40 @@
                 updateSliderFill(this); // apply fill on load
             });
 
-
             for (let i = 1; i <= count; i++) {
                 const label = componentLabels[i - 1] ? `Pages ${componentLabels[i - 1]}` : `Pages ${i}`;
                 $container.append(`
-                    <div class="form-row-section1">
-                        <div class="s-row mb-3">
-                            <label>${label}
-                                <span class="help-circle" data-label="${label}" data-toggle="modal"
-                                    data-target="#helpModal">?</span>
-                            </label>
-                            <div class="page-slider">
-                                <input type="range" name="composite_pages[]" min="1" max="840" value="{{ $defaultPages ?? 1 }}" class="composite-slider" data-index="${i}">
-                                <div class="range-value">
-                                    <button type="button" class="decrease">-</button>
-                                    <span class="composite-value">{{ $defaultPages ?? 1 }}</span>
-                                    <button type="button" class="increase">+</button>
-                                </div>
-                            </div>
-                        </div>
+        <div class="form-row-section1">
+            <div class="s-row mb-3">
+                <label>${label}
+                    <span class="help-circle" data-label="${label}" data-toggle="modal"
+                        data-target="#helpModal">?</span>
+                </label>
+                <div class="page-slider">
+                    <input 
+                        type="range" 
+                        name="composite_pages[]" 
+                        min="${pageRangeConfig.min}" 
+                        max="${pageRangeConfig.max}" 
+                        value="${pageRangeConfig.default}" 
+                        step="1"
+                        class="composite-slider" 
+                        data-index="${i}">
+                    <div class="range-value">
+                        <button type="button" class="decrease">-</button>
+                        <span class="composite-value">${pageRangeConfig.default}</span>
+                        <button type="button" class="increase">+</button>
                     </div>
-                `);
+                </div>
+            </div>
+        </div>
+    `);
             }
+
+            // ✅ After loop: apply fill effect to new sliders
+            $container.find('.composite-slider').each(function () {
+                updateSliderFill(this);
+            });
         }
 
         function renderCompositeFromCurrentSelection() {
@@ -1194,7 +1166,6 @@
                 handleAttributeConditions(attrId, null);
                 renderCompositeFromCurrentSelection();
                 calculateTotalPrice();
-                getRangeConsideringDependencies();
 
                 return; // Exit early
             }
@@ -1219,7 +1190,6 @@
             handleAttributeConditions(attrId, valueId);
             renderCompositeFromCurrentSelection();
             calculateTotalPrice();
-            getRangeConsideringDependencies();
         });
 
         $(document).on('change', 'select.custom-select', function () {
@@ -1242,13 +1212,11 @@
                     handleAttributeConditions(attrId, $firstReal.data('value-id'));
                     renderCompositeFromCurrentSelection();
                     calculateTotalPrice();
-                    getRangeConsideringDependencies();
                 } else {
                     // Optional → treat as no selection
                     handleAttributeConditions(attrId, null);
                     renderCompositeFromCurrentSelection();
                     calculateTotalPrice();
-                    getRangeConsideringDependencies();
                 }
                 return;
             }
@@ -1257,7 +1225,6 @@
             handleAttributeConditions(attrId, valueId);
             renderCompositeFromCurrentSelection();
             calculateTotalPrice();
-            getRangeConsideringDependencies();
         });
 
 
@@ -1357,7 +1324,7 @@
 
 
 
-      
+
         updateSliderFill();
 
         calculateTotalPrice();
@@ -1377,7 +1344,7 @@
         });
     });
 
-     function calculatedAttributeRow() {
+    function calculatedAttributeRow() {
         let colSum = 0;
 
         // Select only visible attribute blocks
@@ -1552,7 +1519,7 @@
     $(document).ready(function () {
         applyInitialHideConditions();
         calculateTotalPrice();
-        getRangeConsideringDependencies();
+        forceSliderRedraw();
         calculatedAttributeRow();
 
 
@@ -1592,7 +1559,7 @@
     });
 
 
- $('#addToCartBtn').on('click', function () {
+    $('#addToCartBtn').on('click', function () {
         let isValid = true;
         let missingFields = [];
 
@@ -1737,5 +1704,5 @@
             }
         });
     });
-    
+
 </script>

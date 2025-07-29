@@ -33,31 +33,53 @@
             </div>
             <div class="card-body">
               <dl class="row">
+
                 <dt class="col-sm-3">Subcategory</dt>
-                <dd class="col-sm-9"><?php echo e($rule->subcategory->name ?? '-'); ?> <br>
+                <dd class="col-sm-9">
+                  <?php echo e($rule->subcategory->name ?? '-'); ?> <br>
                   <small>Category: <?php echo e($rule->category->name ?? '-'); ?></small>
                 </dd>
+
+                <hr class="col-12 my-2">
+
 
                 <dt class="col-sm-3">Pages Dragger</dt>
                 <dd class="col-sm-9">
                   <?php if($rule->pages_dragger_required): ?>
-                    <strong class="text-success">Required</strong><br>
-                    <?php
-                      $depAttr = $dependencyAttrs[$rule->pages_dragger_dependency] ?? null;
-                    ?>
-                    <?php if($depAttr): ?>
-                      Depends on: <strong><?php echo e($depAttr->name); ?></strong><br>
-                    <?php else: ?>
-                      <em class="text-danger">Invalid Dependency</em><br>
-                    <?php endif; ?>
-                    Default Pages: <strong><?php echo e($rule->default_pages ?? '-'); ?></strong>
+                    <div class="mb-1">
+                      <strong class="text-success">Required</strong>
+                      <?php
+                        $depAttr = $dependencyAttrs[$rule->pages_dragger_dependency] ?? null;
+                      ?>
+                      <?php if($depAttr): ?>
+                        <br>Depends on: <strong><?php echo e($depAttr->name); ?></strong>
+                      <?php else: ?>
+                        <br><em class="text-danger">Invalid Dependency</em>
+                      <?php endif; ?>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4"><strong>Default Pages:</strong> <?php echo e($rule->default_pages ?? '-'); ?></div>
+                      <div class="col-md-4"><strong>Min Pages:</strong> <?php echo e($rule->min_pages ?? '-'); ?></div>
+                      <div class="col-md-4"><strong>Max Pages:</strong> <?php echo e($rule->max_pages ?? '-'); ?></div>
+                    </div>
                   <?php else: ?>
                     <span class="text-muted">No</span>
                   <?php endif; ?>
                 </dd>
 
-                <dt class="col-sm-3">Default Quantity</dt>
-                <dd class="col-sm-9"><?php echo e($rule->default_quantity ?? '-'); ?></dd>
+                <hr class="col-12 my-2">
+
+                <dt class="col-sm-3">Quantity</dt>
+                <dd class="col-sm-9">
+                  <div class="row">
+                    <div class="col-md-4"><strong>Default:</strong> <?php echo e($rule->default_quantity ?? '-'); ?></div>
+                    <div class="col-md-4"><strong>Min:</strong> <?php echo e($rule->min_quantity ?? '-'); ?></div>
+                    <div class="col-md-4"><strong>Max:</strong> <?php echo e($rule->max_quantity ?? '-'); ?></div>
+                  </div>
+                </dd>
+
+                <hr class="col-12 my-2">
+
 
                 <dt class="col-sm-3">Attributes</dt>
                 <dd class="col-sm-9">
@@ -90,7 +112,8 @@
                           <ul class="pl-3 mb-0">
                             <?php $__currentLoopData = $attr->dependencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dep): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                               <li>
-                                <strong><?php echo e($dep->parentAttribute->name ?? 'Attribute #' . $dep->parent_attribute_id); ?></strong> =
+                                <strong><?php echo e($dep->parentAttribute->name ?? 'Attribute #' . $dep->parent_attribute_id); ?></strong>
+                                =
                                 <span class="text-dark"><?php echo e($dep->parentValue->value ?? 'Value #' . $dep->parent_value_id); ?></span>
                               </li>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -121,7 +144,7 @@
                         </div>
                       <?php endif; ?>
 
-                       <?php if($attr->attribute->pricing_basis === 'per_extra_copy'): ?>
+                      <?php if($attr->attribute->pricing_basis === 'per_extra_copy'): ?>
                         <div class="text-muted small mt-1">
                           <strong>Per Extra Copy Price:</strong>
                           ₹<?php echo e(rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.')); ?>
@@ -133,6 +156,7 @@
                     <span class="text-muted">No Modifiers</span>
                   <?php endif; ?>
                 </dd>
+
               </dl>
             </div>
           </div>

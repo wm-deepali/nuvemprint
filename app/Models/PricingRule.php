@@ -15,7 +15,11 @@ class PricingRule extends Model
         'pages_dragger_required',
         'pages_dragger_dependency',
         'default_quantity',
+        'min_quantity',
+        'max_quantity',
         'default_pages',
+        'min_pages',
+        'max_pages',
         'proof_reading_required',
         'delivery_charges_required',
     ];

@@ -42,7 +42,7 @@
               <th>ID</th>
               <th>Subcategory</th>
               <th>Pages Dragger</th>
-              <th>Default Qty</th>
+              <th>Qty</th>
               <th>Attributes</th>
               <th>Actions</th>
             </tr>
@@ -74,7 +74,10 @@
           <em class="text-danger">Invalid Dependency</em><br>
           <?php endif; ?>
 
-            Default Pages: <strong><?php echo e($rule->default_pages ?? '-'); ?></strong>
+            Default Pages: <strong><?php echo e($rule->default_pages ?? '-'); ?></strong><br>
+            Min Pages: <strong><?php echo e($rule->min_pages ?? '-'); ?></strong><br>
+            Max Pages: <strong><?php echo e($rule->max_pages ?? '-'); ?></strong>
+
             </div>
           </div>
         <?php else: ?>
@@ -82,7 +85,12 @@
         <?php endif; ?>
             </td>
 
-            <td><?php echo e($rule->default_quantity ?? '-'); ?></td>
+            <td>
+            Default: <strong><?php echo e($rule->default_quantity ?? '-'); ?></strong><br>
+            Min: <strong><?php echo e($rule->min_quantity ?? '-'); ?></strong><br>
+            Max: <strong><?php echo e($rule->max_quantity ?? '-'); ?></strong>
+            </td>
+
 
             <td>
             <?php echo e($rule->attributes->count()); ?> Attribute<?php echo e($rule->attributes->count() !== 1 ? 's' : ''); ?>

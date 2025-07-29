@@ -82,6 +82,11 @@ class PricingRuleController extends Controller
             'default_quantity' => 'required|integer|min:1',
             'proof_reading_required' => 'nullable|boolean',
             'delivery_charges_required' => 'nullable|boolean',
+            'min_quantity' => 'nullable|integer|min:1|lte:max_quantity',
+            'max_quantity' => 'nullable|integer|min:1|gte:min_quantity',
+            'min_pages' => 'nullable|integer|min:1|lte:max_pages',
+            'max_pages' => 'nullable|integer|min:1|gte:min_pages',
+
             'default_pages' => [
                 'nullable',
                 'integer',
@@ -118,10 +123,13 @@ class PricingRuleController extends Controller
                 'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null,
                 'default_quantity' => $request->default_quantity ?? null,
                 'default_pages' => $request->default_pages ?? null,
+                'min_quantity' => $request->min_quantity ?? null,
+                'max_quantity' => $request->max_quantity ?? null,
+                'min_pages' => $request->min_pages ?? null,
+                'max_pages' => $request->max_pages ?? null,
                 'proof_reading_required' => (int) $request->proof_reading_required,
                 'delivery_charges_required' => (int) $request->delivery_charges_required,
             ]);
-
 
             foreach ($request->rows as $row) {
                 $attribute = PricingRuleAttribute::create([
@@ -233,6 +241,10 @@ class PricingRuleController extends Controller
             'default_quantity' => 'required|integer|min:1',
             'proof_reading_required' => 'nullable|boolean',
             'delivery_charges_required' => 'nullable|boolean',
+            'min_quantity' => 'nullable|integer|min:1|lte:max_quantity',
+            'max_quantity' => 'nullable|integer|min:1|gte:min_quantity',
+            'min_pages' => 'nullable|integer|min:1|lte:max_pages',
+            'max_pages' => 'nullable|integer|min:1|gte:min_pages',
             'default_pages' => [
                 'nullable',
                 'integer',
@@ -271,6 +283,10 @@ class PricingRuleController extends Controller
                 'pages_dragger_dependency' => $request->pages_dragger_dependency ?? null,
                 'default_quantity' => $request->default_quantity ?? null,
                 'default_pages' => $request->default_pages ?? null,
+                'min_quantity' => $request->min_quantity ?? null,
+                'max_quantity' => $request->max_quantity ?? null,
+                'min_pages' => $request->min_pages ?? null,
+                'max_pages' => $request->max_pages ?? null,
                 'proof_reading_required' => filter_var($request->proof_reading_required, filter: FILTER_VALIDATE_BOOLEAN),
                 'delivery_charges_required' => filter_var($request->delivery_charges_required, filter: FILTER_VALIDATE_BOOLEAN),
             ]);

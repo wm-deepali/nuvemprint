@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
   <style>
     .remove-modifier,
     .add-modifier {
@@ -20,25 +20,25 @@
       <h4 class="mb-0">Add Pricing Rule</h4>
       </div>
       <div class="col-md-6 text-right">
-      <a href="{{ route('admin.pricing-rules.index') }}" class="btn btn-secondary btn-sm">← Back to List</a>
+      <a href="<?php echo e(route('admin.pricing-rules.index')); ?>" class="btn btn-secondary btn-sm">← Back to List</a>
       </div>
     </div>
 
     <div class="content-body">
       <div class="card">
       <div class="card-body">
-        <form method="POST" action="{{ route('admin.pricing-rules.store') }}" id="pricing-rule-form">
-        @csrf
+        <form method="POST" action="<?php echo e(route('admin.pricing-rules.store')); ?>" id="pricing-rule-form">
+        <?php echo csrf_field(); ?>
 
-        {{-- Category & Subcategory --}}
+        
         <div class="form-row">
           <div class="form-group col-md-3">
           <label>Category</label>
           <select class="form-control" id="category-select" name="category_id" required>
             <option value="">-- Select Category --</option>
-            @foreach($categories as $category)
-        <option value="{{ $category->id }}">{{ $category->name }}</option>
-        @endforeach
+            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           </select>
           </div>
 
@@ -95,6 +95,9 @@
             <option value="0">No</option>
           </select>
           </div>
+
+
+
         </div>
 
         <div id="pages-settings-group" style="display: none;" class="form-row">
@@ -125,7 +128,7 @@
         </div>
         <hr>
 
-        {{-- Attribute Modifiers --}}
+        
         <h6>Attribute Modifiers</h6>
         <div id="attribute-modifier-container">
           <p class="text-muted">Select a subcategory to load attributes.</p>
@@ -140,7 +143,7 @@
   </div>
 
   <script>
-    const categoryMap = @json($categories->mapWithKeys(fn($cat) => [$cat->id => $cat->subcategories->map(fn($s) => ['id' => $s->id, 'name' => $s->name])]));
+    const categoryMap = <?php echo json_encode($categories->mapWithKeys(fn($cat) => [$cat->id => $cat->subcategories->map(fn($s) => ['id' => $s->id, 'name' => $s->name])]), 512) ?>;
     let subcategoryAttributes = [];
     let rowIndex = 0;
 
@@ -479,7 +482,7 @@
 
   </script>
 
-  @push('scripts')
+  <?php $__env->startPush('scripts'); ?>
     <script>
     $(document).ready(function () {
     $.ajaxSetup({
@@ -512,7 +515,7 @@
       $('.invalid-feedback').remove();
 
       $.ajax({
-      url: "{{ route('admin.pricing-rules.store') }}",
+      url: "<?php echo e(route('admin.pricing-rules.store')); ?>",
       method: 'POST',
       data: formData,
       processData: false,
@@ -545,6 +548,7 @@
     });
     });
     </script>
-  @endpush
+  <?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/admin/pricing-rules/create.blade.php ENDPATH**/ ?>

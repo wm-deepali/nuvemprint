@@ -33,31 +33,53 @@
             </div>
             <div class="card-body">
               <dl class="row">
+
                 <dt class="col-sm-3">Subcategory</dt>
-                <dd class="col-sm-9">{{ $rule->subcategory->name ?? '-' }} <br>
+                <dd class="col-sm-9">
+                  {{ $rule->subcategory->name ?? '-' }} <br>
                   <small>Category: {{ $rule->category->name ?? '-' }}</small>
                 </dd>
+
+                <hr class="col-12 my-2">
+
 
                 <dt class="col-sm-3">Pages Dragger</dt>
                 <dd class="col-sm-9">
                   @if ($rule->pages_dragger_required)
-                    <strong class="text-success">Required</strong><br>
-                    @php
-                      $depAttr = $dependencyAttrs[$rule->pages_dragger_dependency] ?? null;
-                    @endphp
-                    @if ($depAttr)
-                      Depends on: <strong>{{ $depAttr->name }}</strong><br>
-                    @else
-                      <em class="text-danger">Invalid Dependency</em><br>
-                    @endif
-                    Default Pages: <strong>{{ $rule->default_pages ?? '-' }}</strong>
+                    <div class="mb-1">
+                      <strong class="text-success">Required</strong>
+                      @php
+                        $depAttr = $dependencyAttrs[$rule->pages_dragger_dependency] ?? null;
+                      @endphp
+                      @if ($depAttr)
+                        <br>Depends on: <strong>{{ $depAttr->name }}</strong>
+                      @else
+                        <br><em class="text-danger">Invalid Dependency</em>
+                      @endif
+                    </div>
+                    <div class="row">
+                      <div class="col-md-4"><strong>Default Pages:</strong> {{ $rule->default_pages ?? '-' }}</div>
+                      <div class="col-md-4"><strong>Min Pages:</strong> {{ $rule->min_pages ?? '-' }}</div>
+                      <div class="col-md-4"><strong>Max Pages:</strong> {{ $rule->max_pages ?? '-' }}</div>
+                    </div>
                   @else
                     <span class="text-muted">No</span>
                   @endif
                 </dd>
 
-                <dt class="col-sm-3">Default Quantity</dt>
-                <dd class="col-sm-9">{{ $rule->default_quantity ?? '-' }}</dd>
+                <hr class="col-12 my-2">
+
+                <dt class="col-sm-3">Quantity</dt>
+                <dd class="col-sm-9">
+                  <div class="row">
+                    <div class="col-md-4"><strong>Default:</strong> {{ $rule->default_quantity ?? '-' }}</div>
+                    <div class="col-md-4"><strong>Min:</strong> {{ $rule->min_quantity ?? '-' }}</div>
+                    <div class="col-md-4"><strong>Max:</strong> {{ $rule->max_quantity ?? '-' }}</div>
+                  </div>
+                </dd>
+
+                <hr class="col-12 my-2">
+
 
                 <dt class="col-sm-3">Attributes</dt>
                 <dd class="col-sm-9">
@@ -84,7 +106,8 @@
                           <ul class="pl-3 mb-0">
                             @foreach ($attr->dependencies as $dep)
                               <li>
-                                <strong>{{ $dep->parentAttribute->name ?? 'Attribute #' . $dep->parent_attribute_id }}</strong> =
+                                <strong>{{ $dep->parentAttribute->name ?? 'Attribute #' . $dep->parent_attribute_id }}</strong>
+                                =
                                 <span class="text-dark">{{ $dep->parentValue->value ?? 'Value #' . $dep->parent_value_id }}</span>
                               </li>
                             @endforeach
@@ -107,13 +130,13 @@
                       @endif
 
                       @if ($attr->attribute->pricing_basis === 'fixed_per_page')
-                    <div class="text-muted small mt-1">
+                        <div class="text-muted small mt-1">
                           <strong>Fixed Per Page Price:</strong>
                           ₹{{ rtrim(rtrim(number_format($attr->flat_rate_per_page, 4, '.', ''), '0'), '.') }}
                         </div>
                       @endif
 
-                       @if ($attr->attribute->pricing_basis === 'per_extra_copy')
+                      @if ($attr->attribute->pricing_basis === 'per_extra_copy')
                         <div class="text-muted small mt-1">
                           <strong>Per Extra Copy Price:</strong>
                           ₹{{ rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.') }}
@@ -124,6 +147,7 @@
                     <span class="text-muted">No Modifiers</span>
                   @endforelse
                 </dd>
+
               </dl>
             </div>
           </div>

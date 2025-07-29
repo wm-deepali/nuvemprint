@@ -1,4 +1,6 @@
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
 
 <?php $__env->startSection('title'); ?>
     Nuvem Prints
@@ -44,13 +46,80 @@
         }
         .text-areafield{
             border:2px solid #6bd3cc !important;
-        color:black !important;
+        col
+        or:black !important;
             border-radius: .375rem !important;
         }
         textarea.text-areafield.form-control {
   color: black !important;
 }
 
+
+.upload-card {
+  border: 2px dashed #d4d4d4;
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-align: center;
+  width: 240px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.upload-card:hover {
+  border-color: #5a9ef8;
+}
+
+.upload-card i {
+  font-size: 30px;
+  color: #5a9ef8;
+  margin-bottom: 10px;
+}
+
+.upload-card .title {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.upload-card .or {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #999;
+}
+
+.upload-card .browse-btn {
+  background-color: #3d82f7;
+  border: none;
+  color: white;
+  padding: 6px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.upload-card .file-info {
+  font-size: 12px;
+  color: #999;
+}
+
+.upload-box-card{
+    width:100%;
+    margin-top:20px;
+    display:grid;
+   grid-template-columns:1fr 1fr 1fr 1fr;
+    gap:20px
+
+    
+}
+.art-top-left-top{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    
+}
     </style>
 <?php $__env->stopPush(); ?>
 
@@ -152,15 +221,29 @@
                         </div>
                         <div class="art-top-left" style="border:1px solid #80808069;">
                             <div class="art-top-left-top">
+                                <h5>Order Quote <strong>#1234566</strong></h5>
+                                <p>Dated: <strong>28th July 2025</strong></p>
 
                             </div>
                             <div class="art-top-left-details" >
-                                <h3>Pending Order <br>1667893</h3>
-                                <p class="m-0" style="font-size: 10px;">Will be an order once confirmed</p>
-                                <p class="mt-2 mb-0" style="font-size: 12px;">14 Jul 2025 06:26</p>
-                                <p class="m-0" style="font-size: 12px;">Status: <strong>Initiated</strong></p>
-                                <img
-                                    src="https://s3-eu-west-1.amazonaws.com/files.mixam.com/qrcode/989ee728-f8e2-402f-8bcf-05ace96d9e47.png">
+                                <div class="d-flex justify-content-between">
+                                    <h6 style="font-size:14px; font-weight:400;">Sub Total</h6>
+                                    <h6 style="font-size:14px; font-weight:400;">£56</h6>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <h6 style="font-size:14px; font-weight:400;">Delivery Cost</h6>
+                                    <h6 style="font-size:14px; font-weight:400;">£6</h6>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <h6 style="font-size:14px; font-weight:400;">VAT</h6>
+                                    <h6 style="font-size:14px; font-weight:400;">£14</h6>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <h6>Total Payable</h6>
+                                    <h6>£76</h6>
+                                </div>
+                             
 
                             </div>
 
@@ -237,9 +320,9 @@
 
                                             </div>
                                         </div>
-                                        <p style="margin-top: 25px; font-size: 12px;">Drag your file(s) here or click on
-                                            the button below to browse your device.
-                                        </p>
+                                        <!--<p style="margin-top: 25px; font-size: 12px;">Drag your file(s) here or click on-->
+                                        <!--    the button below to browse your device.-->
+                                        <!--</p>-->
                                         <!-- <div class="custom-art-upload-buttons">
                                             <button class="custom-art-btn btn-blue" type="file">Upload File(s)</button>
                                             <button class="custom-art-btn btn-dropbox">Choose from Dropbox</button>
@@ -325,28 +408,69 @@
 
                                         <!--</div>-->
 
-                                        <div class="d-flex gap-4 mt-5">
-                                            <div class="custom-art-vat-row">
-                                                <input type="checkbox">
-                                                <label>Bleed Box</label>
+                                       
+<!--                                       <div class="upload-card" onclick="document.getElementById('fileInput').click();">-->
+<!--  <i class="fa-solid fa-arrow-up-from-bracket"></i>-->
+<!--  <p class="title">Drag and Drop files to upload</p>-->
+<!--  <p class="or">or</p>-->
+<!--  <button class="browse-btn">Browse</button>-->
+<!--  <p class="file-info">Supported files: AI, PSD, PDF</p>-->
+<!--</div>-->
 
-                                            </div>
-                                            <div class="custom-art-vat-row">
-                                                <input type="checkbox">
-                                                <label>Trim Box</label>
-
-                                            </div>
-
-                                        </div>
-                                        <div class="paper-box-size" onclick="document.getElementById('fileInput').click();">
-    <p class="m-0" style="color: #00000038;"><i class="fa-solid fa-cloud-arrow-up"></i> Upload File</p>
-</div>
-
-<input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="handleImageUpload(event)">
+<!--<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">-->
 
 
                                     </div>
 
+                                </div>
+                                <div class="upload-box-card">
+                                    <div >
+                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
+  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+  <p class="title">Drag and Drop files to upload</p>
+  <p class="or">or</p>
+  <button class="browse-btn">Browse</button>
+  <p class="file-info">Supported files: AI, PSD, PDF</p>
+</div>
+
+<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
+
+                                    </div>
+                                    <div >
+                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
+  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+  <p class="title">Drag and Drop files to upload</p>
+  <p class="or">or</p>
+  <button class="browse-btn">Browse</button>
+  <p class="file-info">Supported files: AI, PSD, PDF</p>
+</div>
+
+<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
+
+                                    </div>
+                                    <div >
+                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
+  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+  <p class="title">Drag and Drop files to upload</p>
+  <p class="or">or</p>
+  <button class="browse-btn">Browse</button>
+  <p class="file-info">Supported files: AI, PSD, PDF</p>
+</div>
+
+<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
+
+                                    </div><div >
+                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
+  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+  <p class="title">Drag and Drop files to upload</p>
+  <p class="or">or</p>
+  <button class="browse-btn">Browse</button>
+  <p class="file-info">Supported files: AI, PSD, PDF</p>
+</div>
+
+<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
+
+                                    </div>
                                 </div>
 
                             </div>

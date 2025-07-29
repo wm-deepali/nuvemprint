@@ -46,81 +46,61 @@ class SiteController extends Controller
         $pagesDraggerAttributeId = null;
         $compositeDraggerValues = collect();
         $compositeMap = collect();
-        $defaultQuantity = null;
-        $defaultPages = null;
-        $attributeQuantityRanges = [];
+        $quantityDefaults = [
+            'default' => null,
+            'min' => null,
+            'max' => null,
+        ];
+
+        $pagesDefaults = [
+            'default' => null,
+            'min' => null,
+            'max' => null,
+        ];
+
         $deliveryCharges = collect();
         $deliveryChargesRequired = false;
         $proofReadingRequired = false;
         $proofReadings = collect();
 
+
         if ($calculatorRequired) {
-            $defaultQuantity = PricingRule::where('subcategory_id', $subcategoryId)->value('default_quantity');
-            $pagesDraggerRequired = PricingRule::where('subcategory_id', $subcategoryId)->value('pages_dragger_required');
-            $defaultPages = PricingRule::where('subcategory_id', $subcategoryId)->value('default_pages');
-
-            // Set the dragger attribute ID only if required
-            if ($pagesDraggerRequired) {
-                $pagesDraggerAttributeId = PricingRule::where('subcategory_id', $subcategoryId)
-                    ->value('pages_dragger_dependency');
-            }
-
-            if ($pagesDraggerAttributeId) {
-                $attribute = \App\Models\Attribute::find($pagesDraggerAttributeId);
-                if ($attribute && $attribute->is_composite) {
-                    $compositeDraggerValues = \App\Models\SubcategoryAttributeValue::with('value.components')
-                        ->where('subcategory_id', $subcategoryId)
-                        ->where('attribute_id', $pagesDraggerAttributeId)
-                        ->get()
-                        ->filter(fn($sav) => $sav->value->is_composite_value)
-                        ->map(function ($sav) {
-                            return [
-                                'id' => $sav->value->id,
-                                'value' => $sav->value->value,
-                                'component_count' => $sav->value->components->count(),
-                                'components' => $sav->value->components->pluck('value')->toArray(),
-                            ];
-                        })
-                        ->values();
-                }
-            }
-
             $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
 
             if ($pricingRule) {
-                $attributesWithRanges = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)
-                    ->with('quantityRanges')
-                    ->get();
+                $quantityDefaults = [
+                    'default' => $pricingRule->default_quantity ?? null,
+                    'min' => $pricingRule->min_quantity ?? null,
+                    'max' => $pricingRule->max_quantity ?? null,
+                ];
 
-                foreach ($attributesWithRanges as $attribute) {
-                    $basis = $attribute->attribute->pricing_basis ?? null;
+                $pagesDraggerRequired = $pricingRule->pages_dragger_required;
 
-                    if ($basis !== 'per_page') {
-                        continue;
-                    }
+                if ($pagesDraggerRequired) {
+                    $pagesDefaults['default'] = $pricingRule->default_pages ?? 1;
+                    $pagesDefaults['min'] = $pricingRule->min_pages ?? 1;
+                    $pagesDefaults['max'] = $pricingRule->max_pages ?? 840;
 
-                    $valueId = $attribute->value_id;
-                    $dependency = $attribute->dependencies->first();
-                    $key = $dependency ? $dependency->parent_value_id : 'default';
+                    $pagesDraggerAttributeId = $pricingRule->pages_dragger_dependency;
+                }
 
-                    $minFrom = null;
-                    $maxTo = null;
-
-                    foreach ($attribute->quantityRanges as $range) {
-                        if (is_null($minFrom) || $range->quantity_from < $minFrom) {
-                            $minFrom = $range->quantity_from;
-                        }
-
-                        if (is_null($maxTo) || $range->quantity_to > $maxTo) {
-                            $maxTo = $range->quantity_to;
-                        }
-                    }
-
-                    if (!is_null($minFrom) && !is_null($maxTo)) {
-                        $attributeQuantityRanges[$valueId][$key] = [
-                            'min' => $minFrom,
-                            'max' => $maxTo,
-                        ];
+                if ($pagesDraggerAttributeId) {
+                    $attribute = \App\Models\Attribute::find($pagesDraggerAttributeId);
+                    if ($attribute && $attribute->is_composite) {
+                        $compositeDraggerValues = \App\Models\SubcategoryAttributeValue::with('value.components')
+                            ->where('subcategory_id', $subcategoryId)
+                            ->where('attribute_id', $pagesDraggerAttributeId)
+                            ->get()
+                            ->filter(fn($sav) => $sav->value->is_composite_value)
+                            ->map(function ($sav) {
+                                return [
+                                    'id' => $sav->value->id,
+                                    'value' => $sav->value->value,
+                                    'component_count' => $sav->value->components->count(),
+                                    'components' => $sav->value->components->pluck('value')->toArray(),
+                                ];
+                            })
+                            ->values();
                     }
                 }
 
@@ -255,9 +235,8 @@ class SiteController extends Controller
             'pagesDraggerAttributeId',
             'compositeDraggerValues',
             'compositeMap',
-            'defaultQuantity',
-            'defaultPages',
-            'attributeQuantityRanges',
+            'quantityDefaults',
+            'pagesDefaults',
             'deliveryChargesRequired',
             'deliveryCharges',
             'proofReadingRequired',

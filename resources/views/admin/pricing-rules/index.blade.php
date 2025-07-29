@@ -42,7 +42,7 @@
               <th>ID</th>
               <th>Subcategory</th>
               <th>Pages Dragger</th>
-              <th>Default Qty</th>
+              <th>Qty</th>
               <th>Attributes</th>
               <th>Actions</th>
             </tr>
@@ -74,7 +74,10 @@
           <em class="text-danger">Invalid Dependency</em><br>
           @endif
 
-            Default Pages: <strong>{{ $rule->default_pages ?? '-' }}</strong>
+            Default Pages: <strong>{{ $rule->default_pages ?? '-' }}</strong><br>
+            Min Pages: <strong>{{ $rule->min_pages ?? '-' }}</strong><br>
+            Max Pages: <strong>{{ $rule->max_pages ?? '-' }}</strong>
+
             </div>
           </div>
         @else
@@ -82,7 +85,12 @@
         @endif
             </td>
 
-            <td>{{ $rule->default_quantity ?? '-' }}</td>
+            <td>
+            Default: <strong>{{ $rule->default_quantity ?? '-' }}</strong><br>
+            Min: <strong>{{ $rule->min_quantity ?? '-' }}</strong><br>
+            Max: <strong>{{ $rule->max_quantity ?? '-' }}</strong>
+            </td>
+
 
             <td>
             {{ $rule->attributes->count() }} Attribute{{ $rule->attributes->count() !== 1 ? 's' : '' }}

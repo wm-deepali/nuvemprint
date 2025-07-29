@@ -72,12 +72,24 @@
                                     <input type="hidden" name="subcategory_id" value="<?php echo e($pricingRule->subcategory_id); ?>">
                                 </div>
 
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <label for="default_quantity">Default Quantity</label>
                                     <input type="number" name="default_quantity" id="default_quantity" class="form-control"
                                         placeholder="e.g. 1" min="1" value="<?php echo e($pricingRule->default_quantity); ?>">
                                 </div>
+                                <div class="form-group col-md-2">
+                                    <label for="min_quantity">Min Qty</label>
+                                    <input type="number" name="min_quantity" id="min_quantity" class="form-control" min="1"
+                                        value="<?php echo e($pricingRule->min_quantity); ?>">
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label for="max_quantity">Max Qty</label>
+                                    <input type="number" name="max_quantity" id="max_quantity" class="form-control" min="1"
+                                        value="<?php echo e($pricingRule->max_quantity); ?>">
+                                </div>
                             </div>
+
                             <div class="form-row d-flex align-items-end" style="display: flex;">
 
                                 <div class="form-group col-md-2">
@@ -114,9 +126,12 @@
                                         </option>
                                     </select>
                                 </div>
+                            </div>
 
-                                <div class="form-group col-md-2" id="pages-dragger-dependency-group"
-                                    style="<?php echo e($pricingRule->pages_dragger_required ? '' : 'display:none;'); ?>">
+                            <div id="pages-settings-group"
+                                style="<?php echo e($pricingRule->pages_dragger_required ? '' : 'display:none;'); ?>" class="form-row">
+
+                                <div class="form-group col-md-2">
                                     <label for="pages-dragger-dependency">Dependent Attribute</label>
                                     <select name="pages_dragger_dependency" id="pages-dragger-dependency"
                                         class="form-control">
@@ -132,11 +147,22 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group col-md-2" id="default-pages-group"
-                                    style="<?php echo e($pricingRule->pages_dragger_required ? '' : 'display:none;'); ?>">
+                                <div class="form-group col-md-2">
                                     <label for="default_pages">Default Number of Pages</label>
                                     <input type="number" id="default_pages" name="default_pages" class="form-control"
                                         placeholder="e.g. 1" min="1" value="<?php echo e($pricingRule->default_pages); ?>">
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label for="min_pages">Min Pages</label>
+                                    <input type="number" id="min_pages" name="min_pages" class="form-control" min="1"
+                                        value="<?php echo e($pricingRule->min_pages); ?>">
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label for="max_pages">Max Pages</label>
+                                    <input type="number" id="max_pages" name="max_pages" class="form-control" min="1"
+                                        value="<?php echo e($pricingRule->max_pages); ?>">
                                 </div>
 
                             </div>
@@ -312,88 +338,88 @@
             row.dataset.index = index;
 
             row.innerHTML = `
-                                                                                                        <div class="form-group col-md-2">
-                                                                                                            <label> 
-                                                                                                                <?php if(false): ?> <!-- This is a placeholder; actual condition handled in Blade -->
-                                                                                                                    <span class="toggle-pricing" data-target="#pricing-container-${index}" style="cursor: pointer; margin-left: 10px; font-size: 1rem;">+ </span>
-                                                                                                                <?php endif; ?>
-                                                                                                                Attribute
-                                                                                                            </label>
-                                                                                                            <select class="form-control" name="rows[${index}][attribute_id]">
-                                                                                                                <option value="">-- Select --</option>
-                                                                                                                ${attrOptions}
-                                                                                                            </select>
-                                                                                                        </div>
-                                                                                                        <div class="form-group col-md-2">
-                                                                                                            <label>Value</label>
-                                                                                                            <select class="form-control" name="rows[${index}][value_id]">
-                                                                                                                <option value="">-- Select --</option>
-                                                                                                                ${valueOptions}
-                                                                                                            </select>
-                                                                                                        </div>
-                                                                                                        <div class="form-group col-md-2 modifier-type-group" style="display: none;">
-                                                                                                            <label>Modifier Type</label>
-                                                                                                            <select class="form-control" name="rows[${index}][modifier_type]">
-                                                                                                                <option value="add">Add</option>
-                                                                                                                <option value="multiply">Multiply</option>
-                                                                                                            </select>
-                                                                                                        </div>
-                                                                                                        <div class="form-group col-md-2 base-charges-group" style="display: none;">
-                                                                                                            <label>Base Charges</label>
-                                                                                                            <div class="input-group">
-                                                                                                                <input type="text" class="form-control" name="rows[${index}][modifier_value]">
-                                                                                                                <select class="form-control col-auto" name="rows[${index}][base_charges_type]" style="max-width: 100px;">
-                                                                                                                    <option value="">Select Type</option>
-                                                                                                                    <option value="amount">Amount</option>
-                                                                                                                    <option value="percentage">%</option>
-                                                                                                                </select>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                         <div class="form-group col-md-2 fixed-per-page-group" style="display: none;">
-                                                                                                <label>Price per Page (Fixed)</label>
-                                                                                                <div class="input-group">
-                                                                                                    <input type="text" class="form-control"
-                                                                                                        name="rows[${index}][flat_rate_per_page]">
-                                                                                                </div>
-                                                                                            </div>
-                                                                                                        <div class="form-group col-md-2 extra-copy-group" style="display: none;">
-                                                                                                            <label>Extra Copy Charge</label>
-                                                                                                            <div class="input-group">
-                                                                                                                <input type="text" class="form-control" name="rows[${index}][extra_copy_charge]">
-                                                                                                                <select class="form-control col-auto" name="rows[${index}][extra_copy_charge_type]" style="max-width: 100px;">
-                                                                                                                    <option value="">Select Type</option>
-                                                                                                                    <option value="amount">Amount</option>
-                                                                                                                    <option value="percentage">%</option>
-                                                                                                                </select>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <div class="form-group col-md-1 d-flex align-items-center justify-content-center mt-2">
-                                                                                                            <div class="custom-control custom-checkbox">
-                                                                                                                <input type="checkbox" class="custom-control-input" id="default_${index}" name="rows[${index}][is_default]" value="1">
-                                                                                                                <label class="custom-control-label" for="default_${index}" title="Mark this value as default">Default</label>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <div class="form-group col-md-1 d-flex align-items-end modifier-buttons"></div>
-                                                                                                        <div class="col-md-12 per-page-container mt-2" id="pricing-container-${index}" style="display: none;">
-                                                                                                            <label class="font-weight-bold">Per Product Pricing</label>
-                                                                                                            <div class="per-page-wrapper">
-                                                                                                                <div class="form-row per-page-row">
-                                                                                                                    <div class="form-group col-md-3">
-                                                                                                                        <input type="number" class="form-control" name="rows[${index}][per_page_pricing][0][quantity_from]" placeholder="From">
+                                                                                                                                <div class="form-group col-md-2">
+                                                                                                                                    <label> 
+                                                                                                                                        <?php if(false): ?> <!-- This is a placeholder; actual condition handled in Blade -->
+                                                                                                                                            <span class="toggle-pricing" data-target="#pricing-container-${index}" style="cursor: pointer; margin-left: 10px; font-size: 1rem;">+ </span>
+                                                                                                                                        <?php endif; ?>
+                                                                                                                                        Attribute
+                                                                                                                                    </label>
+                                                                                                                                    <select class="form-control" name="rows[${index}][attribute_id]">
+                                                                                                                                        <option value="">-- Select --</option>
+                                                                                                                                        ${attrOptions}
+                                                                                                                                    </select>
+                                                                                                                                </div>
+                                                                                                                                <div class="form-group col-md-2">
+                                                                                                                                    <label>Value</label>
+                                                                                                                                    <select class="form-control" name="rows[${index}][value_id]">
+                                                                                                                                        <option value="">-- Select --</option>
+                                                                                                                                        ${valueOptions}
+                                                                                                                                    </select>
+                                                                                                                                </div>
+                                                                                                                                <div class="form-group col-md-2 modifier-type-group" style="display: none;">
+                                                                                                                                    <label>Modifier Type</label>
+                                                                                                                                    <select class="form-control" name="rows[${index}][modifier_type]">
+                                                                                                                                        <option value="add">Add</option>
+                                                                                                                                        <option value="multiply">Multiply</option>
+                                                                                                                                    </select>
+                                                                                                                                </div>
+                                                                                                                                <div class="form-group col-md-2 base-charges-group" style="display: none;">
+                                                                                                                                    <label>Base Charges</label>
+                                                                                                                                    <div class="input-group">
+                                                                                                                                        <input type="text" class="form-control" name="rows[${index}][modifier_value]">
+                                                                                                                                        <select class="form-control col-auto" name="rows[${index}][base_charges_type]" style="max-width: 100px;">
+                                                                                                                                            <option value="">Select Type</option>
+                                                                                                                                            <option value="amount">Amount</option>
+                                                                                                                                            <option value="percentage">%</option>
+                                                                                                                                        </select>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                 <div class="form-group col-md-2 fixed-per-page-group" style="display: none;">
+                                                                                                                        <label>Price per Page (Fixed)</label>
+                                                                                                                        <div class="input-group">
+                                                                                                                            <input type="text" class="form-control"
+                                                                                                                                name="rows[${index}][flat_rate_per_page]">
+                                                                                                                        </div>
                                                                                                                     </div>
-                                                                                                                    <div class="form-group col-md-3">
-                                                                                                                        <input type="number" class="form-control" name="rows[${index}][per_page_pricing][0][quantity_to]" placeholder="To">
-                                                                                                                    </div>
-                                                                                                                    <div class="form-group col-md-3">
-                                                                                                                        <input type="text" class="form-control" name="rows[${index}][per_page_pricing][0][price]" placeholder="Price">
-                                                                                                                    </div>
-                                                                                                                    <div class="form-group col-md-3 d-flex align-items-center">
-                                                                                                                        <button type="button" class="btn btn-sm btn-primary add-per-page">+ Add</button>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    `;
+                                                                                                                                <div class="form-group col-md-2 extra-copy-group" style="display: none;">
+                                                                                                                                    <label>Extra Copy Charge</label>
+                                                                                                                                    <div class="input-group">
+                                                                                                                                        <input type="text" class="form-control" name="rows[${index}][extra_copy_charge]">
+                                                                                                                                        <select class="form-control col-auto" name="rows[${index}][extra_copy_charge_type]" style="max-width: 100px;">
+                                                                                                                                            <option value="">Select Type</option>
+                                                                                                                                            <option value="amount">Amount</option>
+                                                                                                                                            <option value="percentage">%</option>
+                                                                                                                                        </select>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                <div class="form-group col-md-1 d-flex align-items-center justify-content-center mt-2">
+                                                                                                                                    <div class="custom-control custom-checkbox">
+                                                                                                                                        <input type="checkbox" class="custom-control-input" id="default_${index}" name="rows[${index}][is_default]" value="1">
+                                                                                                                                        <label class="custom-control-label" for="default_${index}" title="Mark this value as default">Default</label>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                <div class="form-group col-md-1 d-flex align-items-end modifier-buttons"></div>
+                                                                                                                                <div class="col-md-12 per-page-container mt-2" id="pricing-container-${index}" style="display: none;">
+                                                                                                                                    <label class="font-weight-bold">Per Product Pricing</label>
+                                                                                                                                    <div class="per-page-wrapper">
+                                                                                                                                        <div class="form-row per-page-row">
+                                                                                                                                            <div class="form-group col-md-3">
+                                                                                                                                                <input type="number" class="form-control" name="rows[${index}][per_page_pricing][0][quantity_from]" placeholder="From">
+                                                                                                                                            </div>
+                                                                                                                                            <div class="form-group col-md-3">
+                                                                                                                                                <input type="number" class="form-control" name="rows[${index}][per_page_pricing][0][quantity_to]" placeholder="To">
+                                                                                                                                            </div>
+                                                                                                                                            <div class="form-group col-md-3">
+                                                                                                                                                <input type="text" class="form-control" name="rows[${index}][per_page_pricing][0][price]" placeholder="Price">
+                                                                                                                                            </div>
+                                                                                                                                            <div class="form-group col-md-3 d-flex align-items-center">
+                                                                                                                                                <button type="button" class="btn btn-sm btn-primary add-per-page">+ Add</button>
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            `;
 
             return row;
         }
@@ -462,12 +488,12 @@
                     const wrapper = document.createElement('div');
                     wrapper.className = 'form-group col-md-2 dependency-select';
                     wrapper.innerHTML = `
-                                                                            <label>Depends on "${parentAttr.name}"</label>
-                                                                            <select class="form-control" name="${selectName}">
-                                                                                <option value="">-- Select --</option>
-                                                                                ${values.map(v => `<option value="${v.id}" ${v.id == preselected ? 'selected' : ''}>${v.value}</option>`).join('')}
-                                                                            </select>
-                                                                        `;
+                                                                                                    <label>Depends on "${parentAttr.name}"</label>
+                                                                                                    <select class="form-control" name="${selectName}">
+                                                                                                        <option value="">-- Select --</option>
+                                                                                                        ${values.map(v => `<option value="${v.id}" ${v.id == preselected ? 'selected' : ''}>${v.value}</option>`).join('')}
+                                                                                                    </select>
+                                                                                                `;
 
                     valueGroup.after(wrapper);
                 });
@@ -646,16 +672,14 @@
         });
 
         document.getElementById('pages_dragger_required').addEventListener('change', function () {
-            const dependencyGroup = document.getElementById('pages-dragger-dependency-group');
-            const PageGroup = document.getElementById('default-pages-group');
-            if (this.checked) {
-                dependencyGroup.style.display = 'block';
-                PageGroup.style.display = 'block';
+            const pagesSettingsGroup = document.getElementById('pages-settings-group');
+
+            if (this.value === '1') {
+                pagesSettingsGroup.style.display = 'flex';
 
                 // Fill attribute options if needed dynamically (optional since already loaded in Blade)
             } else {
-                dependencyGroup.style.display = 'none';
-                PageGroup.style.display = 'none';
+                pagesSettingsGroup.style.display = 'none';
                 document.getElementById('pages-dragger-dependency').value = '';
             }
         });
