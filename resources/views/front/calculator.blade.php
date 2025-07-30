@@ -826,7 +826,7 @@
 
 
             <div class="addtobtn mt-3">
-                <button id="addToCartBtn" data-route="{{ route("shop-cart.store") }}"
+                <button id="addToCartBtn" data-route="{{ route("cart.store") }}"
                     data-subcategory-id="{{ $subcategory->id }}">Add to Cart</button>
                 @if ($deliveryChargesRequired)
                     <div class="note-dis">

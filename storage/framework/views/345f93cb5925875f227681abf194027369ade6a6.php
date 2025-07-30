@@ -258,9 +258,7 @@
         gap: 10px;
     }
 
- 
     .page-slider input[type="range"] {
-        outline: 2px solid #007bff;
         -webkit-appearance: none;
         width: 100%;
         height: 10px;
@@ -830,7 +828,7 @@
 
 
             <div class="addtobtn mt-3">
-                <button id="addToCartBtn" data-route="<?php echo e(route("shop-cart.store")); ?>"
+                <button id="addToCartBtn" data-route="<?php echo e(route("cart.store")); ?>"
                     data-subcategory-id="<?php echo e($subcategory->id); ?>">Add to Cart</button>
                 <?php if($deliveryChargesRequired): ?>
                     <div class="note-dis">

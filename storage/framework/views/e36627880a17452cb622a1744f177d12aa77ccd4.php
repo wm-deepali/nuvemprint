@@ -281,7 +281,7 @@
                                     <div>
                                         <div class="custom-art-tab-section-left">
                                             <div class="custom-art-tab-cont">
-                                                <h6>Art Prints</h6>
+                                                <h6><?php echo e($subcategoryName); ?></h6>
                                                 <button class="custom-art-edit-btn">✎ Edit</button>
                                             </div>
 
@@ -290,14 +290,18 @@
 
                                                 <div class="custom-art-field">
                                                     <label>Copies</label>
-                                                    <input type="number" value="500" class="custom-art-input-box">
+                                                    <input type="number" value="<?php echo e($item['quantity']); ?>" class="custom-art-input-box">
                                                 </div>
 
-                                                <div class="custom-art-field">
-                                                    <label>Size</label>
-                                                    <input type="text" value="A5 (148 mm x 210 mm)"
-                                                        class="custom-art-input-box" readonly>
-                                                </div>
+                                              <?php
+    $paperSizeValue = collect($attributes)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
+?>
+
+<div class="custom-art-field">
+    <label>Size</label>
+    <input type="text" value="<?php echo e($paperSizeValue); ?>" class="custom-art-input-box" readonly>
+</div>
+
 
                                                 <div class="custom-art-field custom-art-gsm-options">
                                                     <label>130 <span class="custom-art-subtext">gsm paper -

@@ -152,17 +152,31 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product added to cart.',
-                'redirect_url' => route('shop-cart'),
+                'redirect_url' => route('cart.show'),
                 'item' => $cartItem
             ]);
         }
 
         // Normal browser POST form, redirect
-        return redirect()->route('shop-cart')->with([
+        return redirect()->route('cart.show')->with([
             'success' => 'Product added to cart.',
             'last_item' => $cartItem
         ]);
     }
+
+    public function saveBeforeCheckout(Request $request)
+    {
+        $item = session('cart.items');
+
+        if (!$item) {
+            return response()->json(['success' => false, 'message' => 'Cart is empty']);
+        }
+        // dd($request->all());
+
+
+        return response()->json(['success' => true]);
+    }
+
 
     public function getByTitle(Request $request)
     {
@@ -217,5 +231,111 @@ class CartController extends Controller
             'delivery_charge' => $postcodeEntry->delivery_charge,
         ]);
     }
+
+    public function clear(Request $request)
+    {
+        session()->forget('cart.items');
+        session()->forget('cart.grand_total');
+
+        return response()->json(['success' => true]);
+    }
+
+    public function checkout()
+    {
+        $item = session('cart.items', null);
+
+        if (!$item) {
+            return redirect()->route('cart.show')->with('error', 'Your cart is empty.');
+        }
+
+        $subcategory = Subcategory::find($item['subcategory_id']);
+        $attributes = [];
+
+        $paperWeight = null;
+        $paperSize = null;
+
+        foreach ($item['attributes'] as $attrId => $valId) {
+            $attribute = Attribute::find($attrId);
+            $value = AttributeValue::find($valId);
+
+            if ($attribute && $value) {
+                $attributes[] = [
+                    'attribute_name' => $attribute->name,
+                    'value_name' => $value->value,
+                ];
+
+                $attrName = strtolower(trim($attribute->name));
+                if ($attrName === 'paper weight') {
+                    $paperWeight = $value->value;
+                } elseif ($attrName === 'paper size') {
+                    $paperSize = $value->value;
+                }
+            }
+        }
+
+        $totalWeight = null;
+        if ($paperWeight && $paperSize && isset($item['pages']) && isset($item['quantity'])) {
+            $gsm = (int) filter_var($paperWeight, FILTER_SANITIZE_NUMBER_INT);
+            $pages = (int) $item['pages'];
+            $quantity = (int) $item['quantity'];
+
+            $sizeMap = [
+                'A5' => [148, 210],
+                'A4' => [210, 297],
+                'A3' => [297, 420],
+            ];
+
+            if (isset($sizeMap[$paperSize])) {
+                [$widthMm, $heightMm] = $sizeMap[$paperSize];
+                $widthM = $widthMm * 0.001;
+                $heightM = $heightMm * 0.001;
+                $sheetArea = $widthM * $heightM;
+
+                $sheetsPerCopy = ceil($pages / 2);
+                $totalSheets = $sheetsPerCopy * $quantity;
+
+                $totalWeightGrams = round($gsm * $sheetArea * $totalSheets, 2);
+                $totalWeight = round($totalWeightGrams / 1000, 2);
+            }
+        }
+
+        $deliveryCharge = null;
+        $deliveryTitle = 'Delivery';
+        $deliveryPrice = 0;
+
+        if (!empty($item['delivery']['id'])) {
+            $deliveryCharge = DeliveryCharge::find($item['delivery']['id']);
+            $deliveryPrice = $deliveryCharge->price ?? 0;
+            $deliveryTitle = $deliveryCharge->title ?? 'Delivery';
+        }
+
+        $proofPrice = (float) ($item['proof']['price'] ?? 0);
+        $totalPrice = (float) $item['total_price'];
+
+        $vatPercentage = (float) Vat::where('country', $deliveryTitle)->value('vat_percentage') ?? 0;
+        $subtotal = $totalPrice - $deliveryPrice - $proofPrice;
+        $vatAmount = round(($totalPrice * $vatPercentage) / 100, 2);
+        $grandTotal = $subtotal + $deliveryPrice + $proofPrice + $vatAmount;
+
+        session(['cart.grand_total' => $grandTotal]);
+
+        $allDeliveryCharges = DeliveryCharge::all();
+        return view('front.artwork', [
+            'item' => $item,
+            'subcategoryName' => $subcategory->name ?? null,
+            'subcategoryThumb' => $subcategory->thumbnail ?? null,
+            'attributes' => $attributes,
+            'paperTotalWeight' => $totalWeight,
+            'subtotal' => $subtotal,
+            'vatPercentage' => $vatPercentage,
+            'vatAmount' => $vatAmount,
+            'deliveryTitle' => $deliveryTitle,
+            'proofPrice' => $proofPrice,
+            'deliveryPrice' => $deliveryPrice,
+            'grandTotal' => $grandTotal,
+            'allDeliveryCharges' => $allDeliveryCharges,
+        ]);
+    }
+
 
 }

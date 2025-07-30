@@ -2,6 +2,11 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -248,7 +253,7 @@
 
             <!--start breadcrumb-->
             <section class="py-3 border-bottom d-none d-md-flex" style="background: #f1f2f7;
-                                                                              padding: 40px 0;">
+                                                                                                      padding: 40px 0;">
                 <!--end shop cart-->
                 <div class="container" style="max-width: 900px;">
                     <div class="row g-4">
@@ -287,11 +292,11 @@
                                                 </p>
                                             @endforeach
                                             <!-- <div class="d-flex justify-content-between mb-3 mt-3 ">
-                                                                                                        <span>Subtotal:</span>
-                                                                                              <span>£15.00 <br><span>VAT: £3.00</span></span>
+                                                                                                                                                        <span>Subtotal:</span>
+                                                                                                                                              <span>£15.00 <br><span>VAT: £3.00</span></span>
 
 
-                                                                                                    </div> -->
+                                                                                                                                                    </div> -->
                                         </div>
 
                                     </div>
@@ -301,7 +306,7 @@
                                     <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
 
                                         <!-- <button class="btn-info trash "><i class="fa-solid fa-trash"></i></button>
-                                                        <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
+                                                                                                        <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
                                         <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
                                     </div>
 
@@ -412,8 +417,11 @@
                                         <span><strong id="grandTotalAmount">£{{ $cartData['grand_total'] }}</strong></span>
                                     </div>
                                     <hr>
-                                    <button class="continue-class">Continue</button>
-                                    <button class="start-new">Start New Qoute</button>
+                                    <button class="continue-class" id="continueToCheckout">Continue</button>
+
+                                    <button type="button" class="start-new" data-toggle="modal" data-target="#startQuoteModal">
+                                        Start a New Quote
+                                    </button>
 
                                 </div>
                             </div>
@@ -422,6 +430,28 @@
                 </div>
 
             </section>
+        </div>
+    </div>
+
+    <!-- Start Quote Modal -->
+    <div class="modal fade" id="startQuoteModal" tabindex="-1" role="dialog" aria-labelledby="startQuoteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="background-color:white;">
+                <div class="modal-header">
+                    <h5 class="modal-title">Start a New Quote</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to start a new quote? This will remove the current cart.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="confirmStartQuote" type="button" class="btn btn-danger">Yes, Start New</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -462,9 +492,56 @@
                 });
         });
 
+
     });
 
+
     document.addEventListener('DOMContentLoaded', function () {
+
+        const continueBtn = document.getElementById('continueToCheckout');
+
+        continueBtn?.addEventListener('click', function () {
+            fetch("{{ route('cart.save.before.checkout') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({}) // Add data if needed
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/checkout';
+                    } else {
+                        alert('Unable to continue. Please try again.');
+                    }
+                })
+                .catch(err => {
+                    alert('Error occurred while processing. Try again.');
+                });
+        });
+
+
+        document.getElementById('confirmStartQuote').addEventListener('click', function () {
+            fetch("{{ route('cart.clear') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/';
+                    } else {
+                        alert("Something went wrong.");
+                    }
+                })
+                .catch(() => alert("Request failed."));
+        });
+
         const applyBtn = document.getElementById('applyPostcodeBtn');
         const postcodeInput = document.getElementById('postcodeInput');
         const status = document.getElementById('postcodeStatus');

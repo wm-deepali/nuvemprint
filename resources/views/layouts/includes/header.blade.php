@@ -207,7 +207,7 @@
 									</li> -->
 
 									<li class="nav-item">
-										<a href="{{ route('shop-cart') }}" class="nav-link cart-link">
+										<a href="{{ route('cart.show') }}" class="nav-link cart-link">
 											<i class='bx bx-cart'></i>
 										</a>
 									</li>

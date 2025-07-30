@@ -36,15 +36,21 @@ Route::get('/', [SiteController::class, 'index'])->name('home');
 Route::get('{slug}/details', [SiteController::class, 'subcateDetails'])->name('subcategory-details');
 Route::post('/calculate-price', [SiteController::class, 'calculate'])->name('calculate.price');
 
-Route::get('cart', [CartController::class, 'showCart'])->name('shop-cart');
-Route::post('cart/store', [CartController::class, 'addToCart'])->name('shop-cart.store');
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'showCart'])->name('show');        // cart.show
+    Route::post('store', [CartController::class, 'addToCart'])->name('store'); // cart.store
+    Route::post('clear', [CartController::class, 'clear'])->name('clear');   
+    Route::post('save-before-checkout', [CartController::class, 'saveBeforeCheckout'])->name('save.before.checkout');
+  // cart.clear
+});
+
+
 Route::post('/check-postcode', [CartController::class, 'check'])->name('check.postcode');
 Route::post('/get-vat', [CartController::class, 'getByTitle'])->name('get.vat.by.title');
 
 
-Route::get('checkout', function () {
-    return view('front.artwork');
-})->name('checkout');
+Route::get('checkout', [CartController::class, 'checkout'])->name('checkout');
+
 
 
 Route::get('order-tracking', function () {
