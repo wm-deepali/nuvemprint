@@ -49,7 +49,7 @@
         <tr>
           <td><?php echo e($index + 1); ?></td>
           <td><?php echo e($item->proof_type); ?></td>
-          <td>$<?php echo e(number_format($item->price, 2)); ?></td>
+          <td>£<?php echo e(number_format($item->price, 2)); ?></td>
           <td><?php echo e($item->created_at->format('Y-m-d')); ?></td>
           <td>
           <div class="d-flex">

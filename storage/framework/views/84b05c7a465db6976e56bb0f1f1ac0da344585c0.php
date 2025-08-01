@@ -1,3 +1,5 @@
+<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js"
+        id="dropboxjs" data-app-key="n5gi2gzrhj8v8b6"></script>
 <div class="tabone-section">
    <div>
       <div class="custom-art-tab-section-left">
@@ -9,13 +11,9 @@
             <div class="custom-art-item-label">Item 1</div>
             <div class="custom-art-field">
                <label>Copies</label>
-               <input
-                  type="number"
-                  value="<?php echo e($items['quantity'] ?? ''); ?>"
-                  class="custom-art-input-box"
-               />
+               <input type="number" value="<?php echo e($items['quantity'] ?? ''); ?>" class="custom-art-input-box" />
             </div>
-            <?php $paperSizeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
+  <?php $paperSizeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
                                  ?>
             <div class="custom-art-field">
                <label>Size</label>
@@ -27,11 +25,14 @@
                />
             </div>
             <?php 
-            $paperWeightValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Weight')['value_name'] ?? '';
-            $paperTypeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Type')['value_name'] ?? ''; 
+            $paperWeightValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper
+            Weight')['value_name'] ?? '';
+            $paperTypeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Type')['value_name'] ??
+            '';
             ?>
             <div class="custom-art-field custom-art-gsm-options">
-               <label><?php echo e($paperWeightValue); ?> <span class="custom-art-subtext">paper - <?php echo e($paperTypeValue); ?></span></label>
+               <label><?php echo e($paperWeightValue); ?> <span class="custom-art-subtext">paper -
+                     <?php echo e($paperTypeValue); ?></span></label>
                <div class="custom-art-side-options">
                   <button class="custom-art-side active">Front</button>
                   <button class="custom-art-side">Back</button>
@@ -50,28 +51,18 @@
    <div class="tab-section-right">
       <div class="custom-art-upload-buttons">
          <div class="d-flex justify-content-between">
-            <input
-               type="file"
-               id="real-file-input"
-               accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            />
+            <input type="file" id="real-file-input"
+               accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
             <!-- Custom button -->
 
-            <button
-               class="custom-art-btn btn-blue"
-               type="button"
-               onclick="document.getElementById('real-file-input').click()"
-            >
+            <button class="custom-art-btn btn-blue" type="button"
+               onclick="document.getElementById('real-file-input').click()">
                <i class="fa-solid fa-cloud-arrow-up"></i> Upload File(s)
             </button>
-            <button class="custom-art-btn btn-dropbox">
+            <button class="custom-art-btn btn-dropbox" type="button">
                <i class="fa-brands fa-dropbox"></i> Choose from Dropbox
             </button>
-            <button
-               class="custom-art-btn btn-link"
-               data-bs-toggle="modal"
-               data-bs-target="#pasteLinkModal"
-            >
+            <button class="custom-art-btn btn-link" data-bs-toggle="modal" data-bs-target="#pasteLinkModal">
                Paste Link to Print File
             </button>
          </div>
@@ -97,44 +88,59 @@
             </p>
          </div>
       </div>
-      <textarea
-         class="form-control text-areafield"
-         id="exampleFormControlTextarea1"
-         rows="5"
-         placeholder="Details..."
-      ></textarea>
+      <textarea class="form-control text-areafield" id="orderDetailsText" rows="5"
+         placeholder="Details..."><?php echo e(session('cart.details')); ?></textarea>
+
    </div>
 </div>
 <div class="upload-container">
-   <div
-      class="upload-card"
-      onclick="document.getElementById('fileInput').click();"
-   >
+   <div class="upload-card" onclick="document.getElementById('fileInput').click();">
       <i class="fa-solid fa-arrow-up-from-bracket"></i>
       <p class="title">Drag and Drop files to upload</p>
       <p class="or">or</p>
       <button class="browse-btn">Browse</button>
       <p class="file-info">Supported files: Image, PDF</p>
    </div>
-   <input
-      type="file"
-      id="fileInput"
-      multiple
-      accept="image/*,application/pdf"
-      style="display: none"
-      onchange="handleImageUpload(event)"
-   />
+   <input type="file" id="fileInput" multiple accept="image/*,application/pdf" style="display: none"
+      onchange="handleImageUpload(event)" />
    <div id="preview-container"></div>
 </div>
 
 <script>
+
+   document.getElementById("orderDetailsText").addEventListener("blur", function () {
+      const details = this.value.trim();
+      if (details !== "") {
+         saveDetailsToSession(details);
+      }
+   });
+
+   function saveDetailsToSession(details) {
+      fetch("/cart/save-details", {
+         method: "POST",
+         headers: {
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+            "Content-Type": "application/json",
+         },
+         body: JSON.stringify({ details }),
+      })
+         .then(res => res.json())
+         .then(data => {
+            console.log("Details saved:", data);
+         })
+         .catch(err => {
+            console.error("Failed to save details:", err);
+         });
+   }
+
+
    document.addEventListener("DOMContentLoaded", async () => {
       try {
          const response = await fetch("/cart/session-files");
-         const files = await response.json();
-         console.log("files", files);
+         const data = await response.json();
 
-         const fileArray = Object.values(files);
+         // Handle files
+         const fileArray = Object.values(data).filter(item => typeof item === 'object' && item?.type);
          fileArray.forEach((file) => {
             if (file.type === "main") {
                renderMainPreviewFromSession(file);
@@ -148,10 +154,20 @@
             }
          });
          renderPreviews();
+
+         // Set textarea if 'details' exist
+         if (data.details) {
+            const textarea = document.getElementById("orderDetailsText");
+            if (textarea) {
+               textarea.value = data.details;
+            }
+         }
+
       } catch (error) {
          console.error("Failed to fetch session files:", error);
       }
    });
+
 
    async function addPastedLink() {
       const urlInput = document.getElementById("pastedLinkInput");
@@ -342,7 +358,7 @@
       } else if (
          fileType === "application/msword" ||
          fileType ===
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       ) {
          preview.innerHTML += `
             <div style="display: flex; align-items: center;">
@@ -361,8 +377,6 @@
    }
 
    function renderMainPreviewFromSession(fileInfo) {
-      console.log("hello");
-
       const container = document.getElementById("uploaded-main-files");
       container.innerHTML = "";
       container.style.display = "block";
@@ -442,7 +456,6 @@
    function renderPreviews() {
       const container = document.getElementById("preview-container");
       container.innerHTML = "";
-      console.log("hello");
       uploadedFiles.forEach((file, index) => {
          const preview = document.createElement("div");
          preview.className = "preview-box";
@@ -555,14 +568,12 @@
       })
          .then((response) => response.json())
          .then((data) => {
-            console.log("Saved to session:", data);
 
             if (type === "extra" && data?.path) {
                // Find the file by name and update its path and mime
                const uploaded = uploadedFiles.find(
                   (f) => f.name === file.name && !f.path,
                );
-               console.log("uploaded", uploaded);
 
                if (uploaded) {
                   uploaded.path = data.path;
@@ -585,5 +596,60 @@
             console.error("Error saving to session:", error);
          });
    }
+
+
+    let files = [];
+
+  // Event listener for Dropbox button click
+  document.querySelector('.btn-dropbox').addEventListener('click', function (event) {
+    event.preventDefault();
+
+    Dropbox.choose({
+      // Acceptable file types/extensions
+      extensions: ['.pdf', '.png', '.jpg', '.jpeg', '.doc', '.docx'],
+
+      // Allow user to select multiple files if you want
+      multiselect: false,
+
+      // Use direct link to easily fetch each file
+      linkType: "direct",
+
+      // After user selects files
+      success: function (files) {
+        files.forEach(async function (file) {
+          try {
+            // Fetch file blob from Dropbox direct link
+            const response = await fetch(file.link);
+            const blob = await response.blob();
+
+            // Determine the mime type based on the blob or extension
+            let ext = file.name.split('.').pop().toLowerCase();
+            let mime = blob.type !== "" ? blob.type : (
+              ext === 'pdf' ? 'application/pdf' :
+              ext === 'png' ? 'image/png' :
+              ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
+              ext === 'doc' ? 'application/msword' :
+              ext === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
+              'application/octet-stream'
+            );
+
+            // Create a File object from the blob to mimic local file upload
+            let dropboxFile = new File([blob], file.name, { type: mime });
+
+            // Save file to session/backend (your existing function)
+            saveToSession(dropboxFile, 'extra');
+
+            // Add to your tracking array and update the UI previews
+            uploadedFiles.push(dropboxFile);
+            renderPreviews();
+          } catch (err) {
+            alert("Failed to retrieve the file from Dropbox.");
+            console.error(err);
+          }
+        });
+      }
+    });
+  });;
+
 </script>
 <?php /**PATH D:\web-mingo-project\new\resources\views/front/tabs/artwork.blade.php ENDPATH**/ ?>

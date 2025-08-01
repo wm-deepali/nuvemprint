@@ -79,11 +79,37 @@
                             <tbody>
                                 <?php $__currentLoopData = $quote->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td>
-                                           <?php echo e($item->subcategory->name ?? 'N/A'); ?> (<?php echo e(optional($item->subcategory->categories->first())->name ?? 'N/A'); ?>)
-                                            <br>
-                                            <!-- <small class="text-muted"><?php echo e($item->note ?? ''); ?></small> -->
-                                        </td>
+<td>
+    
+    <div style="font-weight: 600;">
+        <?php echo e($item->subcategory->name ?? 'N/A'); ?>
+
+        (<?php echo e(optional($item->subcategory->categories->first())->name ?? 'N/A'); ?>)
+    </div>
+
+    
+    <?php if($item->attributes && $item->attributes->count()): ?>
+        <div style="margin-top: 5px;">
+            <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div style="font-size: 13px; margin-left: 8px;">
+                    <strong><?php echo e($attr->attribute->name ?? ''); ?>:</strong>
+                    <?php echo e($attr->attributeValue->value ?? '-'); ?>
+
+                </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    <?php endif; ?>
+
+    
+    <?php if(!is_null($item->pages)): ?>
+        <div style="margin-top: 5px; font-size: 13px; margin-left: 8px;">
+            <strong>Pages:</strong> <?php echo e($item->pages); ?>
+
+        </div>
+    <?php endif; ?>
+
+</td>
+
                                         <td><?php echo e($item->quantity); ?></td>
                                         <td> <?php echo e($item->quantity > 0 ? number_format($item->sub_total / $item->quantity, 2) : '0.00'); ?></td>
                                         <td><?php echo e(number_format($item->sub_total, 2)); ?></td>
@@ -110,20 +136,14 @@
                                     <td class="text-right">£<?php echo e(number_format($quote->proof_price, 2)); ?></td>
                                 </tr>
                                 <tr>
-                                    <th>VAT (<?php echo e($quote->vat_percentage); ?>)%:</th>
+                                    <th>VAT (<?php echo e((int)$quote->vat_percentage); ?>%):</th>
                                     <td class="text-right">£<?php echo e(number_format($quote->vat_amount, 2)); ?></td>
                                 </tr>
-                                <tr class="border-top">
-                                    <th><strong>Total:</strong></th>
-                                    <td class="text-right"><strong>£<?php echo e(number_format($quote->grand_total, 2)); ?></strong></td>
-                                </tr>
-                                <?php
-                                $amountDue = $quote->grand_total - $payments->sum('amount_received');
-                                ?>
+                            
                                 <tr class="font-weight-bold "
                                     style="font-size: 18px; color: #6B3DF4; border-top:2px solid #6B3DF4; border-bottom:2px solid #6B3DF4;">
-                                    <th><strong>Amount due:</strong></th>
-                                    <td class="text-right"><strong>£<?php echo e(number_format($amountDue, 2)); ?></strong></td>
+                                    <th><strong>Total</strong></th>
+                                    <td class="text-right"><strong>£<?php echo e(number_format($quote->grand_total, 2)); ?></strong></td>
                                 </tr>
                             </table>
 

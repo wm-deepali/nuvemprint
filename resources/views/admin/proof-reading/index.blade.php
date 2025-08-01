@@ -49,7 +49,7 @@
         <tr>
           <td>{{ $index + 1 }}</td>
           <td>{{ $item->proof_type }}</td>
-          <td>${{ number_format($item->price, 2) }}</td>
+          <td>£{{ number_format($item->price, 2) }}</td>
           <td>{{ $item->created_at->format('Y-m-d') }}</td>
           <td>
           <div class="d-flex">

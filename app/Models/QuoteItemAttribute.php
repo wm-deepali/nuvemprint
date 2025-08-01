@@ -20,15 +20,17 @@ class QuoteItemAttribute extends Model
         return $this->belongsTo(QuoteItem::class);
     }
 
-    // If you have Attribute and Value models, you can optionally define:
-    // public function attribute()
-    // {
-    //     return $this->belongsTo(Attribute::class);
-    // }
+    // Assuming each attribute row points to an 'Attribute' model
+    public function attribute()
+    {
+        return $this->belongsTo(Attribute::class);
+    }
 
-    // public function value()
-    // {
-    //     return $this->belongsTo(Value::class, 'value_id');
-    // }
+    // Assuming each row points to a selected value in an 'AttributeValue' model
+    public function attributeValue()
+    {
+        return $this->belongsTo(AttributeValue::class, 'value_id'); // explicitly use the correct FK
+    }
+
 }
 

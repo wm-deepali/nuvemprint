@@ -51,7 +51,7 @@
           <td>
           <a href="{{ route('admin.customers.detail', $customer->id) }}" class="btn btn-sm btn-info mr-1">View
           Customer Detail</a>
-          <a href="" class="btn btn-sm btn-primary mr-1">View All Quotes</a>
+          <!-- <a href="" class="btn btn-sm btn-primary mr-1">View All Quotes</a> -->
           <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
           onclick="deleteConfirmation({{ $customer->id }})">
 

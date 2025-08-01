@@ -64,7 +64,6 @@
 
             <td><?php echo e($category->created_at->format('d M Y, h:i A')); ?></td>
 
-            
             <td>
             <ul class="list-inline">
             <li class="list-inline-item">

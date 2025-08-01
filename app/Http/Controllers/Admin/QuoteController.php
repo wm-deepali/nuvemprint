@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use App\Models\Invoice;
 use App\Models\Quote;
 use App\Models\Subcategory;
@@ -13,12 +14,86 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class QuoteController extends Controller
 {
+
+
+    public function index()
+    {
+        // All pending quotes
+        $quotes = Quote::with(['customer', 'deliveryAddress', 'items.subcategory.categories'])
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
+        // Approved quotes 
+        $approvedQuotes = Quote::with(['customer', 'departments', 'deliveryAddress', 'items.subcategory.categories', 'payments'])
+            ->where('status', 'approved')
+            ->get();
+
+        // canceled quotes 
+        $canceledQuotes = Quote::with(['customer', 'departments', 'deliveryAddress', 'items.subcategory.categories', 'payments'])
+            ->where('status', 'cancelled')
+            ->get();
+
+
+        // Approved + processed quotes (with departments)
+        $processedQuotes = Quote::with(['departments', 'customer', 'deliveryAddress', 'items.subcategory.categories', 'payments'])
+            ->where('status', 'approved')
+            ->whereHas('departments') // Assigned to at least one department
+            ->get();
+
+        // Group processed quotes by department
+        $departmentQuotes = [];
+
+        foreach ($processedQuotes as $quote) {
+            // Get the latest department (by created_at or id or pivot timestamp)
+            $latestDepartment = $quote->departments->sortByDesc('pivot.created_at')->first();
+
+            if ($latestDepartment) {
+                $departmentQuotes[$latestDepartment->id][] = $quote;
+            }
+        }
+
+
+        $departments = Department::all();
+
+        return view('admin.quotes.orders', compact(
+            'quotes',
+            'approvedQuotes',
+            'canceledQuotes',
+            'departmentQuotes',
+            'departments'
+        ));
+    }
+
+
+
+
     public function show($id)
     {
-        $quote = Quote::with(['customer', 'items', 'documents', 'deliveryAddress']) // adjust relationships as needed
-            ->findOrFail($id);
+        $quote = Quote::with([
+            'customer',
+            'items.attributes.attribute',
+            'items.attributes.attributeValue',
+            'documents',
+            'deliveryAddress',
+            'departments' // eager load existing departments
+        ])->findOrFail($id);
 
-        return view('admin.quotes.index', compact('quote'));
+        // Get all departments
+        $departments = Department::all();
+
+        // Get IDs of already assigned departments
+        $assignedDepartmentIds = $quote->departments->pluck('id')->toArray();
+
+        // Exclude assigned departments
+        $availableDepartments = $departments->reject(function ($dept) use ($assignedDepartmentIds) {
+            return in_array($dept->id, $assignedDepartmentIds);
+        });
+
+        return view('admin.quotes.index', [
+            'quote' => $quote,
+            'departments' => $availableDepartments,
+        ]);
     }
 
 
@@ -94,6 +169,26 @@ class QuoteController extends Controller
     }
 
 
+    public function updateNote(Request $request)
+    {
+        $request->validate([
+            'quote_id' => 'required|exists:quotes,id',
+            'department_id' => 'required|exists:departments,id',
+            'notes' => 'nullable|string',
+        ]);
+
+        $quote = Quote::findOrFail($request->quote_id);
+
+        // Update pivot table note
+        $quote->departments()->updateExistingPivot($request->department_id, [
+            'notes' => $request->notes,
+            'updated_at' => now()
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Note updated successfully.']);
+    }
+
+
 
     public function submitPayment(Request $request)
     {
@@ -147,8 +242,15 @@ class QuoteController extends Controller
 
     public function viewInvoice($quoteId)
     {
-        $quote = Quote::with(['customer', 'billingAddress', 'deliveryAddress', 'items', 'payments', 'invoice'])->findOrFail($quoteId);
-
+        $quote = Quote::with([
+            'customer',
+            'billingAddress',
+            'deliveryAddress',
+            'items.attributes.attribute',
+            'items.attributes.attributeValue',
+            'payments',
+            'invoice'
+        ])->findOrFail($quoteId);
         return view('admin.quotes.view-invoice', [
             'quote' => $quote,
             'invoice' => $quote->invoice,
@@ -169,7 +271,7 @@ class QuoteController extends Controller
             'payments' => $quote->payments,
             'customer' => $quote->customer,
         ]);
-// dd($pdf);
+        // dd($pdf);
         return $pdf->download('invoice-' . $quote->order_number . '.pdf');
     }
 

@@ -47,7 +47,7 @@
 	}
 
 	.custom-cat-item.active {
-		background-color: #000000;
+		background-color: #d0d0d0;
 		font-weight: bold;
 	}
 
@@ -192,7 +192,7 @@
 											</a>
 											<ul class="dropdown-menu">
 												<li><a class="dropdown-item"
-														href="{{route('account-logout')}}">Dashboard</a></li>
+														href="{{route('account-dashboard')}}">Dashboard</a></li>
 												<li><a class="dropdown-item" href="{{route('account-logout')}}">Logout</a>
 												</li>
 											</ul>
@@ -260,14 +260,14 @@
 										@foreach($menucats as $index => $menucat)
 											<div class="custom-subcat-content {{ $index == 0 ? 'd-block' : 'd-none' }}"
 												id="cat-{{ $menucat->id }}">
-												<h6 class="fw-bold text-white">{{ $menucat->name }}</h6>
+												<h6 class="fw-bold text-black">{{ $menucat->name }}</h6>
 												@if(isset($menucat->subcategories) && count($menucat->subcategories) > 0)
 													<ul class="list-unstyled1 ">
 														@foreach($menucat->subcategories as $subcat)
 															<div class="main-cat">
 																<img src="{{ asset('storage/' . $subcat->thumbnail) }}">
 																<li>
-																	<a class="text-center"
+																	<a class=" text-black"
 																		href="{{ route('subcategory-details', ['slug' => $subcat->slug]) }}">
 																		{{ $subcat->name }}
 																	</a>
@@ -276,7 +276,7 @@
 														@endforeach
 													</ul>
 												@else
-													<p>No subcategories available.</p>
+													<p class=" text-black" style="color:#000;">No subcategories available.</p>
 												@endif
 											</div>
 										@endforeach
@@ -307,7 +307,7 @@
 											@foreach($menucate->subcategories as $k => $menusubcates)
 												<div class="">
 													<img src="{{ asset('storage/' . $menusubcates->thumbnail) }}">
-													<li><a class="dropdown-item text-center"
+													<li><a class="dropdown-item "
 															href="{{ route('subcategory-details', ['slug' => $menusubcates->slug]) }}">{{$menusubcates->name ?? ""}}</a>
 													</li>
 												</div>

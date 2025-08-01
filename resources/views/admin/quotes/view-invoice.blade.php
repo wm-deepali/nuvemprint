@@ -76,11 +76,34 @@
                             <tbody>
                                 @foreach ($quote->items as $item)
                                     <tr>
-                                        <td>
-                                           {{ $item->subcategory->name ?? 'N/A' }} ({{ optional($item->subcategory->categories->first())->name ?? 'N/A' }})
-                                            <br>
-                                            <!-- <small class="text-muted">{{ $item->note ?? '' }}</small> -->
-                                        </td>
+<td>
+    {{-- Subcategory + Category --}}
+    <div style="font-weight: 600;">
+        {{ $item->subcategory->name ?? 'N/A' }}
+        ({{ optional($item->subcategory->categories->first())->name ?? 'N/A' }})
+    </div>
+
+    {{-- Attributes --}}
+    @if ($item->attributes && $item->attributes->count())
+        <div style="margin-top: 5px;">
+            @foreach ($item->attributes as $attr)
+                <div style="font-size: 13px; margin-left: 8px;">
+                    <strong>{{ $attr->attribute->name ?? '' }}:</strong>
+                    {{ $attr->attributeValue->value ?? '-' }}
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    {{-- Number of Pages --}}
+    @if (!is_null($item->pages))
+        <div style="margin-top: 5px; font-size: 13px; margin-left: 8px;">
+            <strong>Pages:</strong> {{ $item->pages }}
+        </div>
+    @endif
+
+</td>
+
                                         <td>{{ $item->quantity }}</td>
                                         <td> {{ $item->quantity > 0 ? number_format($item->sub_total / $item->quantity, 2) : '0.00' }}</td>
                                         <td>{{ number_format($item->sub_total, 2) }}</td>
@@ -107,20 +130,14 @@
                                     <td class="text-right">£{{ number_format($quote->proof_price, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <th>VAT ({{ $quote->vat_percentage }})%:</th>
+                                    <th>VAT ({{ (int)$quote->vat_percentage }}%):</th>
                                     <td class="text-right">£{{ number_format($quote->vat_amount, 2) }}</td>
                                 </tr>
-                                <tr class="border-top">
-                                    <th><strong>Total:</strong></th>
-                                    <td class="text-right"><strong>£{{ number_format($quote->grand_total, 2) }}</strong></td>
-                                </tr>
-                                @php
-                                $amountDue = $quote->grand_total - $payments->sum('amount_received');
-                                @endphp
+                            
                                 <tr class="font-weight-bold "
                                     style="font-size: 18px; color: #6B3DF4; border-top:2px solid #6B3DF4; border-bottom:2px solid #6B3DF4;">
-                                    <th><strong>Amount due:</strong></th>
-                                    <td class="text-right"><strong>£{{ number_format($amountDue, 2) }}</strong></td>
+                                    <th><strong>Total</strong></th>
+                                    <td class="text-right"><strong>£{{ number_format($quote->grand_total, 2) }}</strong></td>
                                 </tr>
                             </table>
 

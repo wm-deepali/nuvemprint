@@ -254,7 +254,7 @@
             <!--start breadcrumb-->
             <section class="py-3 border-bottom d-none d-md-flex"
                 style="background: #f1f2f7;
-                                                                                                          padding: 40px 0;">
+                                                                                                              padding: 40px 0;">
                 <!--end shop cart-->
                 <div class="container" style="max-width: 900px;">
                     <div class="row g-4">
@@ -270,7 +270,7 @@
                                 @if ($cartData)
                                     <div class="d-flex justify-content-between mb-3">
                                         <p><strong>Shipping:</strong> {{ $formattedDate }}</p>
-                                        <h5><strong>Subtotal:</strong> £{{ $cartData['items']['sub_total'] }} </h5>
+                                        <h5><strong>Subtotal:</strong> £{{ $cartData['items']['sub_total'] ?? 0 }} </h5>
                                     </div>
 
                                     <div class="d-flex align-items-start mb-3">
@@ -293,11 +293,11 @@
                                                 </p>
                                             @endforeach
                                             <!-- <div class="d-flex justify-content-between mb-3 mt-3 ">
-                                                                                                                                                                <span>Subtotal:</span>
-                                                                                                                                                      <span>£15.00 <br><span>VAT: £3.00</span></span>
+                                                                                                                                                                        <span>Subtotal:</span>
+                                                                                                                                                              <span>£15.00 <br><span>VAT: £3.00</span></span>
 
 
-                                                                                                                                                            </div> -->
+                                                                                                                                                                    </div> -->
                                         </div>
 
                                     </div>
@@ -307,7 +307,7 @@
                                     <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
 
                                         <!-- <button class="btn-info trash "><i class="fa-solid fa-trash"></i></button>
-                                                                                                                <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
+                                                                                                                        <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
                                         <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
                                     </div>
 
@@ -330,7 +330,7 @@
                             <div class="col-md-5">
                                 <div class="quote-box">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5>Quote Number:<strong> #{{ $cartData['quote_id'] }}</strong></h5>
+                                        <h5>Quote Number:<strong> #{{ $cartData['quote_id'] ?? '' }}</strong></h5>
 
                                     </div>
 
@@ -339,17 +339,17 @@
                                     <div class="d-flex justify-content-between">
                                         <span><strong>{{ $cartData['subcategory_name'] }} x {{ $cartData['items']['quantity'] }}
                                                 Copies</strong></span>
-                                        <span>£{{ $cartData['items']['sub_total'] }}</span>
+                                        <span>£{{ $cartData['items']['sub_total'] ?? 0}}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
                                         <span>Delivery Cost</span>
-                                        <span class="delivery_charge">£{{ $cartData['delivery']['price'] }}</span>
+                                        <span class="delivery_charge">£{{ $cartData['delivery']['price'] ?? 0}}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
                                         <span>Proof Reading Cost</span>
-                                        <span>£{{ $cartData['proof']['price'] }}</span>
+                                        <span>£{{ $cartData['proof']['price'] ?? 0 }}</span>
                                     </div>
 
                                     <hr>
@@ -366,9 +366,10 @@
                                                 <optgroup label="{{ ucfirst($continent) }}">
                                                     @foreach ($charges as $charge)
                                                         <option value="{{ $charge->id }}" data-title="{{ $charge->title }}"
-                                                            data-price="{{ $charge->price }}" {{ $cartData['delivery']['title'] == $charge->title ? 'selected' : '' }}>
+                                                            data-price="{{ $charge->price }}" {{ isset($cartData['delivery']['title']) && $cartData['delivery']['title'] === $charge->title ? 'selected' : '' }}>
                                                             {{ $charge->title }}
                                                         </option>
+
                                                     @endforeach
                                                 </optgroup>
                                             @endforeach
@@ -395,22 +396,22 @@
                                     <hr>
                                     <div class="d-flex justify-content-between">
                                         <span>Subtotal:</span>
-                                        <span id="subtotal">£{{ $cartData['items']['sub_total'] }}</span>
+                                        <span id="subtotal">£{{ $cartData['items']['sub_total'] ?? 0}}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
                                         <span>Total Delivery Cost:</span>
-                                        <span class="delivery_charge">£{{ $cartData['delivery']['price'] }}</span>
+                                        <span class="delivery_charge">£{{ $cartData['delivery']['price'] ?? 0}}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
                                         <span>Total Proof Reading Cost:</span>
-                                        <span>£{{ $cartData['proof']['price'] }}</span>
+                                        <span>£{{ $cartData['proof']['price'] ?? 0}}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
                                         <span>VAT:</span>
-                                        <span>£{{$cartData['vat_amount']  }}</span>
+                                        <span>£{{$cartData['vat_amount'] ?? 0 }}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between  mt-2">

@@ -53,7 +53,7 @@
           <td>{{ $index + 1 }}</td>
           <td>{{ $item->title }}</td>
           <td>{{ $item->no_of_days }}</td>
-          <td>${{ number_format($item->price, 2) }}</td>
+          <td>£{{ number_format($item->price, 2) }}</td>
           <td title="{{ strip_tags($item->details) }}">
           {{ \Illuminate\Support\Str::limit(strip_tags($item->details), 50) }}
           </td>

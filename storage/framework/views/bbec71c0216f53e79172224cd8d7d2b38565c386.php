@@ -47,7 +47,7 @@
 	}
 
 	.custom-cat-item.active {
-		background-color: #000000;
+		background-color: #d0d0d0;
 		font-weight: bold;
 	}
 
@@ -192,7 +192,7 @@
 											</a>
 											<ul class="dropdown-menu">
 												<li><a class="dropdown-item"
-														href="<?php echo e(route('account-logout')); ?>">Dashboard</a></li>
+														href="<?php echo e(route('account-dashboard')); ?>">Dashboard</a></li>
 												<li><a class="dropdown-item" href="<?php echo e(route('account-logout')); ?>">Logout</a>
 												</li>
 											</ul>
@@ -261,14 +261,14 @@
 										<?php $__currentLoopData = $menucats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $menucat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 											<div class="custom-subcat-content <?php echo e($index == 0 ? 'd-block' : 'd-none'); ?>"
 												id="cat-<?php echo e($menucat->id); ?>">
-												<h6 class="fw-bold text-white"><?php echo e($menucat->name); ?></h6>
+												<h6 class="fw-bold text-black"><?php echo e($menucat->name); ?></h6>
 												<?php if(isset($menucat->subcategories) && count($menucat->subcategories) > 0): ?>
 													<ul class="list-unstyled1 ">
 														<?php $__currentLoopData = $menucat->subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 															<div class="main-cat">
 																<img src="<?php echo e(asset('storage/' . $subcat->thumbnail)); ?>">
 																<li>
-																	<a class="text-center"
+																	<a class=" text-black"
 																		href="<?php echo e(route('subcategory-details', ['slug' => $subcat->slug])); ?>">
 																		<?php echo e($subcat->name); ?>
 
@@ -278,7 +278,7 @@
 														<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 													</ul>
 												<?php else: ?>
-													<p>No subcategories available.</p>
+													<p class=" text-black" style="color:#000;">No subcategories available.</p>
 												<?php endif; ?>
 											</div>
 										<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -309,7 +309,7 @@
 											<?php $__currentLoopData = $menucate->subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k => $menusubcates): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 												<div class="">
 													<img src="<?php echo e(asset('storage/' . $menusubcates->thumbnail)); ?>">
-													<li><a class="dropdown-item text-center"
+													<li><a class="dropdown-item "
 															href="<?php echo e(route('subcategory-details', ['slug' => $menusubcates->slug])); ?>"><?php echo e($menusubcates->name ?? ""); ?></a>
 													</li>
 												</div>

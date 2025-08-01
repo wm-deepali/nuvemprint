@@ -19,54 +19,10 @@ class CustomerEstimateController extends Controller
 
     public function detail($id)
     {
-        $customer = Customer::with('quotes')->findOrFail($id);
+        $customer = Customer::with(['quotes', 'addresses.countryname', 'addresses.statename', 'addresses.cityname'])->findOrFail($id);
+        // dd($customer->toArray());
 
         return view('admin.customer_estimates.customer_detail', compact('customer'));
-    }
-
-
-
-
-    public function quoteRequest()
-    {
-        // All pending quotes
-        $quotes = Quote::with(['customer', 'deliveryAddress', 'items.subcategory.categories'])
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
-            // Approved quotes that are NOT yet processed to any department
-            $approvedQuotes = Quote::with(['customer', 'departments', 'deliveryAddress', 'items.subcategory.categories', 'payments'])
-            ->where('status', 'approved')
-            ->get();
-         
-
-        // Approved + processed quotes (with departments)
-        $processedQuotes = Quote::with(['departments', 'customer', 'deliveryAddress', 'items.subcategory.categories', 'payments'])
-            ->where('status', 'approved')
-            ->whereHas('departments') // Assigned to at least one department
-            ->get();
-
-        // Group processed quotes by department
-        $departmentQuotes = [];
-
-        foreach ($processedQuotes as $quote) {
-            // Get the latest department (by created_at or id or pivot timestamp)
-            $latestDepartment = $quote->departments->sortByDesc('pivot.created_at')->first();
-
-            if ($latestDepartment) {
-                $departmentQuotes[$latestDepartment->id][] = $quote;
-            }
-        }
-
-
-        $departments = Department::all();
-
-        return view('admin.customer_estimates.quote_request', compact(
-            'quotes',
-            'approvedQuotes',
-            'departmentQuotes',
-            'departments'
-        ));
     }
 
 

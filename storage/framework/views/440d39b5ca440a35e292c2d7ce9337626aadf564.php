@@ -1,13 +1,5 @@
-<div id="loginPrompt" style="display: none; max-width: 100%; margin: 15px auto; padding: 12px 16px; text-align: center; background: #f1f1f1; border: 1px solid #ccc; border-radius: 6px; font-family: 'Segoe UI', sans-serif;">
-    <p style="margin: 0; font-size: 14px; color: #444;">
-        Please <a href="<?php echo e(route('authentication-signin')); ?>" style="color: #007bff; font-weight: 500; text-decoration: none;">sign in</a>
-        or <a href="<?php echo e(route('authentication-signup')); ?>" style="color: #007bff; font-weight: 500; text-decoration: none;">create an account</a> to continue.
-    </p>
-</div>
-
-
 <div class="tabone-section">
-    <div>
+<div>
         <div class="custom-art-tab-section-left">
          <div class="custom-art-tab-cont">
             <h6><?php echo e($subcategory_name ?? ''); ?></h6>
@@ -23,8 +15,8 @@
                   class="custom-art-input-box"
                />
             </div>
-            <!-- <?php $paperSizeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
-                                 ?> -->
+            <?php $paperSizeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
+                                 ?>
             <div class="custom-art-field">
                <label>Size</label>
                <input
@@ -54,7 +46,39 @@
          </div>
       </div>
     </div>
-    <div class="tab-section-right">
+   <div id="loginPrompt" style="display: none; max-width: 300px; margin: 40px auto; padding: 24px 32px; 
+    background: #ffffff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; text-align: center;">
+
+    <p style="font-size: 16px; margin-bottom: 24px; line-height: 1.4;">
+        Please 
+        <a href="<?php echo e(route('authentication-signin')); ?>" 
+           style="color: #007bff; font-weight: 600; text-decoration: none;">
+           sign in
+        </a>
+        or 
+        <a href="<?php echo e(route('authentication-signup')); ?>" 
+           style="color: #007bff; font-weight: 600; text-decoration: none;">
+           create an account
+        </a> 
+        to continue.
+    </p>
+
+    <!-- Optional: Add some icons for user/fingerprint -->
+    <div style="font-size: 48px; color: #007bff; margin-bottom: 16px;">
+        🔒
+    </div>
+
+    <!-- Optional: Add a subtle separator line -->
+    <hr style="border: none; border-top: 1px solid #eee; margin: 16px 0;">
+
+    <!-- Optional: Add a short description or benefits -->
+    <div style="font-size: 14px; color: #666;">
+        Signing in lets you pre fil your address and speed up checkout.
+    </div>
+</div>
+
+    <div class="tab-section-right" id="addressFormWrapper">
         <div class="custom-address-container">
             <div class="custom-address-title">Billing Address</div>
             <form id="detailsForm" enctype="multipart/form-data">
@@ -158,77 +182,88 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    fetch('/cart/get-session')
-        .then(res => res.json())
-        .then(cart => {
-            const billing = cart.billing || {};
-            const delivery = cart.delivery_address || {};
 
-            let sessionDataFound = false;
+    document.addEventListener('DOMContentLoaded', function () {
+        $('#loginPrompt').hide();
+        $('#addressFormWrapper').hide();
 
-            // Fill billing from session
-            if (billing.first_name) {
-                $('#email').val(billing.email);
-                $('input[name="billing_first_name"]').val(billing.first_name);
-                $('input[name="billing_last_name"]').val(billing.last_name);
-                $('input[name="billing_mobile"]').val(billing.mobile);
-                $('select[name="billing_country"]').val(billing.country);
-                $('input[name="billing_address"]').val(billing.address);
-                sessionDataFound = true;
-            }
+        fetch('/cart/get-session')
+            .then(res => res.json())
+            .then(cart => {
+                const billing = cart.billing || {};
+                const delivery = cart.delivery_address || {};
+                let sessionDataFound = false;
 
-            // Fill delivery from session
-            if (delivery.first_name) {
-                $('input[name="delivery_first_name"]').val(delivery.first_name);
-                $('input[name="delivery_last_name"]').val(delivery.last_name);
-                $('input[name="delivery_mobile"]').val(delivery.mobile);
-                $('select[name="delivery_country"]').val(delivery.country);
-                $('input[name="delivery_address"]').val(delivery.address);
-                $('input[name="delivery_instructions"]').val(delivery.delivery_instructions);
+                if (billing.first_name) {
+                    $('#email').val(billing.email);
+                    $('input[name="billing_first_name"]').val(billing.first_name);
+                    $('input[name="billing_last_name"]').val(billing.last_name);
+                    $('input[name="billing_mobile"]').val(billing.mobile);
+                    $('select[name="billing_country"]').val(billing.country);
+                    $('input[name="billing_address"]').val(billing.address);
+                    sessionDataFound = true;
 
-                if (delivery.plain_packaging === '1') {
-                    $('#plainPackaging').prop('checked', true);
                 }
 
-                if (delivery.same_as_billing === '1') {
-                    $('#sameBilling').prop('checked', true).trigger('change');
+                if (delivery.first_name) {
+                    $('input[name="delivery_first_name"]').val(delivery.first_name);
+                    $('input[name="delivery_last_name"]').val(delivery.last_name);
+                    $('input[name="delivery_mobile"]').val(delivery.mobile);
+                    $('select[name="delivery_country"]').val(delivery.country);
+                    $('input[name="delivery_address"]').val(delivery.address);
+                    $('input[name="delivery_instructions"]').val(delivery.delivery_instructions);
+
+                    if (delivery.plain_packaging === '1') {
+                        $('#plainPackaging').prop('checked', true);
+                    }
+
+                    if (delivery.same_as_billing === '1') {
+                        $('#sameBilling').prop('checked', true).trigger('change');
+                    }
+
+                    sessionDataFound = true;
                 }
 
-                sessionDataFound = true;
-            }
+                if (!sessionDataFound) {
+                    fetch('/customer-data')
+                        .then(res => res.json())
+                        .then(data => {
+                            const user = data.user || {};
+                            if (user && user.first_name) {
+                                $('#email').val(user.email);
+                                $('input[name="billing_first_name"]').val(user.first_name);
+                                $('input[name="billing_last_name"]').val(user.last_name);
+                                $('input[name="billing_mobile"]').val(user.mobile);
+                                $('select[name="billing_country"]').val(user.country);
+                                $('select[name="billing_address"]').val(user.address);
 
-            // If session data not found, try fetching customer data
-            if (!sessionDataFound) {
-                fetch('/customer-data')
-                    .then(res => res.json())
-                    .then(data => {
-                        const user = data.user || {};
-                        if (user && user.first_name) {
-                            $('#email').val(user.email);
-                            $('input[name="billing_first_name"]').val(user.first_name);
-                            $('input[name="billing_last_name"]').val(user.last_name);
-                            $('input[name="billing_mobile"]').val(user.mobile);
-                            $('select[name="billing_country"]').val(user.country);
+                                $('input[name="delivery_first_name"]').val(user.first_name);
+                                $('input[name="delivery_last_name"]').val(user.last_name);
+                                $('input[name="delivery_mobile"]').val(user.mobile);
+                                $('select[name="delivery_country"]').val(user.country);
+                                $('select[name="delivery_address"]').val(user.address);
 
-                            $('#addressFormWrapper').show();
-                        } else {
-                            // Show login/signup if no user data
+                                $('#loginPrompt').hide();
+                                $('#addressFormWrapper').show();
+                            } else {
+                                $('#loginPrompt').show();
+                                $('#addressFormWrapper').hide();
+                            }
+                        })
+                        .catch(() => {
                             $('#loginPrompt').show();
-                        }
-                    })
-                    .catch(() => {
-                        $('#loginPrompt').show();
-                    });
-            } else {
-                $('#addressFormWrapper').show();
-            }
-        })
-        .catch(() => {
-            // If session fetch fails, fallback to login prompt
-            $('#loginPrompt').show();
-        });
-});
+                            $('#addressFormWrapper').hide();
+                        });
+                } else {
+                    $('#loginPrompt').hide();
+                    $('#addressFormWrapper').show();
+                }
+            })
+            .catch(() => {
+                $('#loginPrompt').show();
+                $('#addressFormWrapper').hide();
+            });
+    });
 
     // Autofill delivery when "Same as Billing" is checked
     $(document).on('change', '#sameBilling', function () {

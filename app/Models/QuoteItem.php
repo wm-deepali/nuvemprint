@@ -20,8 +20,14 @@ class QuoteItem extends Model
         return $this->belongsTo(Quote::class);
     }
 
-     public function subcategory()
+    public function subcategory()
     {
         return $this->belongsTo(Subcategory::class);
     }
+
+    public function attributes()
+    {
+        return $this->hasMany(QuoteItemAttribute::class); // adjust model/class name if needed
+    }
+
 }

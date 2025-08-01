@@ -336,7 +336,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('customers', [CustomerEstimateController::class, 'index'])->name('customers');
         Route::get('customers/detail/{id}', [CustomerEstimateController::class, 'detail'])->name('customers.detail');
         Route::delete('customer/{id}', [CustomerEstimateController::class, 'destroy'])->name('customer.destroy');
-        Route::get('quote-request', [CustomerEstimateController::class, 'quoteRequest'])->name('quote.request');
+        Route::get('quote-request', [QuoteController::class, 'index'])->name('quote.request');
         Route::get('order-details/{id}', [QuoteController::class, 'show'])->name('quote.show');
         Route::get('/quotes/{id}/download-pdf', [QuoteController::class, 'downloadPdf'])->name('quotes.download.pdf');
         Route::post('/quotes/update-status', [QuoteController::class, 'updateStatus'])->name('quotes.update.status');
@@ -344,6 +344,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/quote/{quote}/invoice', [QuoteController::class, 'viewInvoice'])->name('quotes.invoice');
         Route::post('/quotes/payment-submit', [QuoteController::class, 'submitPayment'])->name('quotes.payment.submit');
         Route::get('/invoices/download/{quote}', [QuoteController::class, 'downloadInvoice'])->name('invoices.download');
+        Route::post('/quotes/update-note', [QuoteController::class, 'updateNote'])->name('quote.update-note');
+
 
         // Route::view('quote-request', 'admin.customer_estimates.quote_request')->name('quote.request');
         Route::view('order-details', 'admin.quotes.index')->name('quote.index');

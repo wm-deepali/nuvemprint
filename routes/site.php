@@ -45,10 +45,22 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/get-session', [CartController::class, 'getCartSession']);
     Route::post('/uploaded-file', [CartController::class, 'saveUploadedFile']);
     Route::get('/session-files', function () {
-        $images = session('cart.images', []);
-        return response()->json($images);
+        $files = session()->get('cart.images', []);
+        $details = session()->get('cart.details', '');
+        // dd($details);
+        return response()->json([
+            ...$files,
+            'details' => $details,
+        ]);
+
     });
-  Route::post('/pay-later', [CartController::class, 'PayLater']);
+
+    Route::post('/save-details', function (Request $request) {
+        session()->put('cart.details', $request->input('details'));
+        return response()->json(['success' => true]);
+    });
+
+    Route::post('/pay-later', [CartController::class, 'PayLater']);
     // In web.php
     Route::post('/remove-file', [CartController::class, 'removeUploadedFile']);
 
@@ -104,22 +116,23 @@ Route::get('/customer-data/{id}', [CustomerController::class, 'getCustomerData']
 
 
 Route::middleware(['web'])->group(function () {
-    Route::controller(controller: CustomerController::class)->group(function () {
-        Route::get('/customer-data', [CustomerController::class, 'getCustomerData']);
+
+    Route::controller(CustomerController::class)->group(function () {
+        Route::get('/customer-data', 'getCustomerData');
 
         Route::get('add-required-details', 'addRequiredDetails')->name('first.details');
         Route::post('/check-email', 'checkEmail')->name('check-email');
         Route::get('account/verify/{token}', 'verifyAccount')->name('customer.verify');
         Route::post('/customer-register', 'register')->name('customer-register');
-        Route::post('/authenticate', [CustomerController::class, 'authenticate'])->name('customer.authenticate');
+        Route::post('/authenticate', 'authenticate')->name('customer.authenticate');
 
         Route::post('first/add-details/store', 'storeRequiredDetails')->name('first.details.store');
         Route::get('authentication-forgot-password', 'showForgetPasswordForm')->name('authentication-forgot-password.get');
         Route::post('authentication-forgot-password', 'submitForgetPasswordForm')->name('authentication-forgot-password.post');
         Route::get('reset-password/{token}', 'showResetPasswordForm')->name('reset.password.get');
         Route::post('reset-password', 'submitResetPasswordForm')->name('reset.password.post');
-
     });
+
 
     Route::get('shop-categories', [SiteController::class, 'shopCategories'])->name('shop-categories');
 

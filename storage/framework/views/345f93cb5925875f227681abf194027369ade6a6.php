@@ -1,5 +1,5 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"-->
+<!--    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">-->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
@@ -17,32 +17,32 @@
         background-color: #f8f9fa !important;
     }
 
-    .dropdown-menu {
-        -webkit-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
-        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
-        border: 0 solid #e9ecef !important;
-        font-size: 14px !important;
-        margin: 8px 0 0 !important;
-        border-radius: 0px !important;
-        background-color: rgb(30 30 30 / 90%) !important;
-    }
+    /*.dropdown-menu {*/
+    /*    -webkit-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);*/
+    /*    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;*/
+    /*    border: 0 solid #e9ecef !important;*/
+    /*    font-size: 14px !important;*/
+    /*    margin: 8px 0 0 !important;*/
+    /*    border-radius: 0px !important;*/
+    /*    background-color: rgb(30 30 30 / 90%) !important;*/
+    /*}*/
 
-    .dropdown-toggle::after {
-        display: none !important;
-    }
+    /*.dropdown-toggle::after {*/
+    /*    display: none !important;*/
+    /*}*/
 
-    .primary-menu .navbar .dropdown-large-menu ul li {
-        background: black;
-    }
+    /*.primary-menu .navbar .dropdown-large-menu ul li {*/
+    /*    background: black;*/
+    /*}*/
 
-    .list-group-item.active {
-        background-color: #656565 !important;
-        border-color: #656565 !important;
-    }
+    /*.list-group-item.active {*/
+    /*    background-color: #656565 !important;*/
+    /*    border-color: #656565 !important;*/
+    /*}*/
 
-    .nav-item a {
-        color: gray !important;
-    }
+    /*.nav-item a {*/
+    /*    color: gray !important;*/
+    /*}*/
 
     .reset-card {
         width: 100%;
@@ -618,6 +618,9 @@
 
     .attribute-wrapper.disabled label {
         color: #888 !important;
+    }
+    .modal-content{
+        background:#ffffff;
     }
 </style>
 <style>

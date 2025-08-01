@@ -29,61 +29,120 @@
           <h4 class="card-title">Customer Detail</h4>
         </div>
         <div class="card-body">
-          <div class="row">
+          <div class="row mb-2">
           <div class="col-md-2 text-center">
             <img
-            src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=2832"
+            src="<?php echo e($customer->profile_pic ? asset('storage/' . $customer->profile_pic) : asset('images/default-avatar.png')); ?>"
             class="profile-img mb-3" alt="Customer Profile" style="width:110px;">
           </div>
           <div class="col-md-8" style="margin-left:-30px;">
             <h5><?php echo e($customer->first_name); ?> <?php echo e($customer->last_name); ?></h5>
+            <p><strong>Display Name:</strong> <?php echo e($customer->display_name); ?></p>
             <p><strong>Email:</strong> <?php echo e($customer->email); ?></p>
             <p><strong>Contact Number:</strong> <?php echo e($customer->mobile); ?></p>
-            <p><strong>Full Address:</strong> <?php echo e($customer->address); ?></p>
+            <!-- <p><strong>Full Address:</strong> <?php echo e($customer->address); ?></p> -->
           </div>
           </div>
-          <hr>
-          <h5 class="mt-3">Enquiries</h5>
-          <div class="table-responsive">
-          <table class="table" id="enquiries-table">
-            <thead>
+
+          <!-- Bootstrap Tabs -->
+          <ul class="nav nav-tabs mb-3" id="customerTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="enquiries-tab" data-toggle="tab" data-target="#enquiries"
+            type="button" role="tab" aria-controls="enquiries" aria-selected="true">Enquiries</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="addresses-tab" data-toggle="tab" data-target="#addresses" type="button"
+            role="tab" aria-controls="addresses" aria-selected="false">Addresses</button>
+          </li>
+          </ul>
+
+          <div class="tab-content" id="customerTabContent">
+          <!-- Enquiries Tab -->
+          <div class="tab-pane fade show active" id="enquiries" role="tabpanel" aria-labelledby="enquiries-tab">
+            <div class="table-responsive">
+            <table class="table" id="enquiries-table">
+              <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Quote ID</th>
+                <th>Order ID</th>
+                <th>Product</th>
+                <th>Estimated Cost</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <?php $__empty_1 = true; $__currentLoopData = $customer->quotes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quote): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <tr>
-              <th>Date & Time</th>
-              <th>Quote Number</th>
-              <th>Product</th>
-              <th>Estimated Cost</th>
-              <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php $__empty_1 = true; $__currentLoopData = $customer->quotes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quote): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-          <tr>
-            <td><?php echo e($quote->created_at->format('Y-m-d H:i')); ?></td>
-            <td>#<?php echo e($quote->quote_number); ?></td>
-            <?php
+              <td><?php echo e($quote->created_at->format('Y-m-d H:i')); ?></td>
+              <td>#<?php echo e($quote->quote_number); ?></td>
+                <td>#<?php echo e($quote->order_number); ?></td>
+              <?php
           $subcategory = optional($quote->items->first())->subcategory;
           $category = $subcategory?->categories->first();
-        ?>
-            <td>
-            <?php echo e($category?->name ?? '-'); ?> >
-            <?php echo e($subcategory?->name ?? '-'); ?>
+          ?>
+              <td>
+              <?php echo e($category?->name ?? '-'); ?> >
+              <?php echo e($subcategory?->name ?? '-'); ?>
 
-            </td>
-            <td>£<?php echo e(number_format($quote->grand_total, 2)); ?></td>
-            <td>
-            <a href="<?php echo e(route('admin.quote.show', $quote->id)); ?>" class="btn btn-sm btn-info">View Quotation</a>
-            </td>
+              </td>
+              <td>£<?php echo e(number_format($quote->grand_total, 2)); ?></td>
+              <td>
+              <a href="<?php echo e(route('admin.quote.show', $quote->id)); ?>" class="btn btn-sm btn-info">View
+              Quotation</a>
+              </td>
+            </tr>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+          <tr>
+          <td colspan="5" class="text-center">No quotes found.</td>
+          </tr>
+        <?php endif; ?>
+              </tbody>
+            </table>
+            </div>
+          </div>
+
+          <!-- Addresses Tab -->
+          <div class="tab-pane fade" id="addresses" role="tabpanel" aria-labelledby="addresses-tab">
+            <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+              <tr>
+                <th>Type</th>
+                <th>Tag</th>
+                <th>Default</th>
+                <th>Address Line</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Postal Code</th>
+                <th>Country</th>
+              </tr>
+              </thead>
+              <tbody>
+              <?php $__empty_1 = true; $__currentLoopData = $customer->addresses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $address): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+          <tr>
+          <td><?php echo e(ucfirst($address->type)); ?></td>
+          <td><?php echo e(ucfirst($address->address_tag)); ?></td>
+          <td><?php echo e($address->is_default ? 'Yes' : 'No'); ?></td>
+          <td><?php echo e($address->address_line1); ?> <?php echo e($address->address_line2); ?></td>
+          <td><?php echo e($address->cityname->name ?? ''); ?></td>
+          <td><?php echo e($address->statename->name ?? ''); ?></td>
+          <td><?php echo e($address->postal_code); ?></td>
+          <td><?php echo e($address->countryname->name ?? ''); ?></td>
           </tr>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-        <tr>
-          <td colspan="5" class="text-center">No quotes found.</td>
-        </tr>
+          <tr>
+          <td colspan="6" class="text-center">No addresses found.</td>
+          </tr>
         <?php endif; ?>
-            </tbody>
+              </tbody>
+            </table>
+            </div>
+          </div>
 
-          </table>
           </div>
         </div>
+
         </div>
       </div>
       </div>

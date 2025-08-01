@@ -53,7 +53,7 @@
           <td><?php echo e($index + 1); ?></td>
           <td><?php echo e($item->title); ?></td>
           <td><?php echo e($item->no_of_days); ?></td>
-          <td>$<?php echo e(number_format($item->price, 2)); ?></td>
+          <td>£<?php echo e(number_format($item->price, 2)); ?></td>
           <td title="<?php echo e(strip_tags($item->details)); ?>">
           <?php echo e(\Illuminate\Support\Str::limit(strip_tags($item->details), 50)); ?>
 

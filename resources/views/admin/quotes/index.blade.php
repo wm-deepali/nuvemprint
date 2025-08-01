@@ -24,27 +24,63 @@
           <h5><strong>Order ID:</strong> #{{ $quote->quote_number }}</h5>
           <h5>
           <strong>Payment Status:</strong>
-          <span class="badge badge-success">Paid</span>
+          @if($quote->payments->isEmpty())
+        <span class="badge badge-danger">UnPaid</span>
+      @else
+        <span class="badge badge-success">Paid</span>
+      @endif
           </h5>
+          <h5>
+          <strong>Order Status:</strong>
+          @if($quote->status === 'cancelled')
+        <span class="badge badge-danger">Cancelled</span>
+      @elseif($quote->status === 'approved')
+        <span class="badge badge-success">Approved</span>
+      @else
+        <span class="badge badge-secondary text-capitalize">{{ $quote->status ?? 'Pending' }}</span>
+      @endif
+          </h5>
+
         </div>
 
         <div class="col-md-6 ">
-          <label><strong>Update Status:</strong></label>
-          <select class="form-control" id="statusSelect" onchange="handleStatusChange(this)">
-          <option value="">Select Status</option>
-          <option {{ $quote->status == 'approved' ? 'selected' : '' }} value="approved">Approve Order</option>
-          <option {{ $quote->status == 'cancelled' ? 'selected' : '' }} value="cancelled">Cancel Order</option>
-          <!-- <option value="process">Process to Department</option> -->
-          </select>
+
+          @if($quote->status !== 'cancelled')
+        <label><strong>Update Status:</strong></label>
+        <select class="form-control" id="statusSelect" onchange="handleStatusChange(this)">
+        <option value="">Select Status</option>
+
+        {{-- If not approved yet, allow approval --}}
+        @if($quote->status !== 'approved')
+        <option value="approved">Approve Order</option>
+      @endif
+
+        {{-- If already approved, allow processing to department --}}
+        @if($quote->status === 'approved')
+        <option value="process">Process to Department</option>
+      @endif
+
+        {{-- Always allow cancel unless already cancelled --}}
+        @if($quote->status !== 'cancelled')
+        <option value="cancelled">Cancel Order</option>
+      @endif
+        </select>
+      @endif
+
+
 
           <div id="departmentDropdown" class="mt-2 d-none">
           <label><strong>Select Department:</strong></label>
           <select class="form-control" onchange="showNoteModal(this)">
             <option value="">Select Department</option>
-            <option value="department1">Department 1</option>
-            <option value="department2">Department 2</option>
-            <option value="department3">Department 3</option>
+            @foreach($departments as $department)
+        <option value="{{ $department->id }}" data-name="{{ $department->name }}">
+        {{ $department->name }}
+        </option>
+        @endforeach
           </select>
+
+
           </div>
         </div>
         </div>
@@ -62,7 +98,7 @@
           {{ \Carbon\Carbon::parse($quote->delivery_date)->format('d F Y') ?? 'N/A' }}</p>
           <p><strong>Date & Time:</strong> {{ $quote->created_at->format('d F Y, h:i A') ?? 'N/A' }}</p>
           <p><strong>Delivery Address:</strong>
-          {{ $quote->deliveryAddress->address ?? '' }},
+          {{ $quote->deliveryAddress->address ?? '' }}
           </p>
 
         </div>
@@ -90,15 +126,39 @@
           </thead>
           <tbody>
           @forelse($quote->items as $item)
-        <tr>
-        <td>
-        <strong>{{ $item->subcategory->name ?? 'N/A' }}</strong><br>
-        {{ $item->subcategory->description ?? 'No description available' }}<br>
-        Category: {{ optional($item->subcategory->categories->first())->name ?? 'N/A' }}
-        </td>
-        <td>{{ $item->quantity }}</td>
-        <td>{{ number_format($item->sub_total, 2) }}</td>
-        </tr>
+          <tr>
+          <td>
+          {{-- Subcategory Name --}}
+          <div style="font-weight: 600; margin-bottom: 4px;">
+            {{ $item->subcategory->name ?? 'N/A' }}
+            ({{ optional($item->subcategory->categories->first())->name ?? 'N/A' }})
+          </div>
+
+          {{-- Attribute Name-Value List --}}
+          @if($item->attributes && $item->attributes->count())
+          <div>
+          @foreach($item->attributes as $attr)
+          <div style="font-size: 14px; margin-left: 10px;">
+          <strong>{{ $attr->attribute->name ?? 'Attribute' }}:</strong>
+          {{ $attr->attributeValue->value ?? '-' }}
+          </div>
+        @endforeach
+          </div>
+        @else
+        <div class="text-muted" style="font-size: 13px; margin-left: 10px;">No attributes selected.</div>
+        @endif
+
+          {{-- Pages --}}
+          @if (!is_null($item->pages))
+        <div style="font-size: 14px; margin-left: 10px;">
+          <strong> Pages:</strong> {{ $item->pages }}
+        </div>
+        @endif
+          </td>
+
+          <td>{{ $item->quantity }}</td>
+          <td>{{ number_format($item->sub_total, 2) }}</td>
+          </tr>
       @empty
         <tr>
         <td colspan="3" class="text-center">No quote items found.</td>
@@ -134,8 +194,8 @@
             <td class="text-right">£{{ number_format($quote->delivery_price, 2) }}</td>
           </tr>
           <tr>
-            <th>VAT ({{ $quote->vat_percentage }})%:</th>
-            <td class="text-right">£{{ number_format($quote->vat_amount, 2) }}</td>
+            <th>VAT ({{ (int) $quote->vat_percentage }}%):</th>
+            <td class="text-right">£{{ number_format($quote->vat_amount, 0) }}</td>
           </tr>
           <tr class="border-top">
             <th><strong>Grand Total:</strong></th>
@@ -210,20 +270,22 @@
   </div>
 
   <!-- Notes Modal -->
+  <!-- Notes Modal -->
   <div class="modal fade" id="noteModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-    <form>
+    <form id="departmentNoteForm">
       <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Department Note</h5>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
+        <input type="hidden" id="quoteId" value="{{ $quote->id }}">
         <label><strong>Department Name:</strong></label>
-        <input type="text" class="form-control mb-2" readonly value="Auto-filled on select">
+        <input type="text" id="selectedDepartment" class="form-control mb-2" readonly>
 
         <label><strong>Note:</strong></label>
-        <textarea class="form-control" rows="4" placeholder="Enter note for department..."></textarea>
+        <textarea id="departmentNote" class="form-control" rows="4" placeholder="Enter note..."></textarea>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Save Note</button>
@@ -232,6 +294,7 @@
     </form>
     </div>
   </div>
+
 @endsection
 
 <!-- Scripts -->
@@ -249,7 +312,7 @@
     const quoteId = {{ $quote->id }};
     const deptDropdown = document.getElementById('departmentDropdown');
 
-    // Show department dropdown only if "process"
+    // If status is "process", show department dropdown and exit
     if (status === 'process') {
       deptDropdown.classList.remove('d-none');
       return;
@@ -257,20 +320,36 @@
       deptDropdown.classList.add('d-none');
     }
 
-    // Send status change immediately for 'approved' or 'cancelled'
     if (status === 'approved' || status === 'cancelled') {
-      updateQuoteStatus(quoteId, status);
+      Swal.fire({
+      title: `Are you sure you want to ${status} this order?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, update it!'
+      }).then((result) => {
+      if (result.isConfirmed) {
+        updateQuoteStatus(quoteId, status);
+      } else {
+        // Reset select if cancelled
+        select.value = '';
+      }
+      });
     }
     }
 
     function showNoteModal(select) {
-    const department = select.value;
-    if (department) {
-      document.querySelector('#noteModal input').value = department;
-      const modal = new bootstrap.Modal(document.getElementById('noteModal'));
-      modal.show();
+    const departmentId = select.value;
+    const departmentName = select.options[select.selectedIndex].getAttribute('data-name');
+
+    if (departmentId) {
+      $('#selectedDepartment').val(departmentName);
+      $('#selectedDepartment').data('id', departmentId); // store ID for later
+      $('#noteModal').modal('show');
     }
     }
+
 
     function updateQuoteStatus(quoteId, status, department = null) {
     $.ajax({
@@ -285,6 +364,7 @@
       success: function (response) {
       if (response.success) {
         Swal.fire('Success', response.message, 'success');
+        location.reload();
       } else {
         Swal.fire('Error', 'Something went wrong.', 'error');
       }
@@ -295,12 +375,40 @@
     });
     }
 
-    function showNoteModal(select) {
-    if (select.value) {
-      const modal = new bootstrap.Modal(document.getElementById('noteModal'));
-      document.querySelector('#noteModal input').value = select.value;
-      modal.show();
+
+
+    $('#departmentNoteForm').on('submit', function (e) {
+    e.preventDefault();
+
+    const quoteId = $('#quoteId').val();
+    const departmentId = $('#selectedDepartment').data('id');
+    const notes = $('#departmentNote').val();
+
+    if (!departmentId) {
+      Swal.fire('Error', 'Please select a department.', 'error');
+      return;
     }
-    }
+
+    $.ajax({
+      url: '{{ route("admin.quote.update-department") }}',
+      type: 'POST',
+      data: {
+      _token: '{{ csrf_token() }}',
+      quote_id: quoteId,
+      department_id: departmentId,
+      notes: notes
+      },
+      success: function (response) {
+      $('#noteModal').modal('hide');
+      Swal.fire('Success', response.message, 'success');
+      location.reload();
+      },
+      error: function (xhr) {
+      Swal.fire('Error', 'An error occurred while saving.', 'error');
+      }
+    });
+    });
+
+
   </script>
 @endpush

@@ -8,12 +8,19 @@
     <div class="content-header row">
       <div class="col-md-12">
       <ul class="nav nav-tabs" id="orderTabs" role="tablist">
+
         <li class="nav-item">
         <a class="nav-link active" data-toggle="tab" data-tab="new-orders" href="#new-orders" role="tab">New
           Orders</a>
         </li>
+
         <li class="nav-item">
         <a class="nav-link" data-toggle="tab" data-tab="approved-orders" href="#approved-orders" role="tab">Approved
+          Orders</a>
+        </li>
+
+        <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" data-tab="canceled-orders" href="#canceled-orders" role="tab">Canceled
           Orders</a>
         </li>
 
@@ -31,258 +38,29 @@
 
 
       <div class="tab-content" id="orderTabsContent">
+
         <!-- New Orders Tab -->
         <div class="tab-pane fade show active" id="new-orders" role="tabpanel">
-        <div class="card mt-2">
-          <div class="card-header">
-          <h4 class="card-title">Quote Requests - New Orders</h4>
-          </div>
-          <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-            <thead>
-              <tr>
-              <th>Date & Time</th>
-              <th>Quote ID</th>
-              <th>Product</th>
-              <th>Customer Info</th>
-              <th>Address</th>
-              <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($quotes as $quote)
-          <tr>
-          <td>{{ $quote->created_at->format('Y-m-d H:i') }}</td>
-          <td>#{{ $quote->quote_number }}</td>
-          <td>
-          {{ optional($quote->items->first()->subcategory->categories->first())->name ?? '-' }}
-          >
-          {{ optional($quote->items->first()->subcategory)->name ?? '-' }}
-          </td>
-          <td>
-          {{ $quote->customer->first_name ?? '-' }} {{ $quote->customer->last_name ?? '' }}<br>
-          {{ $quote->customer->email ?? '-' }}<br>
-          {{ $quote->customer->mobile ?? '-' }}
-          </td>
-          <td>{{ $quote->deliveryAddress->address ?? 'No delivery address' }}</td>
-          <td>
-          <a href="{{ route('admin.quote.show', $quote->id) }}" class="btn btn-sm btn-info mb-1">View
-          Quote
-          Detail</a>
-          <a href="{{ route('admin.customers.detail', $quote->customer->id) }}"
-          class="btn btn-sm btn-primary mb-1">View Customer Detail</a>
-          <button class="btn btn-sm btn-warning mb-1 change-status-btn" data-toggle="modal"
-          data-target="#changeStatusModal" data-quote-id="{{ $quote->id }}">
-          Change Status
-          </button>
-          <!-- <a href="{{ route('admin.quote.index') }}" class="btn btn-sm btn-dark mb-1">View Invoice</a> -->
-          </td>
-          </tr>
-        @endforeach
-
-            </tbody>
-            </table>
-          </div>
-          </div>
-        </div>
+        @include('admin.quotes.tabs.new-order')
         </div>
 
-        <!-- Other Tabs (blank) -->
+        <!-- approved orders Tabs -->
         <div class="tab-pane fade" id="approved-orders">
-        <div class="card mt-2">
-          <div class="card mt-2">
-          <div class="card-header">
-            <h4 class="card-title">Approved Orders</h4>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-            <table class="table">
-              <thead>
-              <tr>
-                <th>Date & Time</th>
-                <th>quote ID</th>
-                <th>Order ID</th>
-                <th>Product</th>
-                <th>Billed Amount</th>
-                <th>Payment Status</th>
-                <th>Order Status</th>
-                <th>Customer Info</th>
-                <th>Action</th>
-              </tr>
-              </thead>
-              <tbody>
-              @forelse($approvedQuotes as $quote)
-            <tr>
-              <td>{{ $quote->created_at->format('Y-m-d H:i') }}</td>
-              <td>#{{ $quote->quote_number }}</td>
-              <td>{{ $quote->order_number ?? '-' }}</td>
-              <td>
-              {{ optional($quote->items->first()->subcategory->categories->first())->name ?? '-' }}
-              >
-              {{ optional($quote->items->first()->subcategory)->name ?? '-' }}
-              </td>
-              <td>
-              {{ $quote->customer->first_name ?? '-' }} {{ $quote->customer->last_name ?? '' }}<br>
-              {{ $quote->customer->email ?? '-' }}<br>
-              {{ $quote->customer->mobile ?? '-' }}
-              </td>
-
-                  <td> @if($quote->payments->isEmpty())
-          <!-- No payment exists, show Pay Now -->
-          <span class="badge badge-danger">UnPaid</span>
-          @else
-          <!-- Payment exists, show Paid badge -->
-          <span class="badge badge-success">Paid</span>
-          @endif
-              </td>
-              
-              <td>
-              @if($quote->payments->isEmpty())
-          <!-- No payment exists, show Pay Now -->
-          <button class="btn btn-sm btn-success pay-now-btn mb-1" data-quote-id="{{ $quote->id }}"
-            data-order-value="{{ $quote->grand_total }}">
-            Pay Now
-          </button>
-          @else
-          <a href="{{ route('admin.quotes.invoice', $quote->id) }}"
-            class="btn btn-sm btn-dark mb-1">View Invoice</a>
-          @endif
-
-
-              <a href="{{ route('admin.quote.show', $quote->id) }}" class="btn btn-sm btn-info mb-1">View
-              Quote
-              Detail</a>
-              <a href="{{ route('admin.customers.detail', $quote->customer->id) }}"
-              class="btn btn-sm btn-primary mb-1">View Customer Detail</a>
-              <button class="btn btn-sm btn-success mb-1 process-to-dept-btn" data-toggle="modal"
-              data-target="#processToDepartmentModal" data-quote-id="{{ $quote->id }}"
-              data-used-departments="{{ $quote->departments->pluck('id')->implode(',') }}">
-              Process to Department
-              </button>
-
-
-              <button class="btn btn-sm btn-secondary mb-1 view-notes-btn" data-toggle="modal"
-              data-target="#viewNotesModal" data-quote-id="{{ $quote->id }}">
-              View All Notes
-              </button>
-
-              </td>
-            </tr>
-            <div id="quote-notes-{{ $quote->id }}" class="d-none">
-              @foreach($quote->departments as $department)
-          <div class="col-md-6">
-          <div class="card border mb-3">
-            <div class="card-body">
-            <p><strong>Date & Time:</strong> {{ $department->pivot->created_at ?? '-' }}</p>
-            <p><strong>Department:</strong> {{ $department->name }}</p>
-            <p><strong>Notes:</strong> {{ $department->pivot->notes ?? '-' }}</p>
-            </div>
-          </div>
-          </div>
-          @endforeach
-            </div>
-        @empty
-          <tr>
-          <td colspan="5" class="text-center">No approved orders found.</td>
-          </tr>
-        @endforelse
-              </tbody>
-
-            </table>
-            </div>
-          </div>
-          </div>
-
+        @include('admin.quotes.tabs.approved')
         </div>
+
+        <!-- canceled orders Tabs -->
+        <div class="tab-pane fade" id="canceled-orders">
+        @include('admin.quotes.tabs.canceled')
         </div>
+
+        <!-- department Tabs -->
         @foreach($departments as $department)
       @php $slug = Str::slug($department->name); @endphp
       <div class="tab-pane fade" id="{{ $slug }}" role="tabpanel">
-      <div class="card mt-2">
-        <div class="card-header">
-        <h4 class="card-title">{{ $department->name }}</h4>
-        </div>
-
-        <div class="card-body">
-        @if(isset($departmentQuotes[$department->id]) && count($departmentQuotes[$department->id]))
-      <div class="table-responsive">
-        <table class="table">
-        <thead>
-        <tr>
-        <th>Date & Time</th>
-        <th>Order ID</th>
-        <th>Payment</th>
-        <th>Product</th>
-        <th>Customer Info</th>
-        <th>Department Notes</th>
-        <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($departmentQuotes[$department->id] as $quote)
-        @php $pivot = $quote->departments->firstWhere('id', $department->id)?->pivot; @endphp
-        <tr>
-        <td>{{ $quote->created_at->format('Y-m-d H:i') }}</td>
-        <td>#{{ $quote->order_number }}</td>
-        <td> @if($quote->payments->isEmpty())
-      <!-- No payment exists, show Pay Now -->
-      <span class="badge badge-danger">UnPaid</span>
-      @else
-      <!-- Payment exists, show Paid badge -->
-      <span class="badge badge-success">Paid</span>
-      @endif
-        </td>
-        <td>
-        {{ optional($quote->items->first()->subcategory->categories->first())->name ?? '-' }}
-        >
-        {{ optional($quote->items->first()->subcategory)->name ?? '-' }}
-        </td>
-        <td>
-        {{ $quote->customer->first_name ?? '-' }} {{ $quote->customer->last_name ?? '' }}<br>
-        {{ $quote->customer->email ?? '-' }}<br>
-        {{ $quote->customer->mobile ?? '-' }}
-        </td>
-        <td>{{ $pivot->notes ?? '-' }}</td>
-        <td>
-
-        @if($quote->payments->isEmpty())
-      <!-- No payment exists, show Pay Now -->
-      <button class="btn btn-sm btn-success pay-now-btn mb-1" data-quote-id="{{ $quote->id }}"
-      data-order-value="{{ $quote->grand_total }}">
-      Pay Now
-      </button>
-      @else
-      <a href="{{ route('admin.quotes.invoice', $quote->id) }}"
-      class="btn btn-sm btn-dark mb-1">View Invoice</a>
-      @endif
-        <a href="{{ route('admin.quote.show', $quote->id) }}" class="btn btn-sm btn-info mb-1">View
-        Quote Request</a>
-        <a href="{{ route('admin.customers.detail', $quote->customer->id) }}"
-        class="btn btn-sm btn-primary mb-1">View Customer Detail</a>
-        <button class="btn btn-sm btn-success process-to-dept-btn mb-1" data-toggle="modal"
-        data-target="#processToDepartmentModal" data-quote-id="{{ $quote->id }}"
-        data-used-departments="{{ $quote->departments->pluck('id')->implode(',') }}">
-        Process to Department
-        </button>
-        <button class="btn btn-sm btn-secondary mb-1 view-notes-btn" data-toggle="modal"
-        data-target="#viewNotesModal" data-quote-id="{{ $quote->id }}">
-        View All Notes
-        </button>
-        </td>
-        </tr>
-      @endforeach
-        </tbody>
-        </table>
-      </div>
-      @else
-      <div class="text-muted">No quotes assigned to {{ $department->name }} yet.</div>
-      @endif
-        </div>
-      </div>
+      @include('admin.quotes.tabs.department')
       </div>
       @endforeach
-
 
 
       </div>
@@ -457,10 +235,88 @@
   </div>
 
 
+  <!-- Edit Note Modal -->
+  <div class="modal fade" id="editNoteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+    <form id="editNoteForm">
+      @csrf
+      <input type="hidden" id="editNoteQuoteId">
+      <input type="hidden" id="editNoteDepartmentId">
+      <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Note - <span id="editDepartmentName"></span></h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+        <label>Notes</label>
+        <textarea class="form-control" id="editDepartmentNotes" rows="4" required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+      </div>
+    </form>
+    </div>
+  </div>
+
+
 @endsection
 
 @push('scripts')
   <script>
+
+    $(document).on('click', '.edit-note-btn', function () {
+    const quoteId = $(this).data('quote-id');
+    const deptId = $(this).data('department-id');
+    const deptName = $(this).data('department-name');
+    const notes = $(this).data('notes');
+
+    // Set data in edit modal
+    $('#editNoteQuoteId').val(quoteId);
+    $('#editNoteDepartmentId').val(deptId);
+    $('#editDepartmentNotes').val(notes);
+    $('#editDepartmentName').text(deptName);
+
+    // Hide View Notes modal first
+    $('#viewNotesModal').modal('hide');
+
+    // Then show Edit modal
+    setTimeout(() => {
+      $('#editNoteModal').modal('show');
+    }, 300); // slight delay to allow Bootstrap modal transition
+    });
+
+
+    // Submit updated note
+    $('#editNoteForm').on('submit', function (e) {
+    e.preventDefault();
+
+    const quoteId = $('#editNoteQuoteId').val();
+    const deptId = $('#editNoteDepartmentId').val();
+    const notes = $('#editDepartmentNotes').val();
+
+    $.ajax({
+      url: '{{ route("admin.quote.update-note") }}', // define route
+      type: 'POST',
+      data: {
+      _token: '{{ csrf_token() }}',
+      quote_id: quoteId,
+      department_id: deptId,
+      notes: notes
+      },
+      success: function (response) {
+      $('#editNoteModal').modal('hide');
+      Swal.fire('Success', response.message, 'success');
+      setTimeout(() => location.reload(), 1000); // or dynamically update DOM
+      },
+      error: function (xhr) {
+      let msg = xhr.responseJSON?.message || 'Update failed.';
+      Swal.fire('Error', msg, 'error');
+      }
+    });
+    });
 
 
     $(document).on('click', '.pay-now-btn', function () {
@@ -602,6 +458,7 @@
       success: function (response) {
       if (response.success) {
         Swal.fire('Success', response.message, 'success');
+        setTimeout(() => location.reload(), 500);
       } else {
         Swal.fire('Error', 'Something went wrong.', 'error');
       }
@@ -641,6 +498,24 @@
       error: function (xhr) {
       let errorMsg = xhr.responseJSON?.message || 'Something went wrong';
       Swal.fire('Error', errorMsg, 'error');
+      }
+    });
+    });
+
+
+    $(document).on('click', '.cancel-order-btn', function () {
+    const quoteId = $(this).data('quote-id');
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will cancel the order.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+      updateQuoteStatus(quoteId, 'cancelled')
       }
     });
     });

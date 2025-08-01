@@ -128,7 +128,7 @@
                             <?php $__currentLoopData = $attr->quantityRanges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $range): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                               <li>
                                 From <?php echo e($range->quantity_from); ?> to <?php echo e($range->quantity_to); ?>:
-                                ₹<?php echo e(rtrim(rtrim(number_format($range->price, 4, '.', ''), '0'), '.')); ?>
+                                £<?php echo e(rtrim(rtrim(number_format($range->price, 4, '.', ''), '0'), '.')); ?>
 
                               </li>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -139,7 +139,7 @@
                       <?php if($attr->attribute->pricing_basis === 'fixed_per_page'): ?>
                         <div class="text-muted small mt-1">
                           <strong>Fixed Per Page Price:</strong>
-                          ₹<?php echo e(rtrim(rtrim(number_format($attr->flat_rate_per_page, 4, '.', ''), '0'), '.')); ?>
+                          £<?php echo e(rtrim(rtrim(number_format($attr->flat_rate_per_page, 4, '.', ''), '0'), '.')); ?>
 
                         </div>
                       <?php endif; ?>
@@ -147,7 +147,7 @@
                       <?php if($attr->attribute->pricing_basis === 'per_extra_copy'): ?>
                         <div class="text-muted small mt-1">
                           <strong>Per Extra Copy Price:</strong>
-                          ₹<?php echo e(rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.')); ?>
+                          £<?php echo e(rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.')); ?>
 
                         </div>
                       <?php endif; ?>

@@ -122,7 +122,7 @@
                             @foreach ($attr->quantityRanges as $range)
                               <li>
                                 From {{ $range->quantity_from }} to {{ $range->quantity_to }}:
-                                ₹{{ rtrim(rtrim(number_format($range->price, 4, '.', ''), '0'), '.') }}
+                                £{{ rtrim(rtrim(number_format($range->price, 4, '.', ''), '0'), '.') }}
                               </li>
                             @endforeach
                           </ul>
@@ -132,14 +132,14 @@
                       @if ($attr->attribute->pricing_basis === 'fixed_per_page')
                         <div class="text-muted small mt-1">
                           <strong>Fixed Per Page Price:</strong>
-                          ₹{{ rtrim(rtrim(number_format($attr->flat_rate_per_page, 4, '.', ''), '0'), '.') }}
+                          £{{ rtrim(rtrim(number_format($attr->flat_rate_per_page, 4, '.', ''), '0'), '.') }}
                         </div>
                       @endif
 
                       @if ($attr->attribute->pricing_basis === 'per_extra_copy')
                         <div class="text-muted small mt-1">
                           <strong>Per Extra Copy Price:</strong>
-                          ₹{{ rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.') }}
+                          £{{ rtrim(rtrim(number_format($attr->extra_copy_charge, 4, '.', ''), '0'), '.') }}
                         </div>
                       @endif
                     </div>
