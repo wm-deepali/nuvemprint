@@ -136,11 +136,9 @@
                   Customers</span></a>
             </li>
             <li><a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.quote.request')); ?>"><span>
-                  Quote Request</span></a>
-            </li>
-            <li><a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.quote.request')); ?>"><span>
                   Orders</span></a>
             </li>
+
           </ul>
         </li>
 
@@ -164,37 +162,26 @@
           </ul>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="<?php echo e(route('admin.proof-reading.index')); ?>">
-            <span>Proof Reading</span>
-          </a>
-        </li>
-
-
         <li class="dropdown nav-item" data-menu="dropdown">
           <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
-            <span>Shipping & Delivery</span>
+            <span>Settings</span>
           </a>
           <ul class="dropdown-menu">
+            <li><a class=" dropdown-item d-flex align-items-center"
+                href="<?php echo e(route('admin.proof-reading.index')); ?>"><span>Proof Reading</span></a>
+            </li>
             <li><a class="dropdown-item d-flex align-items-center"
                 href="<?php echo e(route('admin.delivery-charges.index')); ?>"><span>Delivery Charges</span></a></li>
 
             <li><a class="dropdown-item d-flex align-items-center"
                 href="<?php echo e(route('admin.postal-codes.index')); ?>"><span>Postal codes</span></a></li>
+            <li><a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.manage-vat.index')); ?>"><span>
+                  <span>Manage VAT</span></a>
+            </li>
+            <li><a class="dropdown-item d-flex align-items-center"
+                 href="<?php echo e(route('admin.manage-department.index')); ?>"><span>Manage Departments</span></a>
+            </li>
           </ul>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="<?php echo e(route('admin.manage-vat.index')); ?>">
-            <span>Manage Vat</span>
-          </a>
-        </li>
-
-
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="<?php echo e(route('admin.manage.department')); ?>">
-            <span>Manage Departments</span>
-          </a>
         </li>
 
       </ul>

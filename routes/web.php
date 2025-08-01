@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\CoverFoilingController;
 use App\Http\Controllers\Admin\CoverPrintingColourController;
 use App\Http\Controllers\Admin\CoverTypeController;
 use App\Http\Controllers\Admin\CoverWeightController;
+use App\Http\Controllers\Admin\CustomerEstimateController;
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\DustJacketColourController;
 use App\Http\Controllers\Admin\DustJacketFinishController;
 use App\Http\Controllers\Admin\EndpaperColourController;
@@ -330,11 +332,22 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get('/home', [HomeController::class, 'index'])
             ->name('home');
-        Route::view('customers', 'admin.customer_estimates.customers')->name('customers');
-        Route::view('customers/detail', 'admin.customer_estimates.customer_detail')->name('customers.detail');
-        Route::view('quote-request', 'admin.customer_estimates.quote_request')->name('quote.request');
+
+        Route::get('customers', [CustomerEstimateController::class, 'index'])->name('customers');
+        Route::get('customers/detail/{id}', [CustomerEstimateController::class, 'detail'])->name('customers.detail');
+        Route::delete('customer/{id}', [CustomerEstimateController::class, 'destroy'])->name('customer.destroy');
+        Route::get('quote-request', [CustomerEstimateController::class, 'quoteRequest'])->name('quote.request');
+        Route::get('order-details/{id}', [QuoteController::class, 'show'])->name('quote.show');
+        Route::get('/quotes/{id}/download-pdf', [QuoteController::class, 'downloadPdf'])->name('quotes.download.pdf');
+        Route::post('/quotes/update-status', [QuoteController::class, 'updateStatus'])->name('quotes.update.status');
+        Route::post('/quotes/update-department', [QuoteController::class, 'processToDepartment'])->name('quote.update-department');
+        Route::get('/quote/{quote}/invoice', [QuoteController::class, 'viewInvoice'])->name('quotes.invoice');
+        Route::post('/quotes/payment-submit', [QuoteController::class, 'submitPayment'])->name('quotes.payment.submit');
+        Route::get('/invoices/download/{quote}', [QuoteController::class, 'downloadInvoice'])->name('invoices.download');
+
+        // Route::view('quote-request', 'admin.customer_estimates.quote_request')->name('quote.request');
         Route::view('order-details', 'admin.quotes.index')->name('quote.index');
-        Route::view('manage-department', 'admin.customer_estimates.manage-department')->name('manage.department');
+        Route::resource('manage-department', DepartmentController::class);
 
         Route::view('content/blogs', 'admin.content.blogs')->name('content.blogs');
         Route::view('content/blogs/create', 'admin.content.blogs_create')->name('content.blogs.create'); // add blog

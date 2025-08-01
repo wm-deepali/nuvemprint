@@ -1,11 +1,9 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.min.js"></script>
 <?php $__env->startSection('title'); ?>
     Nuvem Prints
 <?php $__env->stopSection(); ?>
-
 <?php $__env->startPush('after-styles'); ?>
     <style>
         .page-wrapper {
@@ -27,10 +25,18 @@
         /*    transition: background-color 0.3s;*/
         /*    border-bottom:none !important;*/
         /*}*/
-
         .custom-tab.active {
             background-color: #00aaa5;
             color: #fff;
+        }
+
+        .custom-tab.disabled {
+            pointer-events: none;
+            /* Prevent click */
+            opacity: 0.5;
+            /* Make it look disabled */
+            cursor: not-allowed;
+            /* Show 'not-allowed' cursor */
         }
 
         .custom-tab-number {
@@ -44,615 +50,338 @@
         .tab-pane.active {
             display: block;
         }
-        .text-areafield{
-            border:2px solid #6bd3cc !important;
-        col
-        or:black !important;
+
+        .text-areafield {
+            border: 2px solid #6bd3cc !important;
+            col or: black !important;
             border-radius: .375rem !important;
         }
+
         textarea.text-areafield.form-control {
-  color: black !important;
-}
+            color: black !important;
+        }
 
+        .upload-card {
+            border: 2px dashed #d4d4d4;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            width: 240px;
+            background-color: #fff;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
 
-.upload-card {
-  border: 2px dashed #d4d4d4;
-  border-radius: 12px;
-  padding: 30px 20px;
-  text-align: center;
-  width: 240px;
-  background-color: #fff;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-}
+        .upload-card:hover {
+            border-color: #5a9ef8;
+        }
 
-.upload-card:hover {
-  border-color: #5a9ef8;
-}
+        .upload-card i {
+            font-size: 30px;
+            color: #5a9ef8;
+            margin-bottom: 10px;
+        }
 
-.upload-card i {
-  font-size: 30px;
-  color: #5a9ef8;
-  margin-bottom: 10px;
-}
+        .upload-card .title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
 
-.upload-card .title {
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 5px;
-}
+        .upload-card .or {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #999;
+        }
 
-.upload-card .or {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #999;
-}
+        .upload-card .browse-btn {
+            background-color: #3d82f7;
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
 
-.upload-card .browse-btn {
-  background-color: #3d82f7;
-  border: none;
-  color: white;
-  padding: 6px 16px;
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
+        .upload-card .file-info {
+            font-size: 12px;
+            color: #999;
+        }
 
-.upload-card .file-info {
-  font-size: 12px;
-  color: #999;
-}
+        .upload-box-card {
+            width: 100%;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 20px
+        }
 
-.upload-box-card{
-    width:100%;
-    margin-top:20px;
-    display:grid;
-   grid-template-columns:1fr 1fr 1fr 1fr;
-    gap:20px
+        .art-top-left-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-    
-}
-.art-top-left-top{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    
-}
+        .upload-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+            align-items: flex-start;
+            max-width: 100%;
+        }
+
+        /* .upload-card {
+                               width: 260px;
+                               min-height: 320px;
+                               border: 2px dashed #ccc;
+                               padding: 20px;
+                               text-align: center;
+                               border-radius: 10px;
+                               background: #fff;
+                               cursor: pointer;
+                               } */
+        #preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            flex: 1;
+            min-height: 100px;
+        }
+
+        #preview-container>div {
+            width: 150px;
+            height: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 6px;
+            background: #f9f9f9;
+            text-align: center;
+        }
+
+        .preview-box {
+            width: 150px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fafafa;
+            text-align: center;
+            position: relative;
+            box-sizing: border-box;
+            margin: 6px;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            cursor: pointer;
+            font-Size: 18px;
+            color: red;
+        }
+
+        #uploaded-extra-files {
+            background-color: #fff2cc;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+
+        .file-preview-row {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
     </style>
 <?php $__env->stopPush(); ?>
-
 <?php $__env->startSection('content'); ?>
     <div class="page-wrapper">
-            <div class="page-content">
-                <div class="container py-5">
-                    <div class="art-top-card">
-                        
-                        <div class="art-top-right">
-
-                            <section class="slider-section"
-                                style="background-color: #ff4f42; padding: 30px;height: 450px;">
-                                <div class="first-slider">
-                                    <div id="carouselExampleDark" class="carousel slide" data-bs-ride="carousel">
-                                        <ol class="carousel-indicators">
-                                            <li data-bs-target="#carouselExampleDark" data-bs-slide-to="0"
-                                                class="active"></li>
-                                            <li data-bs-target="#carouselExampleDark" data-bs-slide-to="1"></li>
-                                            <li data-bs-target="#carouselExampleDark" data-bs-slide-to="2"></li>
-                                        </ol>
-                                        <div class="carousel-inner">
-                                            <div class="carousel-item active">
-                                                <div class="row d-flex align-items-center">
-                                                    <div class="col d-none d-lg-flex justify-content-center">
-                                                        <div class="">
-                                                            <!-- <h3 class="h3 fw-light" style="color: #fff;">Upload, Pay & Confirm</h3> -->
-                                                            <h1 class="h1" style="color: #fff;">Upload, Pay & Confirmg
-                                                            </h1>
-                                                            <p class="pb-3" style="color: #fff;">If you need to
-                                                                rearrange or insert blank pages, do it only after all
-                                                                files are uploaded.
-                                                            </p>
-                                                            <!-- <div class=""> <a class="btn btn-light btn-ecomm" href="javascript:;">Shop Now
-												<i class='bx bx-chevron-right'></i></a>
-										</div> -->
-                                                        </div>
+        <div class="page-content">
+            <div class="container py-5">
+                <div class="art-top-card">
+                    <div class="art-top-right">
+                        <section class="slider-section" style="background-color: #ff4f42; padding: 30px;height: 450px;">
+                            <div class="first-slider">
+                                <div id="carouselExampleDark" class="carousel slide" data-bs-ride="carousel">
+                                    <ol class="carousel-indicators">
+                                        <li data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active"></li>
+                                        <li data-bs-target="#carouselExampleDark" data-bs-slide-to="1"></li>
+                                        <li data-bs-target="#carouselExampleDark" data-bs-slide-to="2"></li>
+                                    </ol>
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col d-none d-lg-flex justify-content-center">
+                                                    <div class="">
+                                                        <!-- <h3 class="h3 fw-light" style="color: #fff;">Upload, Pay & Confirm</h3> -->
+                                                        <h1 class="h1" style="color: #fff;">Upload, Pay & Confirmg
+                                                        </h1>
+                                                        <p class="pb-3" style="color: #fff;">If you need to
+                                                            rearrange or insert blank pages, do it only after all
+                                                            files are uploaded.
+                                                        </p>
+                                                        <!-- <div class=""> <a class="btn btn-light btn-ecomm" href="javascript:;">Shop Now
+                                                                      <i class='bx bx-chevron-right'></i></a>
+                                                                      </div> -->
                                                     </div>
-                                                    <div class="col" style="height: 400px;padding-top: 60px;">
-                                                        <!-- <img src="assets/images/slider/04.png" class="img-fluid" alt="..."> -->
-                                                        <!-- Image with Play Button Overlay -->
-                                                        <div class="banner-slider-with position-relative text-center">
-                                                            <img src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/carousel/carousel-rename.png"
-                                                                class="img-fluid">
-
-                                                            <!-- Play Button -->
-                                                            <button type="button"
-                                                                class="btn btn-light position-absolute top-50 start-50 translate-middle"
-                                                                data-bs-toggle="modal" data-bs-target="#videoModal"
-                                                                style="border-radius: 50%; width: 60px; height: 60px;">
-                                                                ▶
-                                                            </button>
-                                                        </div>
-
-                                                        <!-- Modal -->
-                                                        <div class="modal fade" id="videoModal" tabindex="-1"
-                                                            aria-labelledby="videoModalLabel" aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                                <div class="modal-content bg-dark">
-                                                                    <div class="modal-header border-0">
-                                                                        <button type="button"
-                                                                            class="btn-close btn-close-white"
-                                                                            data-bs-dismiss="modal"
-                                                                            aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body p-0">
-                                                                        <div class="ratio ratio-16x9">
-                                                                            <iframe id="videoFrame" src="" title="Video"
-                                                                                allow="autoplay; encrypted-media"
-                                                                                allowfullscreen></iframe>
-                                                                        </div>
+                                                </div>
+                                                <div class="col" style="height: 400px;padding-top: 60px;">
+                                                    <!-- <img src="assets/images/slider/04.png" class="img-fluid" alt="..."> -->
+                                                    <!-- Image with Play Button Overlay -->
+                                                    <div class="banner-slider-with position-relative text-center">
+                                                        <img src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/carousel/carousel-rename.png"
+                                                            class="img-fluid">
+                                                        <!-- Play Button -->
+                                                        <button type="button"
+                                                            class="btn btn-light position-absolute top-50 start-50 translate-middle"
+                                                            data-bs-toggle="modal" data-bs-target="#videoModal"
+                                                            style="border-radius: 50%; width: 60px; height: 60px;">
+                                                            ▶
+                                                        </button>
+                                                    </div>
+                                                    <!-- Modal -->
+                                                    <div class="modal fade" id="videoModal" tabindex="-1"
+                                                        aria-labelledby="videoModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                            <div class="modal-content bg-dark">
+                                                                <div class="modal-header border-0">
+                                                                    <button type="button" class="btn-close btn-close-white"
+                                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body p-0">
+                                                                    <div class="ratio ratio-16x9">
+                                                                        <iframe id="videoFrame" src="" title="Video"
+                                                                            allow="autoplay; encrypted-media"
+                                                                            allowfullscreen></iframe>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                     </div>
                                                 </div>
                                             </div>
-
-
-
-
                                         </div>
-                                        <a class="carousel-control-prev" href="#carouselExampleDark" role="button"
-                                            data-bs-slide="prev">
-                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Previous</span>
-                                        </a>
-                                        <a class="carousel-control-next" href="#carouselExampleDark" role="button"
-                                            data-bs-slide="next">
-                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                            <span class="visually-hidden">Next</span>
-                                        </a>
                                     </div>
+                                    <a class="carousel-control-prev" href="#carouselExampleDark" role="button"
+                                        data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#carouselExampleDark" role="button"
+                                        data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </a>
                                 </div>
-
-                            </section>
-                        </div>
-                        <div class="art-top-left" style="border:1px solid #80808069;">
-                            <div class="art-top-left-top">
-                                <h5>Order Quote <strong>#1234566</strong></h5>
-                                <p>Dated: <strong>28th July 2025</strong></p>
-
                             </div>
-                            <div class="art-top-left-details" >
-                                <div class="d-flex justify-content-between">
-                                    <h6 style="font-size:14px; font-weight:400;">Sub Total</h6>
-                                    <h6 style="font-size:14px; font-weight:400;">£56</h6>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <h6 style="font-size:14px; font-weight:400;">Delivery Cost</h6>
-                                    <h6 style="font-size:14px; font-weight:400;">£6</h6>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <h6 style="font-size:14px; font-weight:400;">VAT</h6>
-                                    <h6 style="font-size:14px; font-weight:400;">£14</h6>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <h6>Total Payable</h6>
-                                    <h6>£76</h6>
-                                </div>
-                             
-
-                            </div>
-
-
-                        </div>
-
+                        </section>
                     </div>
-
-                    <div class="custom-tab-container">
-                        <!-- Tab Headers -->
-                        <div class="custom-tabs" id="customTabs">
-                            <div class="custom-tab active" data-tab="artwork">
-                                <span class="custom-tab-number">1</span>
-                                Artwork
-                            </div>
-                            <div class="custom-tab" data-tab="details">
-                                <span class="custom-tab-number">2</span>
-                                Details
-                            </div>
-                            <div class="custom-tab" data-tab="payment">
-                                <span class="custom-tab-number">3</span>
-                                Payment
-                            </div>
-                            <!-- <div class="custom-tab" data-tab="printlink">
-                                <span class="custom-tab-number">4</span>
-                                PrintLink
-                            </div> -->
-                            
+                    <div class="art-top-left" style="border:1px solid #80808069;">
+                        <div class="art-top-left-top">
+                            <h5>Order Quote <strong>#<?php echo e($quote_id); ?></strong></h5>
+                            <p>Dated: <strong><?php echo e($delivery['date']); ?></strong></p>
                         </div>
-
-                        <!-- Tab Contents -->
-                        <div class="custom-tab-content">
-                            <div class="tab-pane active" id="artwork">
-                                <div class="tabone-section">
-                                    <div>
-                                        <div class="custom-art-tab-section-left">
-                                            <div class="custom-art-tab-cont">
-                                                <h6><?php echo e($subcategoryName); ?></h6>
-                                                <button class="custom-art-edit-btn">✎ Edit</button>
-                                            </div>
-
-                                            <div class="custom-art-card">
-                                                <div class="custom-art-item-label">Item 1</div>
-
-                                                <div class="custom-art-field">
-                                                    <label>Copies</label>
-                                                    <input type="number" value="<?php echo e($item['quantity']); ?>" class="custom-art-input-box">
-                                                </div>
-
-                                              <?php
-    $paperSizeValue = collect($attributes)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
-?>
-
-<div class="custom-art-field">
-    <label>Size</label>
-    <input type="text" value="<?php echo e($paperSizeValue); ?>" class="custom-art-input-box" readonly>
-</div>
-
-
-                                                <div class="custom-art-field custom-art-gsm-options">
-                                                    <label>130 <span class="custom-art-subtext">gsm paper -
-                                                            Silk</span></label>
-                                                    <div class="custom-art-side-options">
-                                                        <button class="custom-art-side active">Front</button>
-                                                        <button class="custom-art-side">Back</button>
-                                                    </div>
-                                                </div>
-
-                                                <button class="custom-art-change-options">🔧 Change Options</button>
-
-                                                <div class="custom-art-vat-row">
-                                                    <input type="checkbox" checked>
-                                                    <label>Add VAT (if applicable)</label>
-                                                    <button class="custom-art-info-btn">Info</button>
-                                                </div>
-
-                                                <a href="#" class="custom-art-view-quote">📄 View this quote</a>
-
-                                            </div>
-                                        </div>
-                                        <!--<p style="margin-top: 25px; font-size: 12px;">Drag your file(s) here or click on-->
-                                        <!--    the button below to browse your device.-->
-                                        <!--</p>-->
-                                        <!-- <div class="custom-art-upload-buttons">
-                                            <button class="custom-art-btn btn-blue" type="file">Upload File(s)</button>
-                                            <button class="custom-art-btn btn-dropbox">Choose from Dropbox</button>
-                                            <button class="custom-art-btn btn-link">Paste Link to Print File</button>
-                                           
-
-                                            <div class="custom-art-files-box">
-                                                📁 Files
-                                            </div>
-
-                                            <div class="custom-art-filetypes-box">
-                                                <h6>File Types</h6>
-                                                <div class="file-tags">
-                                                    <span class="tag recommended">Recommended .pdf</span>
-                                                    <span class="tag">Images</span>
-                                                    <span class="tag">PostScript</span>
-                                                    <span class="tag">MS Office</span>
-                                                    <span class="tag">OpenOffice</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="custom-art-instructions">
-                                                <p>
-                                                    If you need to upload several files, please include a number in your
-                                                    file name. <br>
-                                                    For example: <strong>file1.pdf, file2.pdf, file3.pdf</strong> or
-                                                    <strong>page1.pdf, page2.pdf, page3.pdf</strong><br>
-                                                    Those numbers will determine the order. The words ‘front’, ‘back’,
-                                                    ‘last’, ‘inner’ are also accepted.
-                                                </p>
-                                            </div>
-                                        </div> -->
-
-                                    </div>
-                                    <div class="tab-section-right">
-                                        <div class="custom-art-upload-buttons">
-                                            <div class="d-flex justify-content-between">
-
-                                          <input type="file" id="real-file-input" multiple>
-
-<!-- Custom button -->
-<button class="custom-art-btn btn-blue" type="button" onclick="document.getElementById('real-file-input').click()">
-  <i class="fa-solid fa-cloud-arrow-up"></i> Upload File(s)
-</button>
-                                            <button class="custom-art-btn btn-dropbox"><i class="fa-brands fa-dropbox"></i> Choose from Dropbox</button>
-                                            <button class="custom-art-btn btn-link">Paste Link to Print File</button>
-                                            <!-- <button class="custom-art-btn btn-design">Design Online</button> -->
-
-                                            <div class="custom-art-btn custom-art-files-box">
-                                                📁 Files
-                                            </div>
-                                            </div>
-
-                                            <div class="custom-art-filetypes-box">
-                                                <h6>File Types</h6>
-                                                <div class="file-tags">
-                                                    <span class="tag recommended">Recommended .pdf</span>
-                                                    <span class="tag">Images</span>
-                                                    <span class="tag">PostScript</span>
-                                                    <span class="tag">MS Office</span>
-                                                    <span class="tag">OpenOffice</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="custom-art-instructions mb-3">
-                                                <p>
-                                                    If you need to upload several files, please include a number in your
-                                                    file name. <br>
-                                                    For example: <strong>file1.pdf, file2.pdf, file3.pdf</strong> or
-                                                    <strong>page1.pdf, page2.pdf, page3.pdf</strong><br>
-                                                    Those numbers will determine the order. The words ‘front’, ‘back’,
-                                                    ‘last’, ‘inner’ are also accepted.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <textarea class="form-control text-areafield" id="exampleFormControlTextarea1" rows="5" placeholder="Details..."></textarea>
-                                        <!--<img-->
-                                        <!--    src="https://www.shutterstock.com/image-photo/real-macro-photo-film-frame-600nw-2472739719.jpg">-->
-                                        <!--<p style="font-size: 12px;">You have filled: 1 out of 1 positions</p>-->
-                                        <!--<div class="custom-art-vat-row">-->
-                                        <!--    <input type="checkbox" checked>-->
-                                        <!--    <label>Show guidelines and legend</label>-->
-
-                                        <!--</div>-->
-
-                                       
-<!--                                       <div class="upload-card" onclick="document.getElementById('fileInput').click();">-->
-<!--  <i class="fa-solid fa-arrow-up-from-bracket"></i>-->
-<!--  <p class="title">Drag and Drop files to upload</p>-->
-<!--  <p class="or">or</p>-->
-<!--  <button class="browse-btn">Browse</button>-->
-<!--  <p class="file-info">Supported files: AI, PSD, PDF</p>-->
-<!--</div>-->
-
-<!--<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">-->
-
-
-                                    </div>
-
-                                </div>
-                                <div class="upload-box-card">
-                                    <div >
-                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
-  <i class="fa-solid fa-arrow-up-from-bracket"></i>
-  <p class="title">Drag and Drop files to upload</p>
-  <p class="or">or</p>
-  <button class="browse-btn">Browse</button>
-  <p class="file-info">Supported files: AI, PSD, PDF</p>
-</div>
-
-<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
-
-                                    </div>
-                                    <div >
-                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
-  <i class="fa-solid fa-arrow-up-from-bracket"></i>
-  <p class="title">Drag and Drop files to upload</p>
-  <p class="or">or</p>
-  <button class="browse-btn">Browse</button>
-  <p class="file-info">Supported files: AI, PSD, PDF</p>
-</div>
-
-<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
-
-                                    </div>
-                                    <div >
-                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
-  <i class="fa-solid fa-arrow-up-from-bracket"></i>
-  <p class="title">Drag and Drop files to upload</p>
-  <p class="or">or</p>
-  <button class="browse-btn">Browse</button>
-  <p class="file-info">Supported files: AI, PSD, PDF</p>
-</div>
-
-<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
-
-                                    </div><div >
-                                        <div class="upload-card" onclick="document.getElementById('fileInput').click();">
-  <i class="fa-solid fa-arrow-up-from-bracket"></i>
-  <p class="title">Drag and Drop files to upload</p>
-  <p class="or">or</p>
-  <button class="browse-btn">Browse</button>
-  <p class="file-info">Supported files: AI, PSD, PDF</p>
-</div>
-
-<input type="file" id="fileInput" style="display: none;" accept=".ai,.psd,.pdf" onchange="handleImageUpload(event)">
-
-                                    </div>
-                                </div>
-
+                        <div class="art-top-left-details">
+                            <div class="d-flex justify-content-between">
+                                <h6 style="font-size:14px; font-weight:400;">Sub Total</h6>
+                                <h6 style="font-size:14px; font-weight:400;">£<?php echo e($items['sub_total']); ?></h6>
                             </div>
-                            <div class="tab-pane" id="details">
-                               <div class="tabone-section">
-                                    <div>
-                                        <div class="custom-art-tab-section-left">
-                                            <div class="custom-art-tab-cont">
-                                                <h6>Art Prints</h6>
-                                                <button class="custom-art-edit-btn">✎ Edit</button>
-                                            </div>
-
-                                            <div class="custom-art-card">
-                                                <div class="custom-art-item-label">Item 1</div>
-
-                                                <div class="custom-art-field">
-                                                    <label>Copies</label>
-                                                    <input type="number" value="500" class="custom-art-input-box">
-                                                </div>
-
-                                                <div class="custom-art-field">
-                                                    <label>Size</label>
-                                                    <input type="text" value="A5 (148 mm x 210 mm)"
-                                                        class="custom-art-input-box" readonly>
-                                                </div>
-
-                                                <div class="custom-art-field custom-art-gsm-options">
-                                                    <label>130 <span class="custom-art-subtext">gsm paper -
-                                                            Silk</span></label>
-                                                    <div class="custom-art-side-options">
-                                                        <button class="custom-art-side active">Front</button>
-                                                        <button class="custom-art-side">Back</button>
-                                                    </div>
-                                                </div>
-
-                                                <button class="custom-art-change-options">🔧 Change Options</button>
-
-                                                <div class="custom-art-vat-row">
-                                                    <input type="checkbox" checked>
-                                                    <label>Add VAT (if applicable)</label>
-                                                    <button class="custom-art-info-btn">Info</button>
-                                                </div>
-
-                                                <a href="#" class="custom-art-view-quote">📄 View this quote</a>
-                                                
-
-                                            </div>
-                                             <div class="custom-art-filetypes-box mt-3">
-                                                <h6>Address</h6>
-                                                
-                                            </div>
-                                        </div>
-                                       
-
-                                    </div>
-                                    <div class="tab-section-right">
-                                       <div class="custom-address-container">
-        <div class="custom-address-title">Billing Address</div>
-        <div class="custom-address-field">
-            <label>Email *</label>
-            <input type="text" placeholder="Email">
-        </div>
-        <div class="custom-address-field">
-            <label>Name *</label>
-            <div class="d-flex justify-content-between">
-            <input type="text" placeholder="Firstname" style="width: 48%; display: inline-block; margin-right: 4%;">
-            <input type="text" placeholder="Surname" style="width: 48%; display: inline-block;">
-            </div>
-        </div>
-        <div class="custom-address-field">
-            <label>Phone *</label>
-            <input type="text" placeholder="Phone">
-        </div>
-        <div class="custom-address-field">
-            <label>Country</label>
-            <select>
-                <option value="uk">United Kingdom</option>
-                <option value="us">United States</option>
-                <option value="ca">Canada</option>
-            </select>
-        </div>
-        <div class="custom-address-field">
-            <label>Address</label>
-            <input type="text" placeholder="Start typing address">
-        </div>
-        <div class="custom-address-title">Delivery Address</div>
-        <div class="custom-address-field">
-            <label>Delivery Instructions</label>
-            <input type="text" placeholder="Enter instructions">
-        </div>
-        <div class="custom-address-field custom-checkbox d-flex">
-            <input type="checkbox" id="plainPackaging" style="width: 18px;">
-            <label for="plainPackaging " style="margin-top: 6px;">Use plain packaging</label>
-        </div>
-        <div class="custom-address-field custom-checkbox d-flex">
-            <input type="checkbox" id="sameBilling" style="width: 18px;">
-            <label for="sameBilling" style="margin-top: 6px;">Same as billing address</label>
-        </div>
-        <div class="custom-address-field">
-            <label>Name *</label>
-          <div class="d-flex justify-content-between">
-            <input type="text" placeholder="Firstname" style="width: 48%; display: inline-block; margin-right: 4%;">
-            <input type="text" placeholder="Surname" style="width: 48%; display: inline-block;">
-            </div>
-        </div>
-        <div class="custom-address-field">
-            <label>Phone *</label>
-            <input type="text" placeholder="Phone">
-        </div>
-        <div class="custom-address-field">
-            <label>Country</label>
-            <select>
-                <option value="uk">United Kingdom</option>
-                <option value="us">United States</option>
-                <option value="ca">Canada</option>
-            </select>
-        </div>
-        <div class="custom-address-field">
-            <label>Address</label>
-            <input type="text" placeholder="Start typing address">
-        </div>
-    </div>                         
-
-                                    </div>
-
-                                </div>
+                            <div class="d-flex justify-content-between">
+                                <h6 style="font-size:14px; font-weight:400;">Delivery Cost</h6>
+                                <h6 style="font-size:14px; font-weight:400;">£<?php echo e($delivery['price']); ?></h6>
                             </div>
-                            <div class="tab-pane" id="payment">
-                                <h4>Payment Section</h4>
-                                <div style="height: 150px; background: #f8d0d0;">[Dummy payment content]</div>
+                            <div class="d-flex justify-content-between">
+                                <h6 style="font-size:14px; font-weight:400;">Proof Reading Cost</h6>
+                                <h6 style="font-size:14px; font-weight:400;">£<?php echo e($proof['price']); ?></h6>
                             </div>
-                            <div class="tab-pane" id="printlink">
-                                <h4>PrintLink Section</h4>
-                                <div style="height: 150px; background: #d9d6fc;">[Dummy printlink content]</div>
+                            <div class="d-flex justify-content-between">
+                                <h6 style="font-size:14px; font-weight:400;">VAT</h6>
+                                <h6 style="font-size:14px; font-weight:400;">£<?php echo e($vat_amount); ?></h6>
                             </div>
-                            <div class="tab-pane" id="messages">
-                                <h4>Messages Section</h4>
-                                <div style="height: 150px; background: #d6fcd9;">[Dummy messages content]</div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <h6>Total Payable</h6>
+                                <h6>£<?php echo e($grand_total); ?></h6>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="custom-tab-container">
+                    <!-- Tab Headers -->
+                    <div class="custom-tabs" id="customTabs">
+                        <div class="custom-tab active" data-tab="artwork">
+                            <span class="custom-tab-number">1</span>
+                            Artwork
+                        </div>
+                        <div class="custom-tab" data-tab="details">
+                            <span class="custom-tab-number">2</span>
+                            Details
+                        </div>
+                        <div class="custom-tab disabled" data-tab="payment">
+                            <span class="custom-tab-number">3</span>
+                            Payment
+                        </div>
+                        <!-- <div class="custom-tab" data-tab="printlink">
+                                              <span class="custom-tab-number">4</span>
+                                              PrintLink
+                                              </div> -->
+                    </div>
+                    <!-- Tab Contents -->
+                    <div class="custom-tab-content">
+                        <div class="tab-pane active" id="artwork">
+                            <?php echo $__env->make('front.tabs.artwork', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                        </div>
+                        <div class="tab-pane" id="details">
+                            <?php echo $__env->make('front.tabs.details', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                        </div>
+                        <div class="tab-pane" id="payment">
+                            <?php echo $__env->make('front.tabs.payment', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                        </div>
 
 
-
-
-
+                        <div class="tab-pane" id="printlink">
+                            <h4>PrintLink Section</h4>
+                            <div style="height: 150px; background: #d9d6fc;">[Dummy printlink content]</div>
+                        </div>
+                        <div class="tab-pane" id="messages">
+                            <h4>Messages Section</h4>
+                            <div style="height: 150px; background: #d6fcd9;">[Dummy messages content]</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
-<?php $__env->stopSection(); ?>
+    </div>
 
+    <!-- Paste Link Modal -->
+    <div class="modal fade" id="pasteLinkModal" tabindex="-1" aria-labelledby="pasteLinkModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: #ffffff; color: #000;">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pasteLinkModalLabel">Paste Link to Print File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="url" id="pastedLinkInput" class="form-control" placeholder="Enter file URL (PDF, DOC)">
+                    <div id="pastedLinkError" style="color: red; font-size: 14px; margin-top: 6px;"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addPastedLink()">Add Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<?php $__env->stopSection(); ?>
 <?php $__env->startPush('after-scripts'); ?>
     <script>
-        // Tab Switching
-        document.addEventListener('DOMContentLoaded', function () {
-            const tabs = document.querySelectorAll('.custom-tab');
-            const panes = document.querySelectorAll('.tab-pane');
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const target = tab.getAttribute('data-tab');
-
-                    // Remove active from all tabs and panes
-                    tabs.forEach(t => t.classList.remove('active'));
-                    panes.forEach(p => p.classList.remove('active'));
-
-                    // Add active to selected tab and pane
-                    tab.classList.add('active');
-                    const targetPane = document.getElementById(target);
-                    if (targetPane) {
-                        targetPane.classList.add('active');
-                    } else {
-                        console.error(`Pane with ID "${target}" not found.`);
-                    }
-                });
-            });
-        });
 
         // Video Modal
         const videoModal = document.getElementById('videoModal');
@@ -675,16 +404,51 @@
                 this.parentElement.style.backgroundColor = '';
             });
         });
-    </script>
-    <script>
-  function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-      console.log("Image selected:", file.name);
-      // You can preview it or upload via AJAX here
-    }
-  }
-</script>
 
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.custom-tab');
+            const panes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    const tabId = this.getAttribute('data-tab');
+
+                    // Remove active classes
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panes.forEach(p => p.classList.remove('active'));
+
+                    // Activate selected tab and pane
+                    this.classList.add('active');
+                    const targetPane = document.getElementById(tabId);
+                    if (targetPane) {
+                        targetPane.classList.add('active');
+                    } else {
+                        console.error(`Pane with ID "${tabId}" not found.`);
+                    }
+
+                    // Update URL
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', tabId);
+                    window.history.pushState({}, '', url);
+                });
+            });
+
+            // Load default tab from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const defaultTab = urlParams.get('tab') || 'artwork';
+            const tabToActivate = document.querySelector(`.custom-tab[data-tab="${defaultTab}"]`);
+            if (tabToActivate) tabToActivate.click();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const defaultTab = urlParams.get('tab') || 'artwork'; // Default tab if none
+
+            const tabToActivate = document.querySelector(`.custom-tab[data-tab="${defaultTab}"]`);
+            if (tabToActivate) tabToActivate.click();
+        });
+
+    </script>
 <?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.new-master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/front/artwork.blade.php ENDPATH**/ ?>

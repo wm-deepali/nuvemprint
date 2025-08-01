@@ -3,24 +3,66 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Quote extends Model
 {
-    protected $fillable = ['subcategory_id', 'user_id', 'quantity', 'total_price', 'quote_data'];
+    use HasFactory;
 
-    protected $casts = [
-        'quote_data' => 'array',
+    protected $fillable = [
+        'quote_number',
+        'order_number',
+        'status',
+        'customer_id',
+        'vat_amount',
+        'vat_percentage',
+        'grand_total',
+        'proof_type',
+        'proof_price',
+        'delivery_price',
+        'delivery_date',
     ];
 
-    public function subcategory()
+    public function customer()
     {
-        return $this->belongsTo(Subcategory::class);
+        return $this->belongsTo(Customer::class);
     }
 
-    public function user()
+    public function billingAddress()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(QuoteBillingAddress::class);
     }
+
+    public function deliveryAddress()
+    {
+        return $this->hasOne(QuoteDeliveryAddress::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(QuoteItem::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(QuoteDocument::class);
+    }
+
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'department_quote')
+            ->withPivot('notes')
+            ->withTimestamps();
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
 }
-
-

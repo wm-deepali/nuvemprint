@@ -39,10 +39,24 @@ Route::post('/calculate-price', [SiteController::class, 'calculate'])->name('cal
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'showCart'])->name('show');        // cart.show
     Route::post('store', [CartController::class, 'addToCart'])->name('store'); // cart.store
-    Route::post('clear', [CartController::class, 'clear'])->name('clear');   
+    Route::post('clear', [CartController::class, 'clear'])->name('clear');
     Route::post('save-before-checkout', [CartController::class, 'saveBeforeCheckout'])->name('save.before.checkout');
-  // cart.clear
+    Route::post('/details', [CartController::class, 'storeAddress'])->name('address-details');
+    Route::get('/get-session', [CartController::class, 'getCartSession']);
+    Route::post('/uploaded-file', [CartController::class, 'saveUploadedFile']);
+    Route::get('/session-files', function () {
+        $images = session('cart.images', []);
+        return response()->json($images);
+    });
+  Route::post('/pay-later', [CartController::class, 'PayLater']);
+    // In web.php
+    Route::post('/remove-file', [CartController::class, 'removeUploadedFile']);
+
+    // cart.clear
 });
+
+Route::post('/cart/update-delivery', [CartController::class, 'updateDelivery'])->name('cart.update.delivery');
+
 
 
 Route::post('/check-postcode', [CartController::class, 'check'])->name('check.postcode');
@@ -70,8 +84,8 @@ Route::get('blogs', function () {
     return view('front.blogs');
 })->name('blogs');
 
-Route::post('states-by-country',[CustomerController::class,'statesByCountry'])->name('states-by-country');
-Route::post('cities-by-state',[CustomerController::class,'citiesByState'])->name('cities-by-state');
+Route::post('states-by-country', [CustomerController::class, 'statesByCountry'])->name('states-by-country');
+Route::post('cities-by-state', [CustomerController::class, 'citiesByState'])->name('cities-by-state');
 
 Route::controller(GoogleController::class)->group(function () {
     Route::get('customer/google/redirect', 'redirectToGoogle')->name('google.redirect');
@@ -86,13 +100,18 @@ Route::get('authentication-signup', function () {
     return view('front.authentication-signup');
 })->name('authentication-signup');
 
+Route::get('/customer-data/{id}', [CustomerController::class, 'getCustomerData']);
+
+
 Route::middleware(['web'])->group(function () {
-    Route::controller(CustomerController::class)->group(function () {
+    Route::controller(controller: CustomerController::class)->group(function () {
+        Route::get('/customer-data', [CustomerController::class, 'getCustomerData']);
+
         Route::get('add-required-details', 'addRequiredDetails')->name('first.details');
         Route::post('/check-email', 'checkEmail')->name('check-email');
         Route::get('account/verify/{token}', 'verifyAccount')->name('customer.verify');
         Route::post('/customer-register', 'register')->name('customer-register');
-        Route::post('/authenticate', 'authenticate')->name('customer.authenticate');
+        Route::post('/authenticate', [CustomerController::class, 'authenticate'])->name('customer.authenticate');
 
         Route::post('first/add-details/store', 'storeRequiredDetails')->name('first.details.store');
         Route::get('authentication-forgot-password', 'showForgetPasswordForm')->name('authentication-forgot-password.get');
@@ -113,15 +132,15 @@ Route::middleware(['web'])->group(function () {
         Route::get('account-addresses', [CustomerController::class, 'addresses'])->name('account-addresses');
         Route::get('account-payment-methods', [CustomerController::class, 'paymentmethods'])->name('account-payment-methods');
         Route::get('account-user-details', [CustomerController::class, 'userDetails'])->name('account-user-details');
-        
+
         Route::post('profile-update', [CustomerController::class, 'updateProfile'])->name('profile.update');
         Route::post('profile-pic-update', [CustomerController::class, 'updateProfilePic'])->name('profile-pic.update');
         Route::post('profile-password-update', [CustomerController::class, 'changePassword'])->name('profile-password.update');
-        
+
         Route::post('addresses-store', [CustomerController::class, 'addressStore'])->name('addresses.store');
 
 
-        
+
         Route::get('account-logout', [CustomerController::class, 'logout'])->name('account-logout');
     });
 });

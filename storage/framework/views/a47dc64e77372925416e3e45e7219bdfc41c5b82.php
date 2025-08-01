@@ -252,8 +252,9 @@
             </div>
 
             <!--start breadcrumb-->
-            <section class="py-3 border-bottom d-none d-md-flex" style="background: #f1f2f7;
-                                                                                                      padding: 40px 0;">
+            <section class="py-3 border-bottom d-none d-md-flex"
+                style="background: #f1f2f7;
+                                                                                                          padding: 40px 0;">
                 <!--end shop cart-->
                 <div class="container" style="max-width: 900px;">
                     <div class="row g-4">
@@ -269,7 +270,7 @@
                                 <?php if($cartData): ?>
                                     <div class="d-flex justify-content-between mb-3">
                                         <p><strong>Shipping:</strong> <?php echo e($formattedDate); ?></p>
-                                        <h5><strong>Subtotal:</strong> £<?php echo e($cartData['subtotal']); ?> </h5>
+                                        <h5><strong>Subtotal:</strong> £<?php echo e($cartData['items']['sub_total']); ?> </h5>
                                     </div>
 
                                     <div class="d-flex align-items-start mb-3">
@@ -281,7 +282,7 @@
                                                 class="img-thumb me-3 " alt="Product Image">
                                         <?php endif; ?>
                                         <div class="col-9">
-                                            <p class="mb-1"><strong><?php echo e($cartData['quantity']); ?>
+                                            <p class="mb-1"><strong><?php echo e($cartData['items']['quantity']); ?>
 
                                                     <?php echo e($cartData['subcategory_name']); ?></strong></p>
                                             <?php $__currentLoopData = $cartData['attributes_resolved']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -294,11 +295,11 @@
                                                 </p>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <!-- <div class="d-flex justify-content-between mb-3 mt-3 ">
-                                                                                                                                                        <span>Subtotal:</span>
-                                                                                                                                              <span>£15.00 <br><span>VAT: £3.00</span></span>
+                                                                                                                                                                <span>Subtotal:</span>
+                                                                                                                                                      <span>£15.00 <br><span>VAT: £3.00</span></span>
 
 
-                                                                                                                                                    </div> -->
+                                                                                                                                                            </div> -->
                                         </div>
 
                                     </div>
@@ -308,7 +309,7 @@
                                     <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
 
                                         <!-- <button class="btn-info trash "><i class="fa-solid fa-trash"></i></button>
-                                                                                                        <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
+                                                                                                                <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
                                         <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
                                     </div>
 
@@ -338,10 +339,10 @@
                                     <!--<p class="mb-1"><small>Quote Reference: 1667893</small></p>-->
 
                                     <div class="d-flex justify-content-between">
-                                        <span><strong><?php echo e($cartData['subcategory_name']); ?> x <?php echo e($cartData['quantity']); ?>
+                                        <span><strong><?php echo e($cartData['subcategory_name']); ?> x <?php echo e($cartData['items']['quantity']); ?>
 
                                                 Copies</strong></span>
-                                        <span>£<?php echo e($cartData['subtotal']); ?></span>
+                                        <span>£<?php echo e($cartData['items']['sub_total']); ?></span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
@@ -368,7 +369,7 @@
                                                 <optgroup label="<?php echo e(ucfirst($continent)); ?>">
                                                     <?php $__currentLoopData = $charges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                         <option value="<?php echo e($charge->id); ?>" data-title="<?php echo e($charge->title); ?>"
-                                                            data-price="<?php echo e($charge->price); ?>" <?php echo e($cartData['delivery_title'] == $charge->title ? 'selected' : ''); ?>>
+                                                            data-price="<?php echo e($charge->price); ?>" <?php echo e($cartData['delivery']['title'] == $charge->title ? 'selected' : ''); ?>>
                                                             <?php echo e($charge->title); ?>
 
                                                         </option>
@@ -398,7 +399,7 @@
                                     <hr>
                                     <div class="d-flex justify-content-between">
                                         <span>Subtotal:</span>
-                                        <span id="subtotal">£<?php echo e($cartData['subtotal']); ?></span>
+                                        <span id="subtotal">£<?php echo e($cartData['items']['sub_total']); ?></span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
@@ -467,37 +468,39 @@
             let selected = $(this).find('option:selected');
             let price = parseFloat(selected.data('price')) || 0;
             let deliveryTitle = selected.data('title') || '';
+            let deliveryId = selected.val();
 
             // Update delivery cost in UI
             $('.delivery_charge').text('£' + price.toFixed(2));
 
-            // Fetch updated VAT from server
-            fetch('<?php echo e(route('get.vat.by.title')); ?>', {
+            fetch('<?php echo e(route('cart.update.delivery')); ?>', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                 },
-                body: JSON.stringify({ title: deliveryTitle })
+                body: JSON.stringify({
+                    id: deliveryId,
+                    title: deliveryTitle,
+                    price: price
+                })
             })
                 .then(response => response.json())
                 .then(data => {
-                    const vatPercentage = parseFloat(data.vat_percentage) || 0;
-                    const subtotal = parseFloat("<?php echo e($cartData['subtotal'] ?? 0); ?>") || 0;
-                    const proof = parseFloat("<?php echo e($cartData['proof']['price'] ?? 0); ?>") || 0;
-
-                    const vatAmount = (subtotal + proof + price) * vatPercentage / 100;
-                    const grandTotal = subtotal + proof + price + vatAmount;
-
-                    // Update VAT and Grand Total in UI
-                    $('[id="grandTotalAmount"]').text('£' + grandTotal.toFixed(2));
-                    $('[id="subtotal"]').text('£' + subtotal.toFixed(2));
-                    $('span:contains("VAT:")').next().text('£' + vatAmount.toFixed(2));
+                    if (data.success) {
+                        $('#grandTotalAmount').text('£' + data.grand_total.toFixed(2));
+                        $('span:contains("VAT:")').next().text('£' + data.vat_amount.toFixed(2));
+                    } else {
+                        alert(data.message || 'Failed to update session');
+                    }
+                })
+                .catch(() => {
+                    alert('Error occurred during delivery update.');
                 });
         });
 
-
     });
+
 
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -525,7 +528,6 @@
                     alert('Error occurred while processing. Try again.');
                 });
         });
-
 
         document.getElementById('confirmStartQuote').addEventListener('click', function () {
             fetch("<?php echo e(route('cart.clear')); ?>", {
