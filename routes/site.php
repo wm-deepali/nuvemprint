@@ -146,6 +146,8 @@ Route::middleware(['web'])->group(function () {
     Route::middleware(['auth:customer'])->group(function () {
         Route::get('account-dashboard', [CustomerController::class, 'dashboard'])->name('account-dashboard');
         Route::get('account-orders', [CustomerController::class, 'orders'])->name('account-orders');
+        Route::get('/view-invoice/{quote}', [CustomerController::class, 'viewInvoice'])->name('view-invoice');
+         Route::get('/order-details/{quote}', [CustomerController::class, 'orderDetails'])->name('order-details');
         Route::get('account-downloads', [CustomerController::class, 'downloads'])->name('account-downloads');
         Route::get('account-addresses', [CustomerController::class, 'addresses'])->name('account-addresses');
         Route::get('account-payment-methods', [CustomerController::class, 'paymentmethods'])->name('account-payment-methods');

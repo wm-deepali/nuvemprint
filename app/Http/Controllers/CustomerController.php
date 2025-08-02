@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Quote;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\CustomerTemp;
@@ -285,14 +286,23 @@ class CustomerController extends Controller
     public function orders()
     {
         if (Auth::guard('customer')->check()) {
-            $user_id = Auth::guard('customer')->user()->id;
-            $data['user'] = Customer::findOrFail($user_id);
+            $user = Auth::guard('customer')->user();
+
+            // Fetch customer with their quotes
+            $data['user'] = $user;
+            $data['quotes'] = Quote::with(['items', 'billingAddress', 'deliveryAddress', 'documents', 'departments', 'payments', 'invoice'])
+                ->where('customer_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             return view('front.account-orders', $data);
         } else {
             return redirect()->route('authentication-signin')
                 ->withErrors('Please login to access the dashboard.');
         }
     }
+
+
     public function downloads()
     {
         if (Auth::guard('customer')->check()) {
@@ -501,8 +511,43 @@ class CustomerController extends Controller
             return response()->json($data);
         }
 
-    
+    }
 
+    public function orderDetails($id)
+    {
+        $quote = Quote::with([
+            'customer',
+            'items.attributes.attribute',
+            'items.attributes.attributeValue',
+            'documents',
+            'deliveryAddress',
+            'departments' // eager load existing departments
+        ])->findOrFail($id);
+
+
+        return view('front.order-details', [
+            'quote' => $quote,
+        ]);
+    }
+
+
+    public function viewInvoice($quoteId)
+    {
+        $quote = Quote::with([
+            'customer',
+            'billingAddress',
+            'deliveryAddress',
+            'items.attributes.attribute',
+            'items.attributes.attributeValue',
+            'payments',
+            'invoice'
+        ])->findOrFail($quoteId);
+        return view('front.view-invoice', [
+            'quote' => $quote,
+            'invoice' => $quote->invoice,
+            'payments' => $quote->payments,
+            'customer' => $quote->customer,
+        ]);
     }
 
 }

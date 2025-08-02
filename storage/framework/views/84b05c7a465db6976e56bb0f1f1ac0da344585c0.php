@@ -643,8 +643,6 @@
    }
 
 
-    let files = [];
-
   // Event listener for Dropbox button click
   document.querySelector('.btn-dropbox').addEventListener('click', function (event) {
     event.preventDefault();
@@ -680,13 +678,10 @@
 
             // Create a File object from the blob to mimic local file upload
             let dropboxFile = new File([blob], file.name, { type: mime });
+              renderSingleFilePreview(dropboxFile);
+            saveToSession(dropboxFile, "main")
+// console.log("dropboxFile",dropboxFile);
 
-            // Save file to session/backend (your existing function)
-            saveToSession(dropboxFile, 'extra');
-
-            // Add to your tracking array and update the UI previews
-            uploadedFiles.push(dropboxFile);
-            renderPreviews();
           } catch (err) {
             alert("Failed to retrieve the file from Dropbox.");
             console.error(err);

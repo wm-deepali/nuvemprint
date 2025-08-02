@@ -75,9 +75,7 @@
             </td>
             <td><?php echo $value->icon_class ? "<i class='{$value->icon_class}'></i>" : '-'; ?></td>
             <td><?php echo e($value->custom_input_label ?? '-'); ?></td>
-            <td>
-          
-            </td>
+           
             <td><?php echo e($value->created_at->format('d M Y')); ?></td>
             <td>
             <ul class="list-inline mb-0">

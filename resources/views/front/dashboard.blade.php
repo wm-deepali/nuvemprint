@@ -38,7 +38,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                @include('layouts.includes.user-sidebar')
+                               	@include('layouts.includes.user-sidebar', ['activeMenu' => 'dashboard'])
                                 <div class="col-lg-8">
                                     <div class="card shadow-none mb-0">
                                         <div class="card-body">

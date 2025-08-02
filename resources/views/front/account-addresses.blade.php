@@ -1,4 +1,23 @@
 @extends('layouts.new-master')
+<style>
+    .card{
+        background:#fff !important;
+        margin-top:16px !important;
+    }
+    .list-group-item.active {
+    z-index: 2;
+    color: #000 !important;
+    background-color: #80808029 !important;
+    border-color: rgb(255 255 255 / 20%);
+    }
+    .list-group-flush>.list-group-item {
+    border: 1px solid #80808017 !important;
+    border-width: 0 0 1px;
+}
+.list-group-flush{
+    /*border: 1px solid #8080804a !important;*/
+}
+</style>
 
 @section('title')
     Nuvem Prints -Address Book
@@ -36,17 +55,17 @@
 						<div class="card">
 							<div class="card-body">
 								<div class="row">
-									@include('layouts.includes.user-sidebar')
+									@include('layouts.includes.user-sidebar',['activeMenu' => 'addresses'])
 					            	<div class="col-lg-8">
 					            	    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addressModal">
                                             Add New Address
                                         </button>
-										<div class="card shadow-none mb-0">
+										<div class="card shadow-lg mb-0">
 											<div class="card-body">
 												<h6 class="mb-4">The following addresses will be used on the checkuot page by default.</h6>
 												<div class="row">
 													<div class="table-responsive">
-													<table class="table">
+													<table class="table ">
 														<thead class="table-light">
 															<tr>
 																<th>Tag</th>

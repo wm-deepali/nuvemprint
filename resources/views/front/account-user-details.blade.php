@@ -36,7 +36,7 @@
 						<div class="card">
 							<div class="card-body">
 								<div class="row">
-									@include('layouts.includes.user-sidebar')
+									@include('layouts.includes.user-sidebar', ['activeMenu' => 'account-detailss'])
                                     <!-- Bootstrap & Icons (Required) -->
                                     <div class="col-lg-8 ">
                                        

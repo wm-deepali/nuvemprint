@@ -38,7 +38,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <?php echo $__env->make('layouts.includes.user-sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                               	<?php echo $__env->make('layouts.includes.user-sidebar', ['activeMenu' => 'dashboard'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                                 <div class="col-lg-8">
                                     <div class="card shadow-none mb-0">
                                         <div class="card-body">
