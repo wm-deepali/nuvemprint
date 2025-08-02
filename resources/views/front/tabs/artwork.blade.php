@@ -8,13 +8,13 @@
             <button class="custom-art-edit-btn">✎ Edit</button>
          </div>
          <div class="custom-art-card">
-            <div class="custom-art-item-label">Item 1</div>
+            <div class="custom-art-item-label">{{ $category_name }}</div>
             <div class="custom-art-field">
                <label>Copies</label>
                <input type="number" value="{{ $items['quantity'] ?? ''}}" class="custom-art-input-box" />
             </div>
-  @php $paperSizeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
-                                 @endphp
+            @php $paperSizeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
+            @endphp
             <div class="custom-art-field">
                <label>Size</label>
                <input
@@ -24,25 +24,44 @@
                   readonly
                />
             </div>
-            @php 
-            $paperWeightValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper
-            Weight')['value_name'] ?? '';
-            $paperTypeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Type')['value_name'] ??
-            '';
+       
+
+            @php
+                // Randomly pick 3 or 4 attributes from the resolved collection
+               $randomAttributes = collect($attributes_resolved)->shuffle()->take(4);
             @endphp
             <div class="custom-art-field custom-art-gsm-options">
-               <label>{{ $paperWeightValue }} <span class="custom-art-subtext">paper -
-                     {{ $paperTypeValue }}</span></label>
-               <div class="custom-art-side-options">
-                  <button class="custom-art-side active">Front</button>
-                  <button class="custom-art-side">Back</button>
-               </div>
+               @foreach ($randomAttributes as $attribute)
+               <span class="custom-art-subtext"> {{ $attribute['attribute_name'] }} - {{ $attribute['value_name'] }}</span>
+               <br>
+               @endforeach
             </div>
+
             <button class="custom-art-change-options">🔧 Change Options</button>
             <div class="custom-art-vat-row">
                <input type="checkbox" checked />
                <label>Add VAT (if applicable)</label>
-               <button class="custom-art-info-btn">Info</button>
+            @php
+  $country = $delivery['title'] ?? '';
+  $vat = $vat_percentage ?? '';
+@endphp
+
+<button 
+   type="button" 
+   class="custom-art-info-btn"
+   data-bs-toggle="popover" 
+   data-bs-trigger="focus" 
+   data-bs-html="true"
+   title="VAT Payable?"
+   data-bs-content="
+      Country: <strong>{{ $country }}</strong><br>
+      VAT Percentage: <strong>{{ $vat}}%</strong>"
+>
+   Info
+</button>
+
+
+
             </div>
             <a href="#" class="custom-art-view-quote">📄 View this quote</a>
          </div>
@@ -106,7 +125,33 @@
    <div id="preview-container"></div>
 </div>
 
+                  <div class="text-end mt-4">
+                    <button type="button" class="btn btn-primary" id="detailsTab">
+                        Next <i class="fa fa-arrow-right ms-1"></i>
+                    </button>
+                </div>
+
 <script>
+
+  $(document).ready(function () {
+      $('#detailsTab').on('click', function () {
+         
+         document.querySelectorAll('.custom-tab').forEach(tab => tab.classList.remove('active'));
+         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+         // Activate the "details" tab
+         document.querySelector('.custom-tab[data-tab="details"]').classList.add('active');
+         document.getElementById('details').classList.add('active');
+
+        }
+  )});
+
+   document.addEventListener("DOMContentLoaded", function () {
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl);
+    });
+  });;
 
    document.getElementById("orderDetailsText").addEventListener("blur", function () {
       const details = this.value.trim();
@@ -598,8 +643,6 @@
    }
 
 
-    let files = [];
-
   // Event listener for Dropbox button click
   document.querySelector('.btn-dropbox').addEventListener('click', function (event) {
     event.preventDefault();
@@ -635,13 +678,10 @@
 
             // Create a File object from the blob to mimic local file upload
             let dropboxFile = new File([blob], file.name, { type: mime });
+              renderSingleFilePreview(dropboxFile);
+            saveToSession(dropboxFile, "main")
+// console.log("dropboxFile",dropboxFile);
 
-            // Save file to session/backend (your existing function)
-            saveToSession(dropboxFile, 'extra');
-
-            // Add to your tracking array and update the UI previews
-            uploadedFiles.push(dropboxFile);
-            renderPreviews();
           } catch (err) {
             alert("Failed to retrieve the file from Dropbox.");
             console.error(err);

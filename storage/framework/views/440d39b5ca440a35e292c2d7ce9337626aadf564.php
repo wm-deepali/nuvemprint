@@ -6,7 +6,7 @@
             <button class="custom-art-edit-btn">✎ Edit</button>
          </div>
          <div class="custom-art-card">
-            <div class="custom-art-item-label">Item 1</div>
+           <div class="custom-art-item-label"><?php echo e($category_name); ?></div>
             <div class="custom-art-field">
                <label>Copies</label>
                <input
@@ -16,7 +16,7 @@
                />
             </div>
             <?php $paperSizeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Size')['value_name'] ?? '';
-                                 ?>
+            ?>
             <div class="custom-art-field">
                <label>Size</label>
                <input
@@ -26,21 +26,39 @@
                   readonly
                />
             </div>
-            <?php 
-            $paperWeightValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Weight')['value_name'] ?? ''; 
-            $paperTypeValue = collect($attributes_resolved)->firstWhere('attribute_name', 'Paper Type')['value_name'] ?? ''; ?>
+              <?php
+                // Randomly pick 3 or 4 attributes from the resolved collection
+               $randomAttributes = collect($attributes_resolved)->shuffle()->take(4);
+            ?>
             <div class="custom-art-field custom-art-gsm-options">
-               <label><?php echo e($paperWeightValue); ?><span class="custom-art-subtext">paper - <?php echo e($paperTypeValue); ?></span></label>
-               <div class="custom-art-side-options">
-                  <button class="custom-art-side active">Front</button>
-                  <button class="custom-art-side">Back</button>
-               </div>
+               <?php $__currentLoopData = $randomAttributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+               <span class="custom-art-subtext"> <?php echo e($attribute['attribute_name']); ?> - <?php echo e($attribute['value_name']); ?></span>
+               <br>
+               <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
+
             <button class="custom-art-change-options">🔧 Change Options</button>
             <div class="custom-art-vat-row">
                <input type="checkbox" checked />
                <label>Add VAT (if applicable)</label>
-               <button class="custom-art-info-btn">Info</button>
+                <?php
+  $country = $delivery['title'] ?? '';
+  $vat = $vat_percentage ?? '';
+?>
+
+<button 
+   type="button" 
+   class="custom-art-info-btn"
+   data-bs-toggle="popover" 
+   data-bs-trigger="focus" 
+   data-bs-html="true"
+   title="VAT Payable?"
+   data-bs-content="
+      Country: <strong><?php echo e($country); ?></strong><br>
+      VAT Percentage: <strong><?php echo e($vat); ?>%</strong>"
+>
+   Info
+</button>
             </div>
             <a href="#" class="custom-art-view-quote">📄 View this quote</a>
          </div>
@@ -202,7 +220,8 @@
                     $('select[name="billing_country"]').val(billing.country);
                     $('input[name="billing_address"]').val(billing.address);
                     sessionDataFound = true;
-
+                     const paymentTab = document.querySelector('.custom-tab[data-tab="payment"]');
+                    paymentTab.classList.remove('disabled');
                 }
 
                 if (delivery.first_name) {

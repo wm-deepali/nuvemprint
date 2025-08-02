@@ -21,6 +21,7 @@ class Quote extends Model
         'proof_price',
         'delivery_price',
         'delivery_date',
+        'notes',
     ];
 
     public function customer()

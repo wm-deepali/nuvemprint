@@ -134,9 +134,13 @@ class CartController extends Controller
         $vatAmount = round(($validated['totalPrice'] * $vatPercentage) / 100, 2);
         $validated['totalPrice'] += $vatAmount;
 
+        do {
+            $quoteId = random_int(1000000, 9999999);
+        } while (Quote::where('quote_number', $quoteId)->exists());
+
 
         $cart = [
-            'quote_id' => random_int(1000000, 9999999),
+            'quote_id' => $quoteId,
             'items' => [
                 'subcategory_id' => $validated['subcategory_id'],
                 'quantity' => $validated['quantity'],
@@ -301,9 +305,9 @@ class CartController extends Controller
                 ];
             }
         }
-
         $cart['attributes_resolved'] = $attributes;
         $cart['subcategory_name'] = $subcategory->name ?? 'Unknown';
+        $cart['category_name'] = $subcategory->categories->first()->name ?? '';
         // dd($cart);
         return view('front.checkout', $cart);
     }
@@ -473,7 +477,7 @@ class CartController extends Controller
     public function PayLater(Request $request)
     {
         $data = session()->get('cart', []);
-     
+
         $customer = Customer::where('email', $data['billing']['email'])->first();
         // dd($customer);
 
@@ -481,7 +485,7 @@ class CartController extends Controller
         try {
 
 
-            $dateString =  $data['delivery']['date'];
+            $dateString = $data['delivery']['date'];
 
             // Step 1: Remove weekday and ordinal suffix
             $cleaned = preg_replace('/\w{3},\s*(\d+)(st|nd|rd|th)\s+(\w+)/', '$1 $3', $dateString); // "1 Aug"
@@ -506,6 +510,7 @@ class CartController extends Controller
                 'proof_price' => $data['proof']['price'] ?? 0,
                 'delivery_price' => $data['delivery']['price'] ?? 0,
                 'delivery_date' => $formattedDate ?? null,
+                'notes' => $data['details'] ?? null,
             ]);
 
             // Create QuoteItem
@@ -553,20 +558,23 @@ class CartController extends Controller
                 'same_as_billing' => $delivery['same_as_billing'],
             ]);
 
-            // Save Images
-            foreach ($data['images'] as $img) {
-                QuoteDocument::create([
-                    'quote_id' => $quote->id,
-                    'path' => $img['path'],
-                    'name' => $img['name'],
-                    'type' => $img['type'],
-                ]);
+            if (isset($data['image'])) {
+                // Save Images
+                foreach ($data['images'] as $img) {
+                    QuoteDocument::create([
+                        'quote_id' => $quote->id,
+                        'path' => $img['path'],
+                        'name' => $img['name'],
+                        'type' => $img['type'],
+                    ]);
+                }
             }
 
             DB::commit();
-         session()->forget('cart');
+            session()->forget('cart');
+            return response()->json(['message' => 'Quote saved successfully', 'quote_id' => $quote->quote_number]);
 
-            return response()->json(['message' => 'Quote saved successfully', 'quote_id' => $quote->id]);
+
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['error' => 'Failed to save quote', 'message' => $e->getMessage()], 500);

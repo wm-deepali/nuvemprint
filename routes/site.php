@@ -67,6 +67,11 @@ Route::prefix('cart')->name('cart.')->group(function () {
     // cart.clear
 });
 
+Route::get('/thank-you', function () {
+    return view('front.thank-you');
+})->name('thank-you');
+
+
 Route::post('/cart/update-delivery', [CartController::class, 'updateDelivery'])->name('cart.update.delivery');
 
 
