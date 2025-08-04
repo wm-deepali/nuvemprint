@@ -52,7 +52,7 @@
               <span class="text-danger validation-err" id="values_0_custom_input_label-err"></span>
             </div>
 
-        
+
 
             <div class="form-group mb-2" id="is-composite-wrapper-0">
               <label for="is_composite_0">Is Composite Value?</label>
@@ -109,7 +109,17 @@
       const customInputType = config.custom_input_type || 'none';
 
       const isFileType = ['select_image', 'select_icon'].includes(inputType);
-      renderValueField(index, isFileType);
+
+      // Hide value input if input_type is select_area
+      // Hide the entire value block if input_type is select_area
+      const blockWrapper = $(`#value-input-wrapper-${index}`).closest('.value-block');
+      if (inputType === 'select_area') {
+        blockWrapper.addClass('d-none');
+      } else {
+        blockWrapper.removeClass('d-none');
+        renderValueField(index, isFileType);
+      }
+
 
       if (['text', 'number', 'file'].includes(customInputType)) {
         $(`#custom-label-wrapper-${index}`).removeClass('d-none');

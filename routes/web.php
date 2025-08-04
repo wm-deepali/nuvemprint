@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\EndpaperColourController;
 use App\Http\Controllers\Admin\HeadAndTailBandController;
 use App\Http\Controllers\Admin\ManagePaperSizeController;
 use App\Http\Controllers\Admin\OrientationController;
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PaperWeightController;
 use App\Http\Controllers\Admin\QuotePricingController;
 use App\Http\Controllers\Admin\AttributeController;
@@ -354,8 +355,15 @@ Route::group(['middleware' => 'auth'], function () {
         Route::view('content/blogs', 'admin.content.blogs')->name('content.blogs');
         Route::view('content/blogs/create', 'admin.content.blogs_create')->name('content.blogs.create'); // add blog
         Route::view('content/faq', 'admin.content.faq')->name('content.faq');
-        Route::view('content/dynamic-pages', 'admin.content.dynamic_pages')->name('content.dynamic.pages');
         Route::view('content/manage-page-content', 'admin.content.manage_page_content')->name('content.manage.page.content');
+
+        Route::get('content/dynamic-pages', [PageController::class, 'index'])->name('content.dynamic.pages');
+        Route::prefix('pages')->name('pages.')->group(function () {
+            Route::post('/store', [PageController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [PageController::class, 'edit'])->name('edit');
+            Route::post('/{id}/update', [PageController::class, 'update'])->name('update');
+            Route::delete('/{id}', [PageController::class, 'destroy'])->name('destroy');
+        });
 
 
 

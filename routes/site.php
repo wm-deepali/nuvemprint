@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\CartController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,9 @@ Route::get('/stl', function () {
 });
 Route::get('/', [SiteController::class, 'index'])->name('home');
 Route::get('{slug}/details', [SiteController::class, 'subcateDetails'])->name('subcategory-details');
+
+Route::get('/page/{slug}', [PageController::class, 'show'])->name('page.show');
+
 Route::post('/calculate-price', [SiteController::class, 'calculate'])->name('calculate.price');
 
 Route::prefix('cart')->name('cart.')->group(function () {

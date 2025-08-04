@@ -100,10 +100,20 @@ class QuoteController extends Controller
 
     public function downloadPdf($id)
     {
-        $quote = Quote::with(['customer', 'items.subcategory.categories', 'deliveryAddress', 'documents'])->findOrFail($id);
+        $quote = Quote::with([
+            'customer',
+            'items.subcategory.categories',
+            'items.attributes.attribute',
+            'items.attributes.attributeValue',
+            'deliveryAddress',
+            'documents',
+            'payments'
+        ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('admin.quotes.index', compact('quote'));
-        // dd('here', $pdf);
+        $pdf = Pdf::loadView('admin.quotes.pdf', compact('quote'))
+            ->setPaper('A4', 'portrait')  // Force A4 and portrait
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true); // Needed if loading local images
         return $pdf->download('Quote_' . $quote->quote_number . '.pdf');
     }
 
@@ -262,17 +272,27 @@ class QuoteController extends Controller
 
     public function downloadInvoice($quoteId)
     {
-        $quote = Quote::with(['customer', 'billingAddress', 'deliveryAddress', 'items', 'payments', 'invoice'])
-            ->findOrFail($quoteId);
+        $quote = Quote::with([
+            'customer',
+            'billingAddress',
+            'deliveryAddress',
+            'items.attributes.attribute',
+            'items.attributes.attributeValue',
+            'payments',
+            'invoice'
+        ])->findOrFail($quoteId);
 
-        $pdf = Pdf::loadView('admin.quotes.view-invoice', [
+        $pdf = Pdf::loadView('admin.quotes.down-invoice', [
             'quote' => $quote,
             'invoice' => $quote->invoice,
             'payments' => $quote->payments,
             'customer' => $quote->customer,
-        ]);
-        // dd($pdf);
-        return $pdf->download('invoice-' . $quote->order_number . '.pdf');
+        ])
+            ->setPaper('A4', 'portrait')  // Force A4 and portrait
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true); // Needed if loading local images
+
+        return $pdf->download('invoice-' . $quote->invoice->invoice_number . '.pdf');
     }
 
     protected function generateUniqueOrderNumber()

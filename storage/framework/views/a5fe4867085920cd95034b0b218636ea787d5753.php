@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 
   <div class="app-content content">
     <div class="content-overlay"></div>
@@ -12,7 +12,7 @@
         <div class="col-12">
         <div class="breadcrumb-wrapper">
           <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
           <li class="breadcrumb-item active">Dynamic Page Creations</li>
           </ol>
         </div>
@@ -47,20 +47,20 @@
             </thead>
             <tbody>
 
-            @foreach ($pages as $page)
+            <?php $__currentLoopData = $pages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $page): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <tr>
-          <td>{{ $page->page_name }}</td>
-          <td>{{ $page->slug }}</td>
-          <td>{{ ucfirst($page->status) }}</td>
-          <td>{{ $page->created_at->format('Y-m-d H:i') }}</td>
+          <td><?php echo e($page->page_name); ?></td>
+          <td><?php echo e($page->slug); ?></td>
+          <td><?php echo e(ucfirst($page->status)); ?></td>
+          <td><?php echo e($page->created_at->format('Y-m-d H:i')); ?></td>
           <td>
           <a href="javascript:void(0);" class="btn btn-sm btn-info mr-1 edit-page-btn"
-          data-id="{{ $page->id }}">Edit</a>
-          <button class="btn btn-sm btn-danger delete-page-btn" data-id="{{ $page->id }}">Delete</button>
+          data-id="<?php echo e($page->id); ?>">Edit</a>
+          <button class="btn btn-sm btn-danger delete-page-btn" data-id="<?php echo e($page->id); ?>">Delete</button>
 
           </td>
         </tr>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
           </table>
           </div>
@@ -156,8 +156,8 @@
         <form id="editPageForm">
         <input type="hidden" id="edit_id" name="id">
 
-        {{-- Same fields as addPageForm, just prefixed with `edit_` --}}
-        {{-- You can duplicate the same layout, just change IDs (e.g., edit_title, edit_detail) --}}
+        
+        
 
         <div class="form-row">
           <div class="form-group col-md-6">
@@ -243,12 +243,12 @@
     formData.set('detail', detailContent.trim() ? detailContent : '');
 
     $.ajax({
-      url: '{{ route("admin.pages.store") }}',
+      url: '<?php echo e(route("admin.pages.store")); ?>',
       method: 'POST',
       data: formData,
       processData: false,
       contentType: false,
-      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+      headers: { 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
       success: function (result) {
       Swal.fire('Success!', result.message || '', 'success');
       $('#addPageModal').modal('hide');
@@ -303,7 +303,7 @@
       data: formData,
       processData: false,
       contentType: false,
-      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+      headers: { 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
       success: function (result) {
       Swal.fire('Updated!', result.message || '', 'success');
       $('#editPageModal').modal('hide');
@@ -329,7 +329,7 @@
       $.ajax({
         url: `/admin/pages/${id}`,
         method: 'DELETE',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        headers: { 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
         success: function () {
         Swal.fire('Deleted!', 'Page deleted.', 'success');
         location.reload();
@@ -343,4 +343,5 @@
     });
 
   </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/admin/content/dynamic_pages.blade.php ENDPATH**/ ?>

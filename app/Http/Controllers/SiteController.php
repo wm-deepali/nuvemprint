@@ -140,8 +140,9 @@ class SiteController extends Controller
                 $values = $attributeValues[$attribute->id] ?? collect();
                 $maxHeight = null;
                 $maxWidth = null;
+                $isDefault = false;
 
-                if ($attribute->input_type === 'select_area') {
+                if ($attribute->input_type === 'select_area' && $pricingRule) {
                     $pra = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)
                         ->where('attribute_id', $attribute->id)
                         ->first();
@@ -163,18 +164,21 @@ class SiteController extends Controller
                     'is_required' => (bool) $is_required,
                     'max_height' => $maxHeight,
                     'max_width' => $maxWidth,
-                    'values' => $values->map(function ($sav) use ($attribute, $pricingRule) {
+                    'values' => $values->map(function ($sav) use ($attribute, $pricingRule, $isDefault) {
                         $valueId = $sav->value->id;
 
-                        $isDefault = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)->where(function ($q) use ($attribute, $valueId) {
-                            $q->where('attribute_id', $attribute->id)
-                                ->where('value_id', $valueId);
-                        })
-                            ->orWhereHas('dependencies', function ($q) use ($attribute, $valueId) {
-                                $q->where('parent_attribute_id', $attribute->id)
-                                    ->where('parent_value_id', $valueId);
+                        if ($pricingRule) {
+                            $isDefault = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)->where(function ($q) use ($attribute, $valueId) {
+                                $q->where('attribute_id', $attribute->id)
+                                    ->where('value_id', $valueId);
                             })
-                            ->value('is_default');
+                                ->orWhereHas('dependencies', function ($q) use ($attribute, $valueId) {
+                                    $q->where('parent_attribute_id', $attribute->id)
+                                        ->where('parent_value_id', $valueId);
+                                })
+                                ->value('is_default');
+
+                        }
 
                         return [
                             'id' => $valueId,

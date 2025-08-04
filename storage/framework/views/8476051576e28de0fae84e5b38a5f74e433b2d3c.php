@@ -86,25 +86,25 @@
           </div>
 
 
-        <div class="col-md-12">
-          <div class="form-group">
-            <label>Detail</label>
-            <textarea name="detail" class="form-control" rows="3"><?php echo e($attribute->detail ?? ''); ?></textarea>
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Detail</label>
+              <textarea name="detail" class="form-control" rows="3"><?php echo e($attribute->detail ?? ''); ?></textarea>
+            </div>
           </div>
-        </div>
 
-        <div class="col-md-3">
-          <div class="form-group">
-            <label for="edit-setup">Setup Charges</label>
-            <select name="has_setup_charge" id="edit-setup" class="form-control">
-              <option value="">-- Select --</option>
-              <option value="1" <?php echo e($attribute->has_setup_charge ? 'selected' : ''); ?>>Yes</option>
-              <option value="0" <?php echo e(!$attribute->has_setup_charge ? 'selected' : ''); ?>>No</option>
-            </select>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="edit-setup">Setup Charges</label>
+              <select name="has_setup_charge" id="edit-setup" class="form-control">
+                <option value="">-- Select --</option>
+                <option value="1" <?php echo e($attribute->has_setup_charge ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_setup_charge ? 'selected' : ''); ?>>No</option>
+              </select>
+            </div>
           </div>
-        </div>
 
-        <!-- <div class="col-md-3">
+          <!-- <div class="col-md-3">
             <div class="form-group">
               <label for="edit-quantity">Allow Quantity</label>
               <select name="allow_quantity" class="form-control" id="edit-quantity">
@@ -116,76 +116,76 @@
             </div>
           </div> -->
 
-        <div class="col-md-3">
-          <div class="form-group">
-            <label for="edit-composite">Is Composite</label>
-            <select name="is_composite" class="form-control" id="edit-composite">
-              <option value="1" <?php echo e($attribute->is_composite ? 'selected' : ''); ?>>Yes</option>
-              <option value="0" <?php echo e(!$attribute->is_composite ? 'selected' : ''); ?>>No</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="form-group">
-            <label for="edit-image">Supports Images</label>
-            <select name="has_image" class="form-control" id="edit-image">
-              <option value="1" <?php echo e($attribute->has_image ? 'selected' : ''); ?>>Yes</option>
-              <option value="0" <?php echo e(!$attribute->has_image ? 'selected' : ''); ?>>No</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="form-group">
-            <label for="edit-icon">Supports Icons</label>
-            <select name="has_icon" class="form-control" id="edit-icon">
-              <option value="1" <?php echo e($attribute->has_icon ? 'selected' : ''); ?>>Yes</option>
-              <option value="0" <?php echo e(!$attribute->has_icon ? 'selected' : ''); ?>>No</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="form-group">
-            <label for="edit-dependency">Has Dependency</label>
-            <select name="has_dependency" class="form-control" id="edit-dependency">
-              <option value="1" <?php echo e($attribute->has_dependency ? 'selected' : ''); ?>>Yes</option>
-              <option value="0" <?php echo e(!$attribute->has_dependency ? 'selected' : ''); ?>>No</option>
-            </select>
-          </div>
-        </div>
-
-
-        <div class="col-md-6 dependency-parent-wrapper"
-          style="<?php echo e(!$attribute->has_dependency ? 'display: none;' : ''); ?>">
-          <div class="form-group">
-            <label>Dependency Parents <span class="text-danger">*</span></label>
-            <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
-              <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parentAttr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <?php if($parentAttr->id != $attribute->id): ?> 
-          <div class="form-check">
-          <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
-          value="<?php echo e($parentAttr->id); ?>" id="edit-dep-<?php echo e($parentAttr->id); ?>" <?php echo e($attribute->parents->contains('id', $parentAttr->id) ? 'checked' : ''); ?>>
-          <label class="form-check-label" for="edit-dep-<?php echo e($parentAttr->id); ?>">
-          <?php echo e($parentAttr->name); ?>
-
-          </label>
-          </div>
-        <?php endif; ?>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="edit-composite">Is Composite</label>
+              <select name="is_composite" class="form-control" id="edit-composite">
+                <option value="1" <?php echo e($attribute->is_composite ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->is_composite ? 'selected' : ''); ?>>No</option>
+              </select>
             </div>
           </div>
+
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="edit-image">Supports Images</label>
+              <select name="has_image" class="form-control" id="edit-image">
+                <option value="1" <?php echo e($attribute->has_image ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_image ? 'selected' : ''); ?>>No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="edit-icon">Supports Icons</label>
+              <select name="has_icon" class="form-control" id="edit-icon">
+                <option value="1" <?php echo e($attribute->has_icon ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_icon ? 'selected' : ''); ?>>No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="edit-dependency">Has Dependency</label>
+              <select name="has_dependency" class="form-control" id="edit-dependency">
+                <option value="1" <?php echo e($attribute->has_dependency ? 'selected' : ''); ?>>Yes</option>
+                <option value="0" <?php echo e(!$attribute->has_dependency ? 'selected' : ''); ?>>No</option>
+              </select>
+            </div>
+          </div>
+
+
+          <div class="col-md-6 dependency-parent-wrapper"
+            style="<?php echo e(!$attribute->has_dependency ? 'display: none;' : ''); ?>">
+            <div class="form-group">
+              <label>Dependency Parents <span class="text-danger">*</span></label>
+              <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parentAttr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <?php if($parentAttr->id != $attribute->id): ?> 
+            <div class="form-check">
+            <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
+            value="<?php echo e($parentAttr->id); ?>" id="edit-dep-<?php echo e($parentAttr->id); ?>" <?php echo e($attribute->parents->contains('id', $parentAttr->id) ? 'checked' : ''); ?>>
+            <label class="form-check-label" for="edit-dep-<?php echo e($parentAttr->id); ?>">
+            <?php echo e($parentAttr->name); ?>
+
+            </label>
+            </div>
+          <?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </div>
+            </div>
+          </div>
+
+
         </div>
 
-
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary mr-1" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="update-attribute-btn"
-          data-id="<?php echo e($attribute->id); ?>">Update</button>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary mr-1" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="update-attribute-btn"
+            data-id="<?php echo e($attribute->id); ?>">Update</button>
+        </div>
     </form>
   </div>
 </div>
@@ -219,26 +219,33 @@
         $('#edit-icon').closest('.form-group').show();
       }
 
-      // Show/hide area unit field
+      // Area unit field toggle
       if (selectedType === 'select_area') {
         $('.area-unit-wrapper').show();
+
+        // Remove per_page and fixed_per_page from pricing_basis
+        const $pricing = $('select[name="pricing_basis"]');
+        $pricing.find('option[value="per_page"]').remove();
+        $pricing.find('option[value="fixed_per_page"]').remove();
       } else {
         $('.area-unit-wrapper').hide();
         $('#edit-area-unit').val('');
+
+        // Re-add removed options if they don't exist
+        const $pricing = $('select[name="pricing_basis"]');
+        const $placeholder = $pricing.find('option[value=""]');
+
+        // Re-add only if missing
+        if ($pricing.find('option[value="per_page"]').length === 0) {
+          $placeholder.after('<option value="per_page">Depends Upon No. of Pages</option>');
+        }
+        if ($pricing.find('option[value="fixed_per_page"]').length === 0) {
+          $placeholder.after('<option value="fixed_per_page">Fixed Price Per Page</option>');
+        }
+
       }
     }
 
-
-
-    function toggleEditSupportFields(selectedType) {
-      if (excludedTypes.includes(selectedType)) {
-        $('#edit-image').closest('.form-group').hide();
-        $('#edit-icon').closest('.form-group').hide();
-      } else {
-        $('#edit-image').closest('.form-group').show();
-        $('#edit-icon').closest('.form-group').show();
-      }
-    }
 
     // Dependency Parent Show/Hide
     function toggleDependencyParentField(value) {

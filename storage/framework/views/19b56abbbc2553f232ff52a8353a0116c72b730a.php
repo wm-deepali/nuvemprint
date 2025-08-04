@@ -196,17 +196,6 @@
   const allAttributes = <?php echo json_encode($attributes, 15, 512) ?>;
   const excludedTypes = ['select_image', 'select_icon', 'grouped_select', 'range', 'toggle', 'number'];
 
-  // Attach event to handle conditional hide/show
-  function toggleSupportFields($item, selectedType) {
-    if (excludedTypes.includes(selectedType)) {
-      $item.find('.form-check-input[name$="[has_image]"]').closest('.form-group').hide();
-      $item.find('.form-check-input[name$="[has_icon]"]').closest('.form-group').hide();
-    } else {
-      $item.find('.form-check-input[name$="[has_image]"]').closest('.form-group').show();
-      $item.find('.form-check-input[name$="[has_icon]"]').closest('.form-group').show();
-    }
-  }
-
   // Attach change event for all input_type selects
   $(document).on('change', 'select[name$="[input_type]"]', function () {
     const $item = $(this).closest('.attribute-item');
@@ -228,12 +217,30 @@
     // Handle Area Unit visibility
     if (selectedType === 'select_area') {
       $item.find('.area-unit-wrapper').removeClass('d-none');
+
+      // Remove per_page and fixed_per_page options from pricing_basis
+      const $pricingSelect = $item.find('select[name$="[pricing_basis]"]');
+      $pricingSelect.find('option[value="per_page"]').remove();
+      $pricingSelect.find('option[value="fixed_per_page"]').remove();
     } else {
       $item.find('.area-unit-wrapper').addClass('d-none');
       $item.find('.area-unit-select').val('');
+
+      // Re-add options if they are missing (in case user changes from select_area to something else)
+      const $pricingSelect = $item.find('select[name$="[pricing_basis]"]');
+      const $placeholder = $pricingSelect.find('option[value=""]');
+      console.log($placeholder);
+      
+
+      if ($pricingSelect.find('option[value="per_page"]').length === 0) {
+        $placeholder.after('<option value="per_page">Depends Upon No. of Pages</option>');
+      }
+
+      if ($pricingSelect.find('option[value="fixed_per_page"]').length === 0) {
+        $placeholder.after('<option value="fixed_per_page">Fixed Price Per Page</option>');
+      }
     }
   }
-
 
 
   // Handle Pricing Basis change
