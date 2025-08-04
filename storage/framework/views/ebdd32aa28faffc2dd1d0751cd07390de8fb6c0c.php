@@ -112,7 +112,7 @@
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-       
+
     </div>
 
     
@@ -142,4 +142,76 @@
 
         </div>
     </div>
-<?php endif; ?><?php /**PATH D:\web-mingo-project\new\resources\views/front/attribute-block.blade.php ENDPATH**/ ?>
+
+
+    
+
+<?php elseif($inputType === 'select_area'): ?>
+    <?php
+        $unitLabel = match ($attribute['area_unit']) {
+            'sq_feet' => 'sq ft',
+            'sq_meter' => 'm²',
+            default => 'sq in',
+        };
+    ?>
+<div class="attribute-wrapper" data-attribute-id="<?php echo e($attribute['id']); ?>" data-attribute-type="select_area" data-is-required="<?php echo e($attribute['is_required'] ? '1' : '0'); ?>">
+
+        <label class="form-label d-flex align-items-center" style="gap: 5px;">
+            <?php echo e($attribute['name']); ?>
+
+            <span class="help-circle" data-label="<?php echo e($attribute['name']); ?>" data-toggle="modal"
+                data-target="#helpModal">?</span>
+        </label>
+
+        <div class="row">
+            <div class="col-6">
+                <label for="length_<?php echo e($attribute['id']); ?>">Length (<?php echo e($unitLabel); ?>)</label>
+                <input type="number" step="any" min="0" name="attributes[<?php echo e($attribute['id']); ?>][length]"
+                    id="length_<?php echo e($attribute['id']); ?>" class="form-control area-input"
+                    data-area-unit="<?php echo e($attribute['area_unit']); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
+                    <?php if(!empty($attribute['max_height'])): ?> max="<?php echo e($attribute['max_height']); ?>" <?php endif; ?>
+                    placeholder="Enter length">
+                    <small class="text-danger length-warning" style="display: none;">Maximum length is <?php echo e($attribute['max_height'] ?? ''); ?></small>
+            </div>
+
+            <div class="col-6">
+                <label for="width_<?php echo e($attribute['id']); ?>">Width (<?php echo e($unitLabel); ?>)</label>
+                <input type="number" step="any" min="0" name="attributes[<?php echo e($attribute['id']); ?>][width]"
+                    id="width_<?php echo e($attribute['id']); ?>" class="form-control area-input"
+                    data-area-unit="<?php echo e($attribute['area_unit']); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
+                    <?php if(!empty($attribute['max_width'])): ?> max="<?php echo e($attribute['max_width']); ?>" <?php endif; ?>
+                    placeholder="Enter width">
+                    <small class="text-danger width-warning" style="display: none;">Maximum width is <?php echo e($attribute['max_width'] ?? ''); ?></small>
+            </div>
+        </div>
+
+        <div class="mt-2">
+            <label>Calculated Area</label>
+            <input type="text" id="area_<?php echo e($attribute['id']); ?>" class="form-control" readonly
+                placeholder="Area will appear here">
+            <small class="text-muted">Unit: <?php echo e($unitLabel); ?></small>
+        </div>
+    </div>
+<?php endif; ?>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.area-input').forEach(function (input) {
+            input.addEventListener('input', function () {
+                const max = parseFloat(input.getAttribute('max'));
+                const value = parseFloat(input.value);
+                const id = input.getAttribute('id');
+
+                const warningEl = input.closest('.col-6').querySelector('small');
+
+                if (!isNaN(max) && value > max) {
+                    warningEl.style.display = 'block';
+                } else {
+                    warningEl.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+<?php /**PATH D:\web-mingo-project\new\resources\views/front/attribute-block.blade.php ENDPATH**/ ?>

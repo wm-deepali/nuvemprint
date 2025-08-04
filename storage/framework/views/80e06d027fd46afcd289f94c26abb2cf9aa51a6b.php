@@ -207,54 +207,54 @@
     }
 </style>
 <style>
-  .custom-invoice-table {
-    width: 100%;
-    font-size: 14px;
-    border-collapse: collapse;
-    background: #fff;
-    color: #000;
-  }
+    .custom-invoice-table {
+        width: 100%;
+        font-size: 14px;
+        border-collapse: collapse;
+        background: #fff;
+        color: #000;
+    }
 
-  .custom-invoice-table thead {
-    background: #f0f0f0;
-    font-weight: 600;
-  }
+    .custom-invoice-table thead {
+        background: #f0f0f0;
+        font-weight: 600;
+    }
 
-  .custom-invoice-table th,
-  .custom-invoice-table td {
-    border: 1px solid #222;
-    padding: 10px;
-    vertical-align: middle;
-  }
+    .custom-invoice-table th,
+    .custom-invoice-table td {
+        border: 1px solid #222;
+        padding: 10px;
+        vertical-align: middle;
+    }
 
-  .custom-invoice-table small {
-    color: #555 !important;
-  }
+    .custom-invoice-table small {
+        color: #555 !important;
+    }
 
-  .custom-total-table {
-    width: 100%;
-    font-size: 14px;
-    color: #000;
-    background: #fff;
-  }
+    .custom-total-table {
+        width: 100%;
+        font-size: 14px;
+        color: #000;
+        background: #fff;
+    }
 
-  .custom-total-table th,
-  .custom-total-table td {
-    padding: 10px;
-    border: 1px solid #000;
-  }
+    .custom-total-table th,
+    .custom-total-table td {
+        padding: 10px;
+        border: 1px solid #000;
+    }
 
-  .custom-total-table .highlight-row {
-    border-top: 2px solid #6B3DF4;
-    border-bottom: 2px solid #6B3DF4;
-  }
+    .custom-total-table .highlight-row {
+        border-top: 2px solid #6B3DF4;
+        border-bottom: 2px solid #6B3DF4;
+    }
 
-  .custom-total-table .highlight-row th,
-  .custom-total-table .highlight-row td {
-    font-size: 16px;
-    color: #6B3DF4;
-    font-weight: 700;
-  }
+    .custom-total-table .highlight-row th,
+    .custom-total-table .highlight-row td {
+        font-size: 16px;
+        color: #6B3DF4;
+        font-weight: 700;
+    }
 </style>
 
 <?php $__env->startSection('content'); ?>
@@ -286,7 +286,7 @@
                 <div class="container">
                     <div class="row">
                         <!-- Sidebar -->
-                        <?php echo $__env->make('layouts.includes.user-sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                        <?php echo $__env->make('layouts.includes.user-sidebar', ['activeMenu' => 'orders'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
                         <!-- Invoice Section -->
                         <div class="col-lg-8">
@@ -374,8 +374,18 @@
                                                                 <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                     <div style="font-size: 13px; margin-left: 8px;">
                                                                         <strong><?php echo e($attr->attribute->name ?? ''); ?>:</strong>
-                                                                        <?php echo e($attr->attributeValue->value ?? '-'); ?>
+                                                                        <?php if($attr->attributeValue): ?>
+                                                                            <?php echo e($attr->attributeValue->value); ?>
 
+                                                                        <?php elseif($attr->length && $attr->width): ?>
+                                                                            <?php echo e($attr->length); ?> x <?php echo e($attr->width); ?> <?php echo e($attr->unit); ?>
+
+                                                                        <?php elseif($attr->length): ?>
+                                                                            <?php echo e($attr->length); ?> <?php echo e($attr->unit); ?>
+
+                                                                        <?php else: ?>
+                                                                            -
+                                                                        <?php endif; ?>
                                                                     </div>
                                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                             </div>
@@ -392,7 +402,8 @@
                                                     </td>
 
                                                     <td class="text-center"><?php echo e($item->quantity); ?></td>
-                                                    <td class="text-center"> <?php echo e($item->quantity > 0 ? number_format($item->sub_total / $item->quantity, 2) : '0.00'); ?>
+                                                    <td class="text-center">
+                                                        <?php echo e($item->quantity > 0 ? number_format($item->sub_total / $item->quantity, 2) : '0.00'); ?>
 
                                                     </td>
                                                     <td class="text-center"><?php echo e(number_format($item->sub_total, 2)); ?></td>
@@ -408,24 +419,28 @@
                                         <table class="table custom-total-table">
                                             <tr>
                                                 <th>Subtotal:</th>
-                                               <td class="text-right">£<?php echo e(number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2)); ?></td>
+                                                <td class="text-right">
+                                                    £<?php echo e(number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2)); ?>
+
+                                                </td>
                                             </tr>
                                             <tr>
-                                                 <th>Delivery Charge:</th>
-                                                 <td class="text-right">£<?php echo e(number_format($quote->delivery_price, 2)); ?></td>
+                                                <th>Delivery Charge:</th>
+                                                <td class="text-right">£<?php echo e(number_format($quote->delivery_price, 2)); ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Proof Reading:</th>
                                                 <td class="text-right">£<?php echo e(number_format($quote->proof_price, 2)); ?></td>
                                             </tr>
-                                             <tr>
-                                                <th>VAT (<?php echo e((int)$quote->vat_percentage); ?>%):</th>
+                                            <tr>
+                                                <th>VAT (<?php echo e((int) $quote->vat_percentage); ?>%):</th>
                                                 <td class="text-right">£<?php echo e(number_format($quote->vat_amount, 2)); ?></td>
                                             </tr>
                                             <tr class="highlight-row">
-            <th class="text-primary">Total:</th>
-            <td class="text-right text-primary font-weight-bold">£<?php echo e(number_format($quote->grand_total, 2)); ?></td>
-          </tr>
+                                                <th class="text-primary">Total:</th>
+                                                <td class="text-right text-primary font-weight-bold">
+                                                    £<?php echo e(number_format($quote->grand_total, 2)); ?></td>
+                                            </tr>
                                         </table>
                                     </div>
                                 </div>

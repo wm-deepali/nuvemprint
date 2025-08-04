@@ -145,10 +145,21 @@
           <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
           <div style="font-size: 14px; margin-left: 10px;">
           <strong><?php echo e($attr->attribute->name ?? 'Attribute'); ?>:</strong>
-          <?php echo e($attr->attributeValue->value ?? '-'); ?>
+          <?php if($attr->attributeValue): ?>
+          <?php echo e($attr->attributeValue->value); ?>
 
+        <?php elseif($attr->length && $attr->width): ?>
+          <?php echo e($attr->length); ?> x <?php echo e($attr->width); ?> <?php echo e($attr->unit); ?>
+
+        <?php elseif($attr->length): ?>
+          <?php echo e($attr->length); ?> <?php echo e($attr->unit); ?>
+
+        <?php else: ?>
+          -
+        <?php endif; ?>
           </div>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
           </div>
         <?php else: ?>
         <div class="text-muted" style="font-size: 13px; margin-left: 10px;">No attributes selected.</div>

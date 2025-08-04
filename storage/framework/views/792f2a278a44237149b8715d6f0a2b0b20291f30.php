@@ -239,7 +239,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                              	<?php echo $__env->make('layouts.includes.user-sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                                <?php echo $__env->make('layouts.includes.user-sidebar', ['activeMenu' => 'orders'], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                                 <div class="col-lg-8">
                                     <div class="card shadow-none mb-0">
                                         <div class="card-body">
@@ -256,7 +256,7 @@
                                                         <span class="badge bg-success">Paid</span>
                                                     <?php endif; ?>
                                                 </div>
-                                                
+
                                             </div>
 
                                             <!-- Customer & Company Info -->
@@ -265,11 +265,17 @@
                                                     <h6>Customer Info</h6>
                                                     <p><strong>Name:</strong> <?php echo e($quote->customer->first_name ?? 'N/A'); ?>
 
-                                                     <?php echo e($quote->customer->last_name ?? ''); ?></p>
+                                                        <?php echo e($quote->customer->last_name ?? ''); ?>
+
+                                                    </p>
                                                     <p><strong>Contact:</strong> <?php echo e($quote->customer->mobile ?? 'N/A'); ?></p>
                                                     <p><strong>Email:</strong> <?php echo e($quote->customer->email ?? 'N/A'); ?></p>
-                                                    <p><strong>Expected Delivery:</strong> <?php echo e(\Carbon\Carbon::parse($quote->delivery_date)->format('d F Y') ?? 'N/A'); ?></p>
-                                                    <p><strong>Delivery Address:</strong>  <?php echo e($quote->deliveryAddress->address ?? ''); ?></p>
+                                                    <p><strong>Expected Delivery:</strong>
+                                                        <?php echo e(\Carbon\Carbon::parse($quote->delivery_date)->format('d F Y') ?? 'N/A'); ?>
+
+                                                    </p>
+                                                    <p><strong>Delivery Address:</strong>
+                                                        <?php echo e($quote->deliveryAddress->address ?? ''); ?></p>
                                                 </div>
                                                 <div class="col-md-6 text-end">
                                                     <h6>Company Info</h6>
@@ -280,61 +286,73 @@
                                                 </div>
                                             </div>
 
-                                           <!-- Quote Items -->
-<h6 class="mb-2">Quote Items</h6>
-<ul class="list-group mb-3">
-    <?php $__empty_1 = true; $__currentLoopData = $quote->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-        <li class="list-group-item">
-            
-            <div style="font-weight: 600;">
-                <?php echo e($item->subcategory->name ?? 'N/A'); ?>
+                                            <!-- Quote Items -->
+                                            <h6 class="mb-2">Quote Items</h6>
+                                            <ul class="list-group mb-3">
+                                                <?php $__empty_1 = true; $__currentLoopData = $quote->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                    <li class="list-group-item">
+                                                        
+                                                        <div style="font-weight: 600;">
+                                                            <?php echo e($item->subcategory->name ?? 'N/A'); ?>
 
-                (<?php echo e(optional($item->subcategory->categories->first())->name ?? 'N/A'); ?>)
-            </div>
+                                                            (<?php echo e(optional($item->subcategory->categories->first())->name ?? 'N/A'); ?>)
+                                                        </div>
 
-            
-            <?php if($item->attributes && $item->attributes->count()): ?>
-                <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div style="font-size: 14px; margin-left: 10px;">
-                        <strong><?php echo e($attr->attribute->name ?? 'Attribute'); ?>:</strong>
-                        <?php echo e($attr->attributeValue->value ?? '-'); ?>
+                                                        
+                                                        <?php if($item->attributes && $item->attributes->count()): ?>
+                                                            <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <div style="font-size: 14px; margin-left: 10px;">
+                                                                    <strong><?php echo e($attr->attribute->name ?? 'Attribute'); ?>:</strong>
+                                                                    <?php if($attr->attributeValue): ?>
+                                                                        <?php echo e($attr->attributeValue->value); ?>
 
-                    </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            <?php else: ?>
-                <div class="text-muted" style="font-size: 13px; margin-left: 10px;">
-                    No attributes selected.
-                </div>
-            <?php endif; ?>
+                                                                    <?php elseif($attr->length && $attr->width): ?>
+                                                                        <?php echo e($attr->length); ?> x <?php echo e($attr->width); ?> <?php echo e($attr->unit); ?>
 
-            
-            <?php if(!is_null($item->pages)): ?>
-                <div style="font-size: 14px; margin-left: 10px;">
-                    <strong>Pages:</strong> <?php echo e($item->pages); ?>
+                                                                    <?php elseif($attr->length): ?>
+                                                                        <?php echo e($attr->length); ?> <?php echo e($attr->unit); ?>
 
-                </div>
-            <?php endif; ?>
+                                                                    <?php else: ?>
+                                                                        -
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                          
+                                                        <?php else: ?>
+                                                            <div class="text-muted" style="font-size: 13px; margin-left: 10px;">
+                                                                No attributes selected.
+                                                            </div>
+                                                        <?php endif; ?>
 
-            
-            <div class="mt-1" style="font-size: 14px;">
-                <strong>Quantity:</strong> <?php echo e($item->quantity); ?> |
-                <strong>Price:</strong> £<?php echo e(number_format($item->sub_total, 2)); ?>
+                                                        
+                                                        <?php if(!is_null($item->pages)): ?>
+                                                            <div style="font-size: 14px; margin-left: 10px;">
+                                                                <strong>Pages:</strong> <?php echo e($item->pages); ?>
 
-            </div>
-        </li>
-    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-        <li class="list-group-item text-center text-muted">No quote items found.</li>
-    <?php endif; ?>
+                                                            </div>
+                                                        <?php endif; ?>
 
-    
-    <?php if($quote->proof_type && $quote->proof_price): ?>
-        <li class="list-group-item">
-            <strong>Proof Type:</strong> <?php echo e(ucfirst($quote->proof_type)); ?> |
-            <strong>Price:</strong> £<?php echo e(number_format($quote->proof_price, 2)); ?>
+                                                        
+                                                        <div class="mt-1" style="font-size: 14px;">
+                                                            <strong>Quantity:</strong> <?php echo e($item->quantity); ?> |
+                                                            <strong>Price:</strong> £<?php echo e(number_format($item->sub_total, 2)); ?>
 
-        </li>
-    <?php endif; ?>
-</ul>
+                                                        </div>
+                                                    </li>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                    <li class="list-group-item text-center text-muted">No quote items found.
+                                                    </li>
+                                                <?php endif; ?>
+
+                                                
+                                                <?php if($quote->proof_type && $quote->proof_price): ?>
+                                                    <li class="list-group-item">
+                                                        <strong>Proof Type:</strong> <?php echo e(ucfirst($quote->proof_type)); ?> |
+                                                        <strong>Price:</strong> £<?php echo e(number_format($quote->proof_price, 2)); ?>
+
+                                                    </li>
+                                                <?php endif; ?>
+                                            </ul>
 
                                             <!-- Summary -->
                                             <div class="row justify-content-end mb-4">
@@ -342,19 +360,27 @@
                                                     <table class="table">
                                                         <tr>
                                                             <th>Subtotal:</th>
-                                                            <td class="text-end"> £<?php echo e(number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2)); ?></td>
+                                                            <td class="text-end">
+                                                                £<?php echo e(number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2)); ?>
+
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <th>Delivery Charge:</th>
-                                                            <td class="text-end">£<?php echo e(number_format($quote->delivery_price, 2)); ?></td>
+                                                            <td class="text-end">
+                                                                £<?php echo e(number_format($quote->delivery_price, 2)); ?></td>
                                                         </tr>
                                                         <tr>
                                                             <th>VAT (<?php echo e((int) $quote->vat_percentage); ?>%):</th>
-                                                            <td class="text-end">£<?php echo e(number_format($quote->vat_amount, 0)); ?></td>
+                                                            <td class="text-end">£<?php echo e(number_format($quote->vat_amount, 0)); ?>
+
+                                                            </td>
                                                         </tr>
                                                         <tr class="border-top">
                                                             <th>Grand Total:</th>
-                                                            <td class="text-end"><strong>£<?php echo e(number_format($quote->grand_total, 2)); ?></strong></td>
+                                                            <td class="text-end">
+                                                                <strong>£<?php echo e(number_format($quote->grand_total, 2)); ?></strong>
+                                                            </td>
                                                         </tr>
                                                     </table>
                                                 </div>

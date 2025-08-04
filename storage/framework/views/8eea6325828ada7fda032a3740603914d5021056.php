@@ -90,16 +90,28 @@
     
     <?php if($item->attributes && $item->attributes->count()): ?>
         <div style="margin-top: 5px;">
-            <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div style="font-size: 13px; margin-left: 8px;">
-                    <strong><?php echo e($attr->attribute->name ?? ''); ?>:</strong>
-                    <?php echo e($attr->attributeValue->value ?? '-'); ?>
+              <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+  <div style="font-size: 13px; margin-left: 8px;">
+    <strong><?php echo e($attr->attribute->name ?? ''); ?>:</strong>
+    <?php if($attr->attributeValue): ?>
+      <?php echo e($attr->attributeValue->value); ?>
 
-                </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php elseif($attr->length && $attr->width): ?>
+      <?php echo e($attr->length); ?> x <?php echo e($attr->width); ?> <?php echo e($attr->unit); ?>
+
+    <?php elseif($attr->length): ?>
+      <?php echo e($attr->length); ?> <?php echo e($attr->unit); ?>
+
+    <?php else: ?>
+      -
+    <?php endif; ?>
+  </div>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
         </div>
     <?php endif; ?>
 
+ 
     
     <?php if(!is_null($item->pages)): ?>
         <div style="margin-top: 5px; font-size: 13px; margin-left: 8px;">

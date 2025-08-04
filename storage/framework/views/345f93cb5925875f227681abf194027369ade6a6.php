@@ -619,8 +619,9 @@
     .attribute-wrapper.disabled label {
         color: #888 !important;
     }
-    .modal-content{
-        background:#ffffff;
+
+    .modal-content {
+        background: #ffffff;
     }
 </style>
 <style>
@@ -981,6 +982,56 @@
             if (attrId && valueId) selectedAttributes[attrId] = valueId;
         });
 
+        // Include select_area attributes (length and width)
+        $('.attribute-wrapper').each(function () {
+            const attrId = $(this).data('attribute-id');
+            const isRequired = $(this).data('is-required');
+
+            // Only for select_area input type
+            const $lengthInput = $(this).find(`input[name="attributes[${attrId}][length]"]`);
+            const $widthInput = $(this).find(`input[name="attributes[${attrId}][width]"]`);
+
+            if ($lengthInput.length > 0 && $widthInput.length > 0) {
+                const length = parseFloat($lengthInput.val());
+                const width = parseFloat($widthInput.val());
+
+                if (!isNaN(length) && !isNaN(width)) {
+                    selectedAttributes[attrId] = { length, width };
+                } else if (isRequired) {
+                    // If required and missing, optionally mark as invalid
+                    $lengthInput.addClass('is-invalid');
+                    $widthInput.addClass('is-invalid');
+                }
+            }
+        });
+
+
+
+        document.querySelectorAll('.attribute-wrapper').forEach(wrapper => {
+            const attrId = wrapper.getAttribute('data-attribute-id');
+            const inputType = wrapper.getAttribute('data-input-type'); // You may need to add this if missing
+            const isRequired = wrapper.getAttribute('data-is-required') === '1';
+
+            if (wrapper.querySelector('.area-input')) {
+                // It's a select_area type
+                const lengthInput = wrapper.querySelector(`[id^="length_"]`);
+                const widthInput = wrapper.querySelector(`[id^="width_"]`);
+                const area = parseFloat(lengthInput.value || 0) * parseFloat(widthInput.value || 0);
+
+                selectedAttributes[attrId] = {
+                    type: 'select_area',
+                    length: parseFloat(lengthInput.value || 0),
+                    width: parseFloat(widthInput.value || 0),
+                    area: parseFloat(area.toFixed(2))
+                };
+
+            } else {
+                // Handle other input types...
+            }
+        });
+
+        // console.log("selectedAttributes", selectedAttributes);
+
         let pages = 0;
         let compositePages = {}; // { value_id: { 'Cover': 32, 'Inner': 64 } }
 
@@ -1041,18 +1092,38 @@
                 if (res.success) {
                     const calculatedPrice = parseFloat(res.total_price) || 0;
 
-                    $('.estimate-card').each(function () {
-                        const card = $(this);
-                        const deliveryCharge = parseFloat(card.data('price')) || 0;
+                    const selectedProofOption = $('.selectable-proof-option.active');
+                    const proofPrice = parseFloat(selectedProofOption.data('price')) || 0;
 
-                        const selectedProofOption = $('.selectable-proof-option.active');
-                        const proofPrice = parseFloat(selectedProofOption.data('price')) || 0;
+                    const total = calculatedPrice + proofPrice;
+                    const formattedTotal = '£' + total.toFixed(2);
+                    const estimateCards = $('.estimate-card');
 
-                        const total = deliveryCharge + calculatedPrice + proofPrice;
-                        const formattedTotal = '£' + total.toFixed(2);
+                    if (estimateCards.length > 0) {
+                        estimateCards.each(function () {
+                            const card = $(this);
+                            const deliveryCharge = parseFloat(card.data('price')) || 0;
+                            const cardTotal = deliveryCharge + total;
+                            const formattedCardTotal = '£' + cardTotal.toFixed(2);
+                            card.find('.final-price').text(formattedCardTotal);
+                        });
+                    } else {
+                        // Fallback: no estimate card, update global/normal final-price
+                        $('.final-price').text(formattedTotal);
+                    }
 
-                        card.find('.final-price').text(formattedTotal);
-                    });
+                    // $('.estimate-card').each(function () {
+                    //     const card = $(this);
+                    //     const deliveryCharge = parseFloat(card.data('price')) || 0;
+
+                    //     const selectedProofOption = $('.selectable-proof-option.active');
+                    //     const proofPrice = parseFloat(selectedProofOption.data('price')) || 0;
+
+                    //     const total = deliveryCharge + calculatedPrice + proofPrice;
+                    //     const formattedTotal = '£' + total.toFixed(2);
+
+                    //     card.find('.final-price').text(formattedTotal);
+                    // });
                 }
             },
 
@@ -1197,6 +1268,33 @@
             renderCompositeFromCurrentSelection();
             calculateTotalPrice();
         });
+
+        function convertArea(length, width, unit) {
+            let area = length * width;
+            return area;
+        }
+
+        function updateAreaAndPrice(attributeId) {
+            const length = parseFloat(document.getElementById(`length_${attributeId}`).value) || 0;
+            const width = parseFloat(document.getElementById(`width_${attributeId}`).value) || 0;
+            const unit = document.getElementById(`length_${attributeId}`).dataset.areaUnit;
+
+            const area = convertArea(length, width, unit);
+            document.getElementById(`area_${attributeId}`).value = area.toFixed(2);
+
+            // Trigger price calculation
+            if (typeof calculateTotalPrice === "function") {
+                calculateTotalPrice();
+            }
+        }
+
+        document.querySelectorAll('.area-input').forEach(function (input) {
+            input.addEventListener('input', function () {
+                const attrId = this.dataset.attributeId;
+                updateAreaAndPrice(attrId);
+            });
+        });
+
 
         $(document).on('change', 'select.custom-select', function () {
             const $select = $(this);
@@ -1488,8 +1586,6 @@
 
                 // Only insert checkbox if not already there
                 if (!$affected.find('.change-option-checkbox').length) {
-                    console.log($label);
-
                     $label.hide(); // Hide original label
 
                     const checkboxHTML = `
@@ -1594,7 +1690,6 @@
         }
 
         const route = $(this).data('route');
-        console.log(route, 'route');
         // return
 
         const quantity = parseInt($('#quantityInput').val()) || 1;
@@ -1615,6 +1710,29 @@
             const valueId = selected.data('value-id');
             if (attrId && valueId) selectedAttributes[attrId] = valueId;
         });
+
+        // Add select_area attribute values
+        $('.attribute-wrapper[data-attribute-type="select_area"]').each(function () {
+            const $wrapper = $(this);
+            const attrId = $wrapper.data('attribute-id');
+
+            const length = parseFloat($wrapper.find('input[name^="attributes["][name$="[length]"]').val()) || 0;
+            const width = parseFloat($wrapper.find('input[name^="attributes["][name$="[width]"]').val()) || 0;
+            const area = parseFloat($wrapper.find('input[name^="attributes["][name$="[area]"]').val()) || (length * width);
+            const unit = $wrapper.find('input.area-input').first().data('area-unit') || ''; // Grab from first area input
+
+            if (length > 0 && width > 0) {
+                selectedAttributes[attrId] = {
+                    type: 'select_area',
+                    length: length,
+                    width: width,
+                    area: area,
+                    unit: unit    // 👈 Add this
+                };
+            }
+        });
+
+
 
         // Handle composite pages
         if ($('.composite-slider').length > 0) {
@@ -1666,14 +1784,17 @@
 
         const selectedCard = $('.estimate-card.active'); // or use `.selected`, however your logic marks it
 
+        var finalPriceText = 0;
+
         if (selectedCard.length === 0) {
-            const finalPriceText = $('.final-price').first().text();
+            finalPriceText = $('.final-price').text();
+        } else {
+            finalPriceText = selectedCard.find('.final-price').text(); // e.g., "£27.50"
         }
 
-        const finalPriceText = selectedCard.find('.final-price').text(); // e.g., "£27.50"
         const totalPrice = parseFloat(finalPriceText.replace('£', '')) || 0;
-
-
+        // console.log("selectedAttributes", selectedAttributes);
+        // return;
         // Send AJAX to backend
         $.ajax({
             url: route,
