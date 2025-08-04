@@ -11,6 +11,7 @@ class Attribute extends Model
         'detail',
         'input_type',
         'pricing_basis',
+        'area_unit',
         'has_setup_charge',
         // 'allow_quantity',
         'is_composite',

@@ -108,7 +108,7 @@
                 </div>
             @endforeach
         </div>
-       
+
     </div>
 
     {{-- ========== DROPDOWN SELECT ========== --}}
@@ -136,4 +136,74 @@
 
         </div>
     </div>
+
+
+    {{-- ========== SELECT AREA (LENGTH x width) ========== --}}
+
+@elseif ($inputType === 'select_area')
+    @php
+        $unitLabel = match ($attribute['area_unit']) {
+            'sq_feet' => 'sq ft',
+            'sq_meter' => 'm²',
+            default => 'sq in',
+        };
+    @endphp
+<div class="attribute-wrapper" data-attribute-id="{{ $attribute['id'] }}" data-attribute-type="select_area" data-is-required="{{ $attribute['is_required'] ? '1' : '0' }}">
+
+        <label class="form-label d-flex align-items-center" style="gap: 5px;">
+            {{ $attribute['name'] }}
+            <span class="help-circle" data-label="{{ $attribute['name'] }}" data-toggle="modal"
+                data-target="#helpModal">?</span>
+        </label>
+
+        <div class="row">
+            <div class="col-6">
+                <label for="length_{{ $attribute['id'] }}">Length ({{ $unitLabel }})</label>
+                <input type="number" step="any" min="0" name="attributes[{{ $attribute['id'] }}][length]"
+                    id="length_{{ $attribute['id'] }}" class="form-control area-input"
+                    data-area-unit="{{ $attribute['area_unit'] }}" data-attribute-id="{{ $attribute['id'] }}"
+                    @if(!empty($attribute['max_height'])) max="{{ $attribute['max_height'] }}" @endif
+                    placeholder="Enter length">
+                    <small class="text-danger length-warning" style="display: none;">Maximum length is {{ $attribute['max_height'] ?? '' }}</small>
+            </div>
+
+            <div class="col-6">
+                <label for="width_{{ $attribute['id'] }}">Width ({{ $unitLabel }})</label>
+                <input type="number" step="any" min="0" name="attributes[{{ $attribute['id'] }}][width]"
+                    id="width_{{ $attribute['id'] }}" class="form-control area-input"
+                    data-area-unit="{{ $attribute['area_unit'] }}" data-attribute-id="{{ $attribute['id'] }}"
+                    @if(!empty($attribute['max_width'])) max="{{ $attribute['max_width'] }}" @endif
+                    placeholder="Enter width">
+                    <small class="text-danger width-warning" style="display: none;">Maximum width is {{ $attribute['max_width'] ?? '' }}</small>
+            </div>
+        </div>
+
+        <div class="mt-2">
+            <label>Calculated Area</label>
+            <input type="text" id="area_{{ $attribute['id'] }}" class="form-control" readonly
+                placeholder="Area will appear here">
+            <small class="text-muted">Unit: {{ $unitLabel }}</small>
+        </div>
+    </div>
 @endif
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.area-input').forEach(function (input) {
+            input.addEventListener('input', function () {
+                const max = parseFloat(input.getAttribute('max'));
+                const value = parseFloat(input.value);
+                const id = input.getAttribute('id');
+
+                const warningEl = input.closest('.col-6').querySelector('small');
+
+                if (!isNaN(max) && value > max) {
+                    warningEl.style.display = 'block';
+                } else {
+                    warningEl.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>

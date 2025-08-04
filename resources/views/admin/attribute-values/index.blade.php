@@ -73,9 +73,7 @@
             </td>
             <td>{!! $value->icon_class ? "<i class='{$value->icon_class}'></i>" : '-' !!}</td>
             <td>{{ $value->custom_input_label ?? '-' }}</td>
-            <td>
-          
-            </td>
+           
             <td>{{ $value->created_at->format('d M Y') }}</td>
             <td>
             <ul class="list-inline mb-0">

@@ -25,15 +25,16 @@
                   <select name="attributes[0][input_type]" class="form-control">
                     <option value="dropdown">Dropdown</option>
                     <option value="radio">Radio</option>
-                    <option value="checkbox">Checkbox</option>
-                    <option value="text">Text</option>
-                    <option value="number">Number</option>
-                    <option value="range">Range</option>
                     <option value="select_image">Select Image</option>
-                    <option value="select_icon">Select Icon</option>
-                    <option value="toggle">Toggle</option>
-                    <option value="textarea">Textarea</option>
-                    <option value="grouped_select">Grouped Select</option>
+                    <option value="select_area">Select Area</option>
+                    <!-- <option value="checkbox">Checkbox</option> -->
+                    <!-- <option value="text">Text</option> -->
+                    <!-- <option value="number">Number</option> -->
+                    <!-- <option value="range">Range</option> -->
+                    <!-- <option value="select_icon">Select Icon</option> -->
+                    <!-- <option value="toggle">Toggle</option> -->
+                    <!-- <option value="textarea">Textarea</option> -->
+                    <!-- <option value="grouped_select">Grouped Select</option> -->
                   </select>
                   <small class="text-danger validation-err" id="attributes_0_input_type-err"></small>
                 </div>
@@ -50,6 +51,18 @@
                     <option value="per_extra_copy">Per Extra Copy (Multiply by Product Qnty)</option>
                   </select>
                   <small class="text-danger validation-err" id="attributes_0_pricing_basis-err"></small>
+                </div>
+              </div>
+
+              <div class="col-md-6 area-unit-wrapper d-none">
+                <div class="form-group">
+                  <label>Area Unit for Pricing</label>
+                  <select class="form-control area-unit-select" name="attributes[0][area_unit]">
+                    <option value="">-- Select Unit --</option>
+                    <option value="sq_inch">Square Inch</option>
+                    <option value="sq_feet">Square Feet</option>
+                    <option value="sq_meter">Square Meter</option>
+                  </select>
                 </div>
               </div>
 
@@ -200,6 +213,28 @@
     toggleSupportFields($item, selectedType);
   });
 
+
+  function toggleSupportFields($item, selectedType) {
+    // Handle image/icon visibility
+    if (excludedTypes.includes(selectedType)) {
+      $item.find('.form-check-input[name$="[has_image]"]').closest('.form-group').hide();
+      $item.find('.form-check-input[name$="[has_icon]"]').closest('.form-group').hide();
+    } else {
+      $item.find('.form-check-input[name$="[has_image]"]').closest('.form-group').show();
+      $item.find('.form-check-input[name$="[has_icon]"]').closest('.form-group').show();
+    }
+
+    // Handle Area Unit visibility
+    if (selectedType === 'select_area') {
+      $item.find('.area-unit-wrapper').removeClass('d-none');
+    } else {
+      $item.find('.area-unit-wrapper').addClass('d-none');
+      $item.find('.area-unit-select').val('');
+    }
+  }
+
+
+
   // Handle Pricing Basis change
   // $(document).on('change', 'select[name$="[pricing_basis]"]', function () {
   //   const $item = $(this).closest('.attribute-item');
@@ -274,15 +309,9 @@
         <select name="attributes[${attributeIndex}][input_type]" class="form-control">
           <option value="dropdown">Dropdown</option>
           <option value="radio">Radio</option>
-          <option value="checkbox">Checkbox</option>
-          <option value="text">Text</option>
-          <option value="number">Number</option>
-          <option value="range">Range</option>
           <option value="select_image">Select Image</option>
-          <option value="select_icon">Select Icon</option>
-          <option value="toggle">Toggle</option>
-          <option value="textarea">Textarea</option>
-          <option value="grouped_select">Grouped Select</option>
+            <option value="select_area">Select Area</option>
+         
         </select>
         <small class="text-danger" id="attributes.${attributeIndex}.input_type-err"></small>
       </div>
@@ -300,6 +329,19 @@
         <small class="text-danger" id="attributes.${attributeIndex}.pricing_basis-err"></small>
       </div>
     </div>
+
+    <div class="col-md-6 area-unit-wrapper d-none">
+  <div class="form-group">
+    <label>Area Unit for Pricing</label>
+    <select class="form-control area-unit-select" name="attributes[${attributeIndex}][area_unit]">
+      <option value="">-- Select Unit --</option>
+      <option value="sq_inch">Square Inch</option>
+      <option value="sq_feet">Square Feet</option>
+      <option value="sq_meter">Square Meter</option>
+    </select>
+  </div>
+</div>
+
     <div class="col-md-6">
       <div class="form-group">
         <label>Custom Input Type</label>

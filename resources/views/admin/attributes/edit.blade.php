@@ -23,22 +23,24 @@
               <select name="input_type" class="form-control">
                 <option value="dropdown" {{ $attribute->input_type == 'dropdown' ? 'selected' : '' }}>Dropdown</option>
                 <option value="radio" {{ $attribute->input_type == 'radio' ? 'selected' : '' }}>Radio</option>
-                <option value="checkbox" {{ $attribute->input_type == 'checkbox' ? 'selected' : '' }}>Checkbox</option>
-                <option value="text" {{ $attribute->input_type == 'text' ? 'selected' : '' }}>Text</option>
-                <option value="number" {{ $attribute->input_type == 'number' ? 'selected' : '' }}>Number</option>
-                <option value="range" {{ $attribute->input_type == 'range' ? 'selected' : '' }}>Range</option>
                 <option value="select_image" {{ $attribute->input_type == 'select_image' ? 'selected' : '' }}>Select Image
                 </option>
-                <option value="select_icon" {{ $attribute->input_type == 'select_icon' ? 'selected' : '' }}>Select Icon
+                <option value="select_area" {{ $attribute->input_type == 'select_area' ? 'selected' : '' }}>Select Area
                 </option>
-                <option value="toggle" {{ $attribute->input_type == 'toggle' ? 'selected' : '' }}>Toggle</option>
-                <option value="textarea" {{ $attribute->input_type == 'textarea' ? 'selected' : '' }}>Textarea</option>
-                <option value="grouped_select" {{ $attribute->input_type == 'grouped_select' ? 'selected' : '' }}>Grouped
-                  Select</option>
+                <!-- <option value="checkbox" {{ $attribute->input_type == 'checkbox' ? 'selected' : '' }}>Checkbox</option> -->
+                <!-- <option value="text" {{ $attribute->input_type == 'text' ? 'selected' : '' }}>Text</option> -->
+                <!-- <option value="number" {{ $attribute->input_type == 'number' ? 'selected' : '' }}>Number</option> -->
+                <!-- <option value="range" {{ $attribute->input_type == 'range' ? 'selected' : '' }}>Range</option> -->
+                <!-- <option value="select_icon" {{ $attribute->input_type == 'select_icon' ? 'selected' : '' }}>Select Icon</option> -->
+                <!-- <option value="toggle" {{ $attribute->input_type == 'toggle' ? 'selected' : '' }}>Toggle</option> -->
+                <!-- <option value="textarea" {{ $attribute->input_type == 'textarea' ? 'selected' : '' }}>Textarea</option> -->
+                <!-- <option value="grouped_select" {{ $attribute->input_type == 'grouped_select' ? 'selected' : '' }}>Grouped -->
+                Select</option>
               </select>
 
             </div>
           </div>
+
 
           <div class="col-md-6">
             <div class="form-group">
@@ -70,25 +72,39 @@
             </div>
           </div>
 
-          <div class="col-md-12">
+          <div class="col-md-6 area-unit-wrapper"
+            style="{{ $attribute->input_type == 'select_area' ? '' : 'display: none;' }}">
             <div class="form-group">
-              <label>Detail</label>
-              <textarea name="detail" class="form-control" rows="3">{{ $attribute->detail ?? '' }}</textarea>
-            </div>
-          </div>
-
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="edit-setup">Setup Charges</label>
-              <select name="has_setup_charge" id="edit-setup" class="form-control">
-                <option value="">-- Select --</option>
-                <option value="1" {{ $attribute->has_setup_charge ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_setup_charge ? 'selected' : '' }}>No</option>
+              <label>Area Unit for Pricing</label>
+              <select class="form-control" name="area_unit" id="edit-area-unit">
+                <option value="">-- Select Unit --</option>
+                <option value="sq_inch" {{ $attribute->area_unit == 'sq_inch' ? 'selected' : '' }}>Square Inch</option>
+                <option value="sq_feet" {{ $attribute->area_unit == 'sq_feet' ? 'selected' : '' }}>Square Feet</option>
+                <option value="sq_meter" {{ $attribute->area_unit == 'sq_meter' ? 'selected' : '' }}>Square Meter</option>
               </select>
             </div>
           </div>
 
-          <!-- <div class="col-md-3">
+
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Detail</label>
+            <textarea name="detail" class="form-control" rows="3">{{ $attribute->detail ?? '' }}</textarea>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="edit-setup">Setup Charges</label>
+            <select name="has_setup_charge" id="edit-setup" class="form-control">
+              <option value="">-- Select --</option>
+              <option value="1" {{ $attribute->has_setup_charge ? 'selected' : '' }}>Yes</option>
+              <option value="0" {{ !$attribute->has_setup_charge ? 'selected' : '' }}>No</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- <div class="col-md-3">
             <div class="form-group">
               <label for="edit-quantity">Allow Quantity</label>
               <select name="allow_quantity" class="form-control" id="edit-quantity">
@@ -100,75 +116,75 @@
             </div>
           </div> -->
 
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="edit-composite">Is Composite</label>
-              <select name="is_composite" class="form-control" id="edit-composite">
-                <option value="1" {{ $attribute->is_composite ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->is_composite ? 'selected' : '' }}>No</option>
-              </select>
-            </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="edit-composite">Is Composite</label>
+            <select name="is_composite" class="form-control" id="edit-composite">
+              <option value="1" {{ $attribute->is_composite ? 'selected' : '' }}>Yes</option>
+              <option value="0" {{ !$attribute->is_composite ? 'selected' : '' }}>No</option>
+            </select>
           </div>
+        </div>
 
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="edit-image">Supports Images</label>
-              <select name="has_image" class="form-control" id="edit-image">
-                <option value="1" {{ $attribute->has_image ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_image ? 'selected' : '' }}>No</option>
-              </select>
-            </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="edit-image">Supports Images</label>
+            <select name="has_image" class="form-control" id="edit-image">
+              <option value="1" {{ $attribute->has_image ? 'selected' : '' }}>Yes</option>
+              <option value="0" {{ !$attribute->has_image ? 'selected' : '' }}>No</option>
+            </select>
           </div>
+        </div>
 
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="edit-icon">Supports Icons</label>
-              <select name="has_icon" class="form-control" id="edit-icon">
-                <option value="1" {{ $attribute->has_icon ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_icon ? 'selected' : '' }}>No</option>
-              </select>
-            </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="edit-icon">Supports Icons</label>
+            <select name="has_icon" class="form-control" id="edit-icon">
+              <option value="1" {{ $attribute->has_icon ? 'selected' : '' }}>Yes</option>
+              <option value="0" {{ !$attribute->has_icon ? 'selected' : '' }}>No</option>
+            </select>
           </div>
+        </div>
 
-          <div class="col-md-3">
-            <div class="form-group">
-              <label for="edit-dependency">Has Dependency</label>
-              <select name="has_dependency" class="form-control" id="edit-dependency">
-                <option value="1" {{ $attribute->has_dependency ? 'selected' : '' }}>Yes</option>
-                <option value="0" {{ !$attribute->has_dependency ? 'selected' : '' }}>No</option>
-              </select>
-            </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="edit-dependency">Has Dependency</label>
+            <select name="has_dependency" class="form-control" id="edit-dependency">
+              <option value="1" {{ $attribute->has_dependency ? 'selected' : '' }}>Yes</option>
+              <option value="0" {{ !$attribute->has_dependency ? 'selected' : '' }}>No</option>
+            </select>
           </div>
+        </div>
 
 
-          <div class="col-md-6 dependency-parent-wrapper"
-            style="{{ !$attribute->has_dependency ? 'display: none;' : '' }}">
-            <div class="form-group">
-              <label>Dependency Parents <span class="text-danger">*</span></label>
-              <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
-                @foreach ($attributes as $parentAttr)
-              @if ($parentAttr->id != $attribute->id) {{-- prevent self-reference --}}
-            <div class="form-check">
-            <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
-            value="{{ $parentAttr->id }}" id="edit-dep-{{ $parentAttr->id }}" {{ $attribute->parents->contains('id', $parentAttr->id) ? 'checked' : '' }}>
-            <label class="form-check-label" for="edit-dep-{{ $parentAttr->id }}">
-            {{ $parentAttr->name }}
-            </label>
-            </div>
-          @endif
+        <div class="col-md-6 dependency-parent-wrapper"
+          style="{{ !$attribute->has_dependency ? 'display: none;' : '' }}">
+          <div class="form-group">
+            <label>Dependency Parents <span class="text-danger">*</span></label>
+            <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+              @foreach ($attributes as $parentAttr)
+            @if ($parentAttr->id != $attribute->id) {{-- prevent self-reference --}}
+          <div class="form-check">
+          <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
+          value="{{ $parentAttr->id }}" id="edit-dep-{{ $parentAttr->id }}" {{ $attribute->parents->contains('id', $parentAttr->id) ? 'checked' : '' }}>
+          <label class="form-check-label" for="edit-dep-{{ $parentAttr->id }}">
+          {{ $parentAttr->name }}
+          </label>
+          </div>
+        @endif
         @endforeach
-              </div>
             </div>
           </div>
-
-
         </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary mr-1" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="update-attribute-btn"
-            data-id="{{ $attribute->id }}">Update</button>
-        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary mr-1" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="update-attribute-btn"
+          data-id="{{ $attribute->id }}">Update</button>
+      </div>
     </form>
   </div>
 </div>
@@ -188,6 +204,28 @@
     //   }
     // }
 
+    $('select[name="input_type"]').on('change', function () {
+      toggleEditSupportFields($(this).val());
+    });
+
+
+    function toggleEditSupportFields(selectedType) {
+      if (excludedTypes.includes(selectedType)) {
+        $('#edit-image').closest('.form-group').hide();
+        $('#edit-icon').closest('.form-group').hide();
+      } else {
+        $('#edit-image').closest('.form-group').show();
+        $('#edit-icon').closest('.form-group').show();
+      }
+
+      // Show/hide area unit field
+      if (selectedType === 'select_area') {
+        $('.area-unit-wrapper').show();
+      } else {
+        $('.area-unit-wrapper').hide();
+        $('#edit-area-unit').val('');
+      }
+    }
 
 
 

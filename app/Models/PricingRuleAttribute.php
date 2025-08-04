@@ -20,6 +20,8 @@ class PricingRuleAttribute extends Model
         'extra_copy_charge_type',
         'flat_rate_per_page',
         'is_default',
+        'max_width',
+        'max_height'
     ];
 
     public function rule()

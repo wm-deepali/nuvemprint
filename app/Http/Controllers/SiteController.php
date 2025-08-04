@@ -136,20 +136,37 @@ class SiteController extends Controller
 
             $subcategoryAttrMap = $subcategoryAttributes->keyBy('attribute_id');
 
-            $mapAttributeData = function ($attribute, $is_required) use ($attributeValues) {
+            $mapAttributeData = function ($attribute, $is_required) use ($attributeValues, $pricingRule) {
                 $values = $attributeValues[$attribute->id] ?? collect();
+                $maxHeight = null;
+                $maxWidth = null;
+
+                if ($attribute->input_type === 'select_area') {
+                    $pra = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)
+                        ->where('attribute_id', $attribute->id)
+                        ->first();
+
+                    if ($pra) {
+                        $maxHeight = $pra->max_height;
+                        $maxWidth = $pra->max_width;
+                    }
+                    // dd($pra->toArray(),$maxWidth, $maxHeight);
+                }
 
                 return [
                     'id' => $attribute->id,
                     'name' => $attribute->name,
+                    'area_unit' => $attribute->area_unit ?? null,
                     'input_type' => $attribute->input_type,
                     'has_image' => $attribute->has_image,
                     'is_composite' => $attribute->is_composite,
                     'is_required' => (bool) $is_required,
-                    'values' => $values->map(function ($sav) use ($attribute) {
+                    'max_height' => $maxHeight,
+                    'max_width' => $maxWidth,
+                    'values' => $values->map(function ($sav) use ($attribute, $pricingRule) {
                         $valueId = $sav->value->id;
 
-                        $isDefault = PricingRuleAttribute::where(function ($q) use ($attribute, $valueId) {
+                        $isDefault = PricingRuleAttribute::where('pricing_rule_id', $pricingRule->id)->where(function ($q) use ($attribute, $valueId) {
                             $q->where('attribute_id', $attribute->id)
                                 ->where('value_id', $valueId);
                         })
@@ -278,25 +295,37 @@ class SiteController extends Controller
 
         // Step 2: Expand composite values into individual components
         $expandedAttributes = [];
-        foreach ($selectedAttributes as $attributeId => $valueId) {
-            $value = AttributeValue::with('components')->find($valueId);
-            if ($value && $value->is_composite_value) {
-                foreach ($value->components as $component) {
-                    $expandedAttributes[$attributeId][] = $component->id;
-                }
+        foreach ($selectedAttributes as $attributeId => $valueData) {
+            if (is_array($valueData) && isset($valueData['length'], $valueData['width'])) {
+                // This is a select_area field
+                $expandedAttributes[$attributeId] = $valueData;
             } else {
-                $expandedAttributes[$attributeId][] = $valueId;
+                $value = AttributeValue::with('components')->find($valueData);
+                if ($value && $value->is_composite_value) {
+                    foreach ($value->components as $component) {
+                        $expandedAttributes[$attributeId][] = $component->id;
+                    }
+                } else {
+                    $expandedAttributes[$attributeId][] = $valueData;
+                }
             }
         }
 
         $total = 0;
 
         // Step 3: Process each expanded value for pricing
-        foreach ($expandedAttributes as $attributeId => $valueIds) {
-            foreach ($valueIds as $valueId) {
+        foreach ($expandedAttributes as $attributeId => $valueData) {
+            $attribute = Attribute::find($attributeId);
+
+            // Handle select_area
+            if (is_array($valueData) && ($valueData['type'] ?? null) === 'select_area' && $attribute && $attribute->input_type === 'select_area') {
+                $area = isset($valueData['area']) ? floatval($valueData['area']) : (
+                    (isset($valueData['length'], $valueData['width'])) ? floatval($valueData['length']) * floatval($valueData['width']) : 0
+                );
+
+                // dd($area);
                 $attrs = PricingRuleAttribute::with(['quantityRanges', 'attribute', 'dependencies'])
                     ->where('attribute_id', $attributeId)
-                    ->where('value_id', $valueId)
                     ->get();
 
                 $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
@@ -312,8 +341,7 @@ class SiteController extends Controller
 
                 foreach ($validAttrs as $attr) {
                     $basis = $attr->attribute->pricing_basis ?? null;
-                    $pages = $componentPages[$attr->dependency_value_id] ?? $defaultPages;
-                    $rangeInput = ($basis === 'per_page') ? $pages * $quantity : $quantity;
+                    $rangeInput = $quantity;
 
                     $range = $attr->quantityRanges->first(function ($r) use ($rangeInput) {
                         return $rangeInput >= $r->quantity_from && $rangeInput <= $r->quantity_to;
@@ -327,26 +355,83 @@ class SiteController extends Controller
 
                     if ($range) {
                         $price = $range->price;
-                        match ($basis) {
-                            'per_page' => $total += $price * $pages * $quantity,
-                            'per_product' => $total += $price * $quantity,
-                            default => null,
-                        };
-                    }
+                        $total += $price * $area * $quantity;
 
-                    // Apply any additional pricing logic
+                    }
+                    // dd($price);
+
                     if ($basis === 'per_extra_copy') {
-                        $total += ($attr->extra_copy_charge ?? 0) * $quantity;
+                        $total += ($attr->extra_copy_charge ?? 0) * $area * $quantity;
                     }
 
-                    if ($basis === 'fixed_per_page') {
-                        $total += ($attr->flat_rate_per_page ?? 0) * $pages * $quantity;
+                    if ($basis === 'fixed_per_page' || $basis === 'per_extra_copy') {
+                        $total += ($attr->flat_rate_per_page ?? 0) * $area * $quantity;
                     }
 
                     if ($attr->attribute->has_setup_charge ?? false) {
                         $total += $attr->price_modifier_value ?? 0;
                     }
                 }
+            }
+
+            // Else: regular attribute processing
+            elseif (is_array($valueData)) {
+                foreach ($valueData as $valueId) {
+                    $attrs = PricingRuleAttribute::with(['quantityRanges', 'attribute', 'dependencies'])
+                        ->where('attribute_id', $attributeId)
+                        ->where('value_id', $valueId)
+                        ->get();
+
+                    $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
+                        foreach ($item->dependencies as $dep) {
+                            $selected = $selectedAttributes[$dep->parent_attribute_id] ?? null;
+                            $matches = $expandedAttributes[$dep->parent_attribute_id] ?? ($selected ? [$selected] : []);
+                            if (!in_array($dep->parent_value_id, $matches)) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+
+                    foreach ($validAttrs as $attr) {
+                        $basis = $attr->attribute->pricing_basis ?? null;
+                        $pages = $componentPages[$attr->dependency_value_id] ?? $defaultPages;
+                        $rangeInput = ($basis === 'per_page') ? $pages * $quantity : $quantity;
+
+                        $range = $attr->quantityRanges->first(function ($r) use ($rangeInput) {
+                            return $rangeInput >= $r->quantity_from && $rangeInput <= $r->quantity_to;
+                        });
+
+                        if (!$range && $attr->quantityRanges->isNotEmpty()) {
+                            $range = $attr->quantityRanges->sortBy(function ($r) use ($rangeInput) {
+                                return min(abs($rangeInput - $r->quantity_from), abs($rangeInput - $r->quantity_to));
+                            })->first();
+                        }
+
+                        if ($range) {
+                            $price = $range->price;
+                            match ($basis) {
+                                'per_page' => $total += $price * $pages * $quantity,
+                                'per_product' => $total += $price * $quantity,
+                                default => null,
+                            };
+                        }
+
+                        // Apply any additional pricing logic
+                        if ($basis === 'per_extra_copy') {
+                            $total += ($attr->extra_copy_charge ?? 0) * $quantity;
+                        }
+
+                        if ($basis === 'fixed_per_page') {
+                            $total += ($attr->flat_rate_per_page ?? 0) * $pages * $quantity;
+                        }
+
+                        if ($attr->attribute->has_setup_charge ?? false) {
+                            $total += $attr->price_modifier_value ?? 0;
+                        }
+                    }
+                }
+                // original code for valueId processing (same as your existing loop)
             }
         }
 

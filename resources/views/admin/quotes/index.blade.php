@@ -140,9 +140,18 @@
           @foreach($item->attributes as $attr)
           <div style="font-size: 14px; margin-left: 10px;">
           <strong>{{ $attr->attribute->name ?? 'Attribute' }}:</strong>
-          {{ $attr->attributeValue->value ?? '-' }}
+          @if($attr->attributeValue)
+          {{ $attr->attributeValue->value }}
+        @elseif($attr->length && $attr->width)
+          {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
+        @elseif($attr->length)
+          {{ $attr->length }} {{ $attr->unit }}
+        @else
+          -
+        @endif
           </div>
         @endforeach
+
           </div>
         @else
         <div class="text-muted" style="font-size: 13px; margin-left: 10px;">No attributes selected.</div>

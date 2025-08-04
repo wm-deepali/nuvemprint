@@ -32,25 +32,50 @@ class SubcategoryAttributeController extends Controller
             'html' => $view,
         ]);
     }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'subcategory_id' => 'required|exists:subcategories,id',
             'attribute_id' => 'required|array|min:1',
             'attribute_id.*' => 'required|exists:attributes,id|distinct',
-            'attribute_value_ids' => 'required|array',
-            'attribute_value_ids.*' => 'required|array',
+            'attribute_value_ids' => 'nullable|array',
+            'attribute_value_ids.*' => 'nullable|array',
             'attribute_value_ids.*.*' => 'exists:attribute_values,id',
             'is_required' => 'nullable|array',
             'is_required.*' => 'boolean',
-            'sort_order' => 'nullable|array',
-            'sort_order.*' => 'nullable|integer|min:0',
+            'sort_order' => 'required|array',
+            'sort_order.*' => 'required|integer|min:0',
         ], [
             'attribute_id.*.distinct' => 'You cannot assign the same attribute more than once.',
         ]);
 
         if ($validator->fails()) {
             return $this->validationError($validator);
+        }
+
+        // ✅ Now manually validate values for attributes (only if NOT select_area)
+        $errors = [];
+
+        foreach ($request->attribute_id as $index => $attrId) {
+            $attribute = Attribute::find($attrId);
+            // dd($attribute && $attribute->input_type !== 'select_area');
+            // If input_type is NOT 'select_area', then value must be provided
+            if ($attribute && $attribute->input_type !== 'select_area') {
+                $valueIds = $request->attribute_value_ids[$attrId] ?? null;
+
+                if (empty($valueIds) || !is_array($valueIds)) {
+                    $errors["attribute_value_ids.$index"] = ["Attribute values are required for '{$attribute->name}'."];
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => $errors,
+                'code' => 422
+            ], 422);
         }
 
         $skipped = [];
@@ -61,7 +86,6 @@ class SubcategoryAttributeController extends Controller
                 ->exists();
 
             if ($alreadyMapped) {
-                // Fetch attribute name for warning message
                 $attributeName = Attribute::find($attrId)?->name ?? "Attribute ID: $attrId";
                 $skipped[] = $attributeName;
                 continue;
@@ -75,6 +99,7 @@ class SubcategoryAttributeController extends Controller
             ]);
 
             $valueIds = $request->attribute_value_ids[$attrId] ?? [];
+
             foreach ($valueIds as $valueId) {
                 $already = SubcategoryAttributeValue::where([
                     'subcategory_id' => $request->subcategory_id,
@@ -91,7 +116,6 @@ class SubcategoryAttributeController extends Controller
                     ]);
                 }
             }
-
         }
 
         $message = 'Attributes mapped successfully.';
@@ -104,6 +128,7 @@ class SubcategoryAttributeController extends Controller
             'message' => $message,
         ]);
     }
+
 
 
     public function edit($id)
@@ -131,16 +156,38 @@ class SubcategoryAttributeController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Fetch attribute type
         $subcategoryAttribute = SubcategoryAttribute::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
+        $attribute = Attribute::find($request->attribute_id);
+        if (!$attribute) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => [
+                    'attribute_id' => ['Selected attribute does not exist.']
+                ]
+            ]);
+        }
+        // dd($attribute);
+        // Don't require values for these input types
+        $requiresValues = !in_array($attribute->input_type, ['select_area']);
+
+        // Base validation rules
+        $rules = [
             'subcategory_id' => 'required|exists:subcategories,id',
             'attribute_id' => 'required|exists:attributes,id',
-            'attribute_value_ids' => 'required|array',
-            'attribute_value_ids.*' => 'exists:attribute_values,id',
             'is_required' => 'sometimes|boolean',
             'sort_order' => 'required|integer|min:0',
-        ]);
+        ];
+
+        if ($requiresValues) {
+            $rules['attribute_value_ids'] = 'required|array';
+            $rules['attribute_value_ids.*'] = 'exists:attribute_values,id';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
 
         if ($validator->fails()) {
             return $this->validationError($validator);
@@ -184,14 +231,15 @@ class SubcategoryAttributeController extends Controller
             'subcategory_id' => $subcategoryAttribute->subcategory_id,
             'attribute_id' => $subcategoryAttribute->attribute_id
         ])->delete();
-
-        foreach ($request->attribute_value_ids as $valueId) {
-            SubcategoryAttributeValue::create([
-                'subcategory_id' => $subcategoryAttribute->subcategory_id,
-                'attribute_id' => $subcategoryAttribute->attribute_id,
-                'attribute_value_id' => $valueId,
-                'is_default' => false,
-            ]);
+        if (isset($request->attribute_value_ids)) {
+            foreach ($request->attribute_value_ids as $valueId) {
+                SubcategoryAttributeValue::create([
+                    'subcategory_id' => $subcategoryAttribute->subcategory_id,
+                    'attribute_id' => $subcategoryAttribute->attribute_id,
+                    'attribute_value_id' => $valueId,
+                    'is_default' => false,
+                ]);
+            }
         }
 
         return $this->respondSuccess($request, 'Subcategory Attribute updated successfully.');

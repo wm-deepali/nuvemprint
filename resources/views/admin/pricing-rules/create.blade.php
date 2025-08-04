@@ -199,7 +199,7 @@
       document.getElementById('pages_dragger_required-wrapper').style.display = 'block';
 
       // Optionally reset previous selection
-     document.getElementById('pages_dragger_required').value = '0';
+      document.getElementById('pages_dragger_required').value = '0';
       document.getElementById('pages-settings-group').style.display = 'none';
       });
 
@@ -232,13 +232,26 @@
       </select>
       </div>
 
-      <div class="form-group col-md-2">
-      <label>Value</label>
-      <select class="form-control" name="rows[${index}][value_id]">
+
+    <!-- Value Select -->
+    <div class="form-group col-md-2 value-select-group">
+    <label>Value</label>
+    <select class="form-control" name="rows[${index}][value_id]">
       <option value="">-- Select --</option>
-      ${subcategoryAttributes[0]?.values.map(val => `<option value="${val.id}">${val.value}</option>`).join('') || ''}
-      </select>
-      </div>
+       ${subcategoryAttributes[0]?.values.map(val => `<option value="${val.id}">${val.value}</option>`).join('') || ''}
+    </select>
+    </div>
+
+    <!-- Max Width & Height (for select_area only) -->
+    <div class="form-group col-md-1 max-dimensions-group" style="display: none;">
+    <label>Max Width</label>
+    <input type="number" class="form-control" name="rows[${index}][max_width]">
+    </div>
+
+    <div class="form-group col-md-1 max-dimensions-group" style="display: none;">
+    <label>Max Height</label>
+    <input type="number" class="form-control" name="rows[${index}][max_height]">
+    </div>
 
 
     <div class="dependency-group" style="display: none;"></div>
@@ -341,6 +354,18 @@
       const attrId = e.target.value;
       const selectedAttr = subcategoryAttributes.find(attr => attr.id == attrId);
       const row = e.target.closest('.attribute-row');
+
+      const inputType = selectedAttr?.input_type;
+      const valueSelectGroup = row.querySelector('.value-select-group');
+      const dimensionInputs = row.querySelectorAll('.max-dimensions-group');
+
+      if (inputType === 'select_area') {
+      if (valueSelectGroup) valueSelectGroup.style.display = 'none';
+      dimensionInputs.forEach(el => el.style.display = 'block');
+      } else {
+      if (valueSelectGroup) valueSelectGroup.style.display = 'block';
+      dimensionInputs.forEach(el => el.style.display = 'none');
+      }
 
       // Update value options
       const valueSelect = row.querySelector('select[name*="[value_id]"]');

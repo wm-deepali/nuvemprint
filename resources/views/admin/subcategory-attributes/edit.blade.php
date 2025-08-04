@@ -23,7 +23,7 @@
           <label>Attribute <span class="text-danger">*</span></label>
           <select name="attribute_id" class="form-control">
             @foreach($attributes as $attribute)
-        <option value="{{ $attribute->id }}" {{ $subcategoryAttribute->attribute_id == $attribute->id ? 'selected' : '' }}>
+        <option value="{{ $attribute->id }}" data-input-type="{{ $attribute->input_type }}" {{ $subcategoryAttribute->attribute_id == $attribute->id ? 'selected' : '' }}>
           {{ $attribute->name }}
         </option>
       @endforeach
@@ -114,6 +114,7 @@
     }
 
     // Initial load on modal open
+    toggleAttributeValuesSection();
     loadAttributeValues(currentAttributeId, currentSubcategoryId);
 
     // On attribute change
@@ -124,6 +125,7 @@
       if (newAttrId === currentAttributeId) return;
 
       currentAttributeId = newAttrId;
+      toggleAttributeValuesSection(); // 👈 Add this line
       loadAttributeValues(newAttrId, subcategoryId);
     });
 
@@ -133,5 +135,21 @@
       const $container = $(this).closest('#attribute-values-checkboxes');
       $container.find('input[type="checkbox"]').not(this).prop('checked', isChecked);
     });
+
+    function toggleAttributeValuesSection() {
+      console.log('her');
+      
+      const selectedOption = $('select[name="attribute_id"]').find('option:selected');
+      const inputType = selectedOption.data('input-type');
+      const $valuesGroup = $('#attribute-values-checkboxes').closest('.form-group');
+
+      if (inputType === 'select_area') {
+        $valuesGroup.hide();
+      } else {
+        $valuesGroup.show();
+      }
+    }
+
+
   });
 </script>

@@ -15,6 +15,7 @@ use App\Models\SubcategoryAttributeValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\PricingRuleAttributeDependency;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class PricingRuleController extends Controller
@@ -74,7 +75,15 @@ class PricingRuleController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-        $request->validate([
+        $rows = $request->input('rows', []);
+        $attributeInputTypes = [];
+
+        foreach ($rows as $i => $row) {
+            $attribute = \App\Models\Attribute::find($row['attribute_id'] ?? null);
+            $attributeInputTypes[$i] = $attribute ? $attribute->input_type : null;
+        }
+
+        $rules = [
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
             'pages_dragger_required' => 'nullable',
@@ -95,22 +104,39 @@ class PricingRuleController extends Controller
             ],
 
             'rows' => 'array',
-            'rows.*.attribute_id' => 'required|exists:attributes,id',
-            'rows.*.value_id' => 'required|exists:attribute_values,id',
-            'rows.*.dependency_value_ids' => 'nullable|array',
-            'rows.*.dependency_value_ids.*' => 'nullable|exists:attribute_values,id',
-            'rows.*.modifier_type' => 'nullable|in:add,multiply',
-            'rows.*.modifier_value' => 'nullable|numeric',
-            'rows.*.base_charges_type' => 'nullable|in:amount,percentage',
-            'rows.*.flat_rate_per_page' => 'nullable|numeric|min:0',
-            'rows.*.extra_copy_charge' => 'nullable|numeric|min:0',
-            'rows.*.extra_copy_charge_type' => 'nullable|in:amount,percentage',
-            'rows.*.is_default' => 'nullable|boolean',
-            'rows.*.per_page_pricing' => 'nullable|array',
-            'rows.*.per_page_pricing.*.quantity_from' => 'required_with:rows.*.per_page_pricing|integer|min:1',
-            'rows.*.per_page_pricing.*.quantity_to' => 'required_with:rows.*.per_page_pricing|integer|min:1|gte:rows.*.per_page_pricing.*.quantity_from',
-            'rows.*.per_page_pricing.*.price' => 'required_with:rows.*.per_page_pricing|numeric|min:0',
-        ]);
+        ];
+
+        foreach ($rows as $i => $row) {
+            $rules["rows.$i.attribute_id"] = 'required|exists:attributes,id';
+
+            if ($attributeInputTypes[$i] === 'select_area') {
+                $rules["rows.$i.max_width"] = 'nullable|numeric|min:0.1';
+                $rules["rows.$i.max_height"] = 'nullable|numeric|min:0.1';
+            } else {
+                $rules["rows.$i.value_id"] = 'required|exists:attribute_values,id';
+            }
+
+            $rules["rows.$i.dependency_value_ids"] = 'nullable|array';
+            $rules["rows.$i.dependency_value_ids.*"] = 'nullable|exists:attribute_values,id';
+            $rules["rows.$i.modifier_type"] = 'nullable|in:add,multiply';
+            $rules["rows.$i.modifier_value"] = 'nullable|numeric';
+            $rules["rows.$i.base_charges_type"] = 'nullable|in:amount,percentage';
+            $rules["rows.$i.flat_rate_per_page"] = 'nullable|numeric|min:0';
+            $rules["rows.$i.extra_copy_charge"] = 'nullable|numeric|min:0';
+            $rules["rows.$i.extra_copy_charge_type"] = 'nullable|in:amount,percentage';
+            $rules["rows.$i.is_default"] = 'nullable|boolean';
+
+            if (!empty($row['per_page_pricing'])) {
+                foreach ($row['per_page_pricing'] as $j => $pricing) {
+                    $rules["rows.$i.per_page_pricing.$j.quantity_from"] = 'required|integer|min:1';
+                    $rules["rows.$i.per_page_pricing.$j.quantity_to"] = "required|integer|min:1|gte:rows.$i.per_page_pricing.$j.quantity_from";
+                    $rules["rows.$i.per_page_pricing.$j.price"] = 'required|numeric|min:0';
+                }
+            }
+        }
+
+        $request->validate($rules);
+
 
 
         DB::beginTransaction();
@@ -135,7 +161,7 @@ class PricingRuleController extends Controller
                 $attribute = PricingRuleAttribute::create([
                     'pricing_rule_id' => $pricingRule->id,
                     'attribute_id' => $row['attribute_id'],
-                    'value_id' => $row['value_id'],
+                    'value_id' => $row['value_id'] ?? null,
                     // 'dependency_value_id' => $row['dependency_value_id'] ?? null,
                     'price_modifier_type' => $row['modifier_type'] ?? 'add',
                     'price_modifier_value' => $row['modifier_value'] ?? 0,
@@ -144,6 +170,9 @@ class PricingRuleController extends Controller
                     'extra_copy_charge' => $row['extra_copy_charge'] ?? null,
                     'extra_copy_charge_type' => $row['extra_copy_charge_type'] ?? null,
                     'flat_rate_per_page' => $row['flat_rate_per_page'] ?? null,
+
+                    'max_width' => $row['max_width'] ?? null,
+                    'max_height' => $row['max_height'] ?? null,
                 ]);
 
                 // Save quantity ranges if provided
@@ -214,6 +243,7 @@ class PricingRuleController extends Controller
             return [
                 'id' => $sa->attribute->id,
                 'name' => $sa->attribute->name,
+                'input_type' => $sa->attribute->input_type,
                 'values' => $values,
                 'pricing_basis' => $sa->attribute->pricing_basis,
                 'has_setup_charge' => $sa->attribute->has_setup_charge,
@@ -233,7 +263,9 @@ class PricingRuleController extends Controller
     public function update(Request $request, PricingRule $pricingRule)
     {
         // dd($request->all());
-        $request->validate([
+        $rows = $request->input('rows', []);
+
+        $rules = [
             'category_id' => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
             'pages_dragger_required' => 'nullable|boolean',
@@ -251,26 +283,51 @@ class PricingRuleController extends Controller
                 'min:1',
                 Rule::requiredIf($request->pages_dragger_required == '1'),
             ],
-
             'rows' => 'nullable|array',
-            'rows.*.id' => 'nullable|exists:pricing_rule_attributes,id',
-            'rows.*.attribute_id' => 'required|exists:attributes,id',
-            'rows.*.value_id' => 'required|exists:attribute_values,id',
-            'rows.*.dependency_value_ids' => 'nullable|array',
-            'rows.*.dependency_value_ids.*' => 'nullable|exists:attribute_values,id',
-            'rows.*.modifier_type' => 'nullable|in:add,multiply',
-            'rows.*.modifier_value' => 'nullable|numeric',
-            'rows.*.base_charges_type' => 'nullable|in:amount,percentage',
-            'rows.*.flat_rate_per_page' => 'nullable|numeric|min:0',
-            'rows.*.extra_copy_charge' => 'nullable|numeric|min:0',
-            'rows.*.extra_copy_charge_type' => 'nullable|in:amount,percentage',
-            'rows.*.is_default' => 'nullable|in:1',
-            'rows.*.per_page_pricing' => 'nullable|array',
-            'rows.*.per_page_pricing.*.id' => 'nullable|integer|exists:pricing_rule_attribute_quantities,id',
-            'rows.*.per_page_pricing.*.quantity_from' => 'nullable|integer|min:1',
-            'rows.*.per_page_pricing.*.quantity_to' => 'nullable|integer|min:1',
-            'rows.*.per_page_pricing.*.price' => 'nullable|numeric|min:0',
-        ]);
+        ];
+
+        foreach ($rows as $i => $row) {
+            $attributeId = $row['attribute_id'] ?? null;
+            $attribute = \App\Models\Attribute::find($attributeId);
+            $inputType = $attribute?->input_type;
+
+            $rules["rows.$i.id"] = 'nullable|exists:pricing_rule_attributes,id';
+            $rules["rows.$i.attribute_id"] = 'required|exists:attributes,id';
+
+            // Conditionally require value_id
+            if ($inputType !== 'select_area') {
+                $rules["rows.$i.value_id"] = 'required|exists:attribute_values,id';
+            } else {
+                $rules["rows.$i.value_id"] = 'nullable';
+                $rules["rows.$i.max_width"] = 'nullable|numeric|min:0.1';
+                $rules["rows.$i.max_height"] = 'nullable|numeric|min:0.1';
+            }
+
+            $rules["rows.$i.dependency_value_ids"] = 'nullable|array';
+            $rules["rows.$i.dependency_value_ids.*"] = 'nullable|exists:attribute_values,id';
+
+            $rules["rows.$i.modifier_type"] = 'nullable|in:add,multiply';
+            $rules["rows.$i.modifier_value"] = 'nullable|numeric';
+
+            $rules["rows.$i.base_charges_type"] = 'nullable|in:amount,percentage';
+            $rules["rows.$i.flat_rate_per_page"] = 'nullable|numeric|min:0';
+            $rules["rows.$i.extra_copy_charge"] = 'nullable|numeric|min:0';
+            $rules["rows.$i.extra_copy_charge_type"] = 'nullable|in:amount,percentage';
+            $rules["rows.$i.is_default"] = 'nullable|in:1';
+
+            // Loop per_page_pricing for this row
+            if (!empty($row['per_page_pricing']) && is_array($row['per_page_pricing'])) {
+                foreach ($row['per_page_pricing'] as $j => $pricing) {
+                    $rules["rows.$i.per_page_pricing.$j.quantity_from"] = 'required|integer|min:1';
+                    $rules["rows.$i.per_page_pricing.$j.quantity_to"] = 'required|integer|min:1|gte:rows.' . $i . '.per_page_pricing.' . $j . '.quantity_from';
+                    $rules["rows.$i.per_page_pricing.$j.price"] = 'required|numeric|min:0';
+                    $rules["rows.$i.per_page_pricing.$j.id"] = 'nullable|exists:pricing_rule_attribute_quantities,id';
+                }
+            }
+        }
+
+        Validator::make($request->all(), $rules)->validate();
+
         // dd((int) $request->delivery_charges_required);
         DB::beginTransaction();
 
@@ -294,7 +351,7 @@ class PricingRuleController extends Controller
             foreach ($request->input('rows', []) as $row) {
                 $data = [
                     'attribute_id' => $row['attribute_id'],
-                    'value_id' => $row['value_id'],
+                    'value_id' => $row['value_id'] ?? null,
                     // 'dependency_value_id' => $row['dependency_value_id'] ?? null,
                     'price_modifier_type' => $row['modifier_type'] ?? 'add',
                     'price_modifier_value' => $row['modifier_value'] ?? 0,
@@ -303,6 +360,9 @@ class PricingRuleController extends Controller
                     'extra_copy_charge' => $row['extra_copy_charge'] ?? null,
                     'extra_copy_charge_type' => $row['extra_copy_charge_type'] ?? null,
                     'flat_rate_per_page' => $row['flat_rate_per_page'] ?? null,
+                    
+                    'max_width' => $row['max_width'] ?? null,
+                    'max_height' => $row['max_height'] ?? null,
                 ];
 
                 if (!empty($row['id'])) {
@@ -416,8 +476,6 @@ class PricingRuleController extends Controller
             ], 500);
         }
     }
-
-
 
     public function destroy(PricingRule $pricingRule)
     {

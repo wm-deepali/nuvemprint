@@ -34,7 +34,7 @@ class AttributeController extends Controller
         $validator = Validator::make($request->all(), [
             'attributes' => 'required|array',
             'attributes.*.name' => 'required|string|max:255|distinct|unique:attributes,name',
-            'attributes.*.input_type' => 'required|in:dropdown,radio,checkbox,text,number,range,select_image,select_icon,toggle,textarea,grouped_select',
+            'attributes.*.input_type' => 'required|in:dropdown,radio,select_image,select_area',
             'attributes.*.custom_input_type' => 'nullable|in:number,text,file,none',
             'attributes.*.has_image' => 'nullable|boolean',
             'attributes.*.has_icon' => 'nullable|boolean',
@@ -46,7 +46,7 @@ class AttributeController extends Controller
             'attributes.*.detail' => 'nullable|string|max:1000',
             'attributes.*.dependency_parent' => 'nullable|array',
             'attributes.*.dependency_parent.*' => 'exists:attributes,id',
-
+            'attributes.*.area_unit' => 'nullable|in:sq_inch,sq_feet,sq_meter',
         ]);
 
         // If validation fails, return errors
@@ -66,6 +66,7 @@ class AttributeController extends Controller
                 'name' => $attr['name'],
                 'input_type' => $attr['input_type'],
                 'custom_input_type' => $attr['custom_input_type'] ?? null,
+                'area_unit' => $attr['area_unit'] ?? null,
                 'pricing_basis' => $attr['pricing_basis'] ?? null,
                 'detail' => $attr['detail'] ?? null,
                 'has_image' => filter_var($attr['has_image'] ?? false, FILTER_VALIDATE_BOOLEAN),
@@ -110,11 +111,12 @@ class AttributeController extends Controller
         $attribute = Attribute::findOrFail($id);
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:attributes,name,' . $attribute->id,
-            'input_type' => 'required|in:dropdown,radio,checkbox,text,number,range,select_image,select_icon,toggle,textarea,grouped_select',
+            'input_type' => 'required|in:dropdown,radio,select_area,select_image',
             'has_image' => 'sometimes|boolean',
             'has_icon' => 'sometimes|boolean',
             'has_dependency' => 'sometimes|boolean',
             'pricing_basis' => 'nullable|string|in:per_page,per_product,per_extra_copy,fixed_per_page',
+            'area_unit' => 'nullable|in:sq_inch,sq_feet,sq_meter',
             'detail' => 'nullable|string|max:1000',
             'is_composite' => 'sometimes|boolean',
             'custom_input_type' => 'nullable|in:number,text,file,none',
@@ -141,6 +143,7 @@ class AttributeController extends Controller
             'has_image' => $request->boolean('has_image'),
             'has_icon' => $request->boolean('has_icon'),
             'has_dependency' => $request->boolean('has_dependency'),
+            'area_unit' => $request->area_unit,
             'pricing_basis' => $request->pricing_basis,
             'detail' => $request->detail,
             'is_composite' => $request->boolean('is_composite'),

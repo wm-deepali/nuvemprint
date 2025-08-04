@@ -169,6 +169,7 @@
       processData: false,
       contentType: false,
       success: handleResponseStore,
+      error: handleError,
       });
     }
 
@@ -188,8 +189,51 @@
       });
     }
 
+    function handleError(xhr) {
+      $('#save-subcategory-attribute-btn').attr('disabled', false);
+
+      if (xhr.status === 422) {
+      const errors = xhr.responseJSON.errors || {};
+
+      for (const key in errors) {
+        const messages = errors[key];
+
+        const baseKey = key.split('.')[0];
+        const index = parseInt(key.split('.')[1]);
+
+        if (baseKey === 'subcategory_id') {
+        $('#subcategory_id-err').html(messages[0]);
+        }
+
+        else if (baseKey === 'attribute_value_ids') {
+        if (!isNaN(index)) {
+          $('.attribute-item').eq(index).find('.attribute-values-error').html(messages[0]);
+        } else {
+          $('.attribute-values-error').first().html(messages[0]);
+        }
+        }
+
+        else if (baseKey === 'sort_order' && !isNaN(index)) {
+        $('.attribute-item').eq(index).find('.sort-order-error').html(messages[0]);
+        }
+
+        else if (baseKey === 'attribute_id' && !isNaN(index)) {
+        $('.attribute-item').eq(index).find('.validation-err').first().html(messages[0]);
+        }
+
+        else {
+        console.warn('Unhandled validation field:', key, messages);
+        }
+      }
+      } else {
+      Swal.fire('Oops!', xhr.responseJSON?.message || 'Something went wrong.', 'error');
+      }
+    }
+
     // handle response
     function handleResponseStore(result) {
+      console.log('here', result);
+
       $('#save-subcategory-attribute-btn').attr('disabled', false);
       if (result.success) {
       Swal.fire('Success!', result.message || 'Saved successfully.', 'success');

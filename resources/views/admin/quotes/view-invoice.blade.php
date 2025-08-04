@@ -86,15 +86,25 @@
     {{-- Attributes --}}
     @if ($item->attributes && $item->attributes->count())
         <div style="margin-top: 5px;">
-            @foreach ($item->attributes as $attr)
-                <div style="font-size: 13px; margin-left: 8px;">
-                    <strong>{{ $attr->attribute->name ?? '' }}:</strong>
-                    {{ $attr->attributeValue->value ?? '-' }}
-                </div>
-            @endforeach
+              @foreach ($item->attributes as $attr)
+  <div style="font-size: 13px; margin-left: 8px;">
+    <strong>{{ $attr->attribute->name ?? '' }}:</strong>
+    @if ($attr->attributeValue)
+      {{ $attr->attributeValue->value }}
+    @elseif ($attr->length && $attr->width)
+      {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
+    @elseif ($attr->length)
+      {{ $attr->length }} {{ $attr->unit }}
+    @else
+      -
+    @endif
+  </div>
+@endforeach
+
         </div>
     @endif
 
+ 
     {{-- Number of Pages --}}
     @if (!is_null($item->pages))
         <div style="margin-top: 5px; font-size: 13px; margin-left: 8px;">

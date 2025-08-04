@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-xl" role="document">
+<div class="modal-dialog modal-lg" role="document">
   <div class="modal-content">
     <form id="subcategory-attribute-form">
       <div class="modal-header">
@@ -21,17 +21,17 @@
         <div id="attribute-items-wrapper">
           <div class="attribute-item border rounded p-1 mb-1 bg-light">
             <div class="form-row">
-              <div class="form-group col-md-5">
+              <div class="form-group col-md-6">
                 <label><strong>Attribute <span class="text-danger">*</span></strong></label>
                 <select name="attribute_id[]" class="form-control attribute-select">
                   <option value="">-- Select Attribute --</option>
                   @foreach($attributes as $attribute)
-            <option value="{{ $attribute->id }}">{{ $attribute->name }}</option>
+            <option value="{{ $attribute->id }}" data-input-type="{{ $attribute->input_type }}">{{ $attribute->name }}</option>
           @endforeach
                 </select>
               </div>
 
-              <div class="form-group col-md-5">
+              <div class="form-group col-md-6">
                 <label><strong>Is Required?</strong></label>
                 <select name="is_required[]" class="form-control">
                   <option value="1">Yes</option>
@@ -39,7 +39,7 @@
                 </select>
               </div>
 
-              <div class="form-group col-md-7">
+              <div class="form-group col-md-8">
                 <label><strong>Attribute Values <span class="text-danger">*</span></strong></label>
                 <div class="scrollable-checkbox-box attribute-values-container">
                   <!-- checkboxes will be appended dynamically -->
@@ -47,10 +47,11 @@
                 <span class="text-danger validation-err attribute-values-error"></span> <!-- Add this -->
               </div>
 
-              <div class="form-group col-md-3">
+              <div class="form-group col-md-4">
                 <label><strong>Sort Order</strong></label>
                 <input type="number" name="sort_order[]" class="form-control" placeholder="e.g. 1">
               </div>
+               <span class="text-danger validation-err" id="sort_order-error"></span>
             </div>
 
             <div class="text-right">
@@ -82,3 +83,23 @@
     background-color: #fff;
   }
 </style>
+
+
+<script>
+  $(document).on('change', '.attribute-select', function () {
+    const selectedOption = $(this).find('option:selected');
+    const inputType = selectedOption.data('input-type');
+
+    const container = $(this).closest('.attribute-item');
+    const attributeValuesSection = container.find('.attribute-values-container').closest('.form-group');
+
+    if (inputType === 'select_area') {
+      attributeValuesSection.hide(); // Hide if 'select_area'
+    } else {
+      attributeValuesSection.show(); // Show otherwise
+    }
+  });
+
+  // Optional: Trigger change on page load if needed (e.g. when editing)
+  $('.attribute-select').trigger('change');
+</script>

@@ -239,7 +239,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                              	@include('layouts.includes.user-sidebar', ['activeMenu' => 'orders'])
+                                @include('layouts.includes.user-sidebar', ['activeMenu' => 'orders'])
                                 <div class="col-lg-8">
                                     <div class="card shadow-none mb-0">
                                         <div class="card-body">
@@ -256,7 +256,7 @@
                                                         <span class="badge bg-success">Paid</span>
                                                     @endif
                                                 </div>
-                                                
+
                                             </div>
 
                                             <!-- Customer & Company Info -->
@@ -264,11 +264,15 @@
                                                 <div class="col-md-6">
                                                     <h6>Customer Info</h6>
                                                     <p><strong>Name:</strong> {{ $quote->customer->first_name ?? 'N/A' }}
-                                                     {{ $quote->customer->last_name ?? '' }}</p>
+                                                        {{ $quote->customer->last_name ?? '' }}
+                                                    </p>
                                                     <p><strong>Contact:</strong> {{ $quote->customer->mobile ?? 'N/A' }}</p>
                                                     <p><strong>Email:</strong> {{ $quote->customer->email ?? 'N/A' }}</p>
-                                                    <p><strong>Expected Delivery:</strong> {{ \Carbon\Carbon::parse($quote->delivery_date)->format('d F Y') ?? 'N/A' }}</p>
-                                                    <p><strong>Delivery Address:</strong>  {{ $quote->deliveryAddress->address ?? '' }}</p>
+                                                    <p><strong>Expected Delivery:</strong>
+                                                        {{ \Carbon\Carbon::parse($quote->delivery_date)->format('d F Y') ?? 'N/A' }}
+                                                    </p>
+                                                    <p><strong>Delivery Address:</strong>
+                                                        {{ $quote->deliveryAddress->address ?? '' }}</p>
                                                 </div>
                                                 <div class="col-md-6 text-end">
                                                     <h6>Company Info</h6>
@@ -279,56 +283,66 @@
                                                 </div>
                                             </div>
 
-                                           <!-- Quote Items -->
-<h6 class="mb-2">Quote Items</h6>
-<ul class="list-group mb-3">
-    @forelse($quote->items as $item)
-        <li class="list-group-item">
-            {{-- Subcategory and Category --}}
-            <div style="font-weight: 600;">
-                {{ $item->subcategory->name ?? 'N/A' }}
-                ({{ optional($item->subcategory->categories->first())->name ?? 'N/A' }})
-            </div>
+                                            <!-- Quote Items -->
+                                            <h6 class="mb-2">Quote Items</h6>
+                                            <ul class="list-group mb-3">
+                                                @forelse($quote->items as $item)
+                                                    <li class="list-group-item">
+                                                        {{-- Subcategory and Category --}}
+                                                        <div style="font-weight: 600;">
+                                                            {{ $item->subcategory->name ?? 'N/A' }}
+                                                            ({{ optional($item->subcategory->categories->first())->name ?? 'N/A' }})
+                                                        </div>
 
-            {{-- Attributes --}}
-            @if($item->attributes && $item->attributes->count())
-                @foreach($item->attributes as $attr)
-                    <div style="font-size: 14px; margin-left: 10px;">
-                        <strong>{{ $attr->attribute->name ?? 'Attribute' }}:</strong>
-                        {{ $attr->attributeValue->value ?? '-' }}
-                    </div>
-                @endforeach
-            @else
-                <div class="text-muted" style="font-size: 13px; margin-left: 10px;">
-                    No attributes selected.
-                </div>
-            @endif
+                                                        {{-- Attributes --}}
+                                                        @if($item->attributes && $item->attributes->count())
+                                                            @foreach($item->attributes as $attr)
+                                                                <div style="font-size: 14px; margin-left: 10px;">
+                                                                    <strong>{{ $attr->attribute->name ?? 'Attribute' }}:</strong>
+                                                                    @if($attr->attributeValue)
+                                                                        {{ $attr->attributeValue->value }}
+                                                                    @elseif($attr->length && $attr->width)
+                                                                        {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
+                                                                    @elseif($attr->length)
+                                                                        {{ $attr->length }} {{ $attr->unit }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
+                                                                </div>
+                                                            @endforeach
+                                                          
+                                                        @else
+                                                            <div class="text-muted" style="font-size: 13px; margin-left: 10px;">
+                                                                No attributes selected.
+                                                            </div>
+                                                        @endif
 
-            {{-- Pages --}}
-            @if (!is_null($item->pages))
-                <div style="font-size: 14px; margin-left: 10px;">
-                    <strong>Pages:</strong> {{ $item->pages }}
-                </div>
-            @endif
+                                                        {{-- Pages --}}
+                                                        @if (!is_null($item->pages))
+                                                            <div style="font-size: 14px; margin-left: 10px;">
+                                                                <strong>Pages:</strong> {{ $item->pages }}
+                                                            </div>
+                                                        @endif
 
-            {{-- Quantity & Price --}}
-            <div class="mt-1" style="font-size: 14px;">
-                <strong>Quantity:</strong> {{ $item->quantity }} |
-                <strong>Price:</strong> £{{ number_format($item->sub_total, 2) }}
-            </div>
-        </li>
-    @empty
-        <li class="list-group-item text-center text-muted">No quote items found.</li>
-    @endforelse
+                                                        {{-- Quantity & Price --}}
+                                                        <div class="mt-1" style="font-size: 14px;">
+                                                            <strong>Quantity:</strong> {{ $item->quantity }} |
+                                                            <strong>Price:</strong> £{{ number_format($item->sub_total, 2) }}
+                                                        </div>
+                                                    </li>
+                                                @empty
+                                                    <li class="list-group-item text-center text-muted">No quote items found.
+                                                    </li>
+                                                @endforelse
 
-    {{-- Proofreading row --}}
-    @if($quote->proof_type && $quote->proof_price)
-        <li class="list-group-item">
-            <strong>Proof Type:</strong> {{ ucfirst($quote->proof_type) }} |
-            <strong>Price:</strong> £{{ number_format($quote->proof_price, 2) }}
-        </li>
-    @endif
-</ul>
+                                                {{-- Proofreading row --}}
+                                                @if($quote->proof_type && $quote->proof_price)
+                                                    <li class="list-group-item">
+                                                        <strong>Proof Type:</strong> {{ ucfirst($quote->proof_type) }} |
+                                                        <strong>Price:</strong> £{{ number_format($quote->proof_price, 2) }}
+                                                    </li>
+                                                @endif
+                                            </ul>
 
                                             <!-- Summary -->
                                             <div class="row justify-content-end mb-4">
@@ -336,19 +350,25 @@
                                                     <table class="table">
                                                         <tr>
                                                             <th>Subtotal:</th>
-                                                            <td class="text-end"> £{{ number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2) }}</td>
+                                                            <td class="text-end">
+                                                                £{{ number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2) }}
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <th>Delivery Charge:</th>
-                                                            <td class="text-end">£{{ number_format($quote->delivery_price, 2) }}</td>
+                                                            <td class="text-end">
+                                                                £{{ number_format($quote->delivery_price, 2) }}</td>
                                                         </tr>
                                                         <tr>
                                                             <th>VAT ({{ (int) $quote->vat_percentage }}%):</th>
-                                                            <td class="text-end">£{{ number_format($quote->vat_amount, 0) }}</td>
+                                                            <td class="text-end">£{{ number_format($quote->vat_amount, 0) }}
+                                                            </td>
                                                         </tr>
                                                         <tr class="border-top">
                                                             <th>Grand Total:</th>
-                                                            <td class="text-end"><strong>£{{ number_format($quote->grand_total, 2) }}</strong></td>
+                                                            <td class="text-end">
+                                                                <strong>£{{ number_format($quote->grand_total, 2) }}</strong>
+                                                            </td>
                                                         </tr>
                                                     </table>
                                                 </div>

@@ -207,54 +207,54 @@
     }
 </style>
 <style>
-  .custom-invoice-table {
-    width: 100%;
-    font-size: 14px;
-    border-collapse: collapse;
-    background: #fff;
-    color: #000;
-  }
+    .custom-invoice-table {
+        width: 100%;
+        font-size: 14px;
+        border-collapse: collapse;
+        background: #fff;
+        color: #000;
+    }
 
-  .custom-invoice-table thead {
-    background: #f0f0f0;
-    font-weight: 600;
-  }
+    .custom-invoice-table thead {
+        background: #f0f0f0;
+        font-weight: 600;
+    }
 
-  .custom-invoice-table th,
-  .custom-invoice-table td {
-    border: 1px solid #222;
-    padding: 10px;
-    vertical-align: middle;
-  }
+    .custom-invoice-table th,
+    .custom-invoice-table td {
+        border: 1px solid #222;
+        padding: 10px;
+        vertical-align: middle;
+    }
 
-  .custom-invoice-table small {
-    color: #555 !important;
-  }
+    .custom-invoice-table small {
+        color: #555 !important;
+    }
 
-  .custom-total-table {
-    width: 100%;
-    font-size: 14px;
-    color: #000;
-    background: #fff;
-  }
+    .custom-total-table {
+        width: 100%;
+        font-size: 14px;
+        color: #000;
+        background: #fff;
+    }
 
-  .custom-total-table th,
-  .custom-total-table td {
-    padding: 10px;
-    border: 1px solid #000;
-  }
+    .custom-total-table th,
+    .custom-total-table td {
+        padding: 10px;
+        border: 1px solid #000;
+    }
 
-  .custom-total-table .highlight-row {
-    border-top: 2px solid #6B3DF4;
-    border-bottom: 2px solid #6B3DF4;
-  }
+    .custom-total-table .highlight-row {
+        border-top: 2px solid #6B3DF4;
+        border-bottom: 2px solid #6B3DF4;
+    }
 
-  .custom-total-table .highlight-row th,
-  .custom-total-table .highlight-row td {
-    font-size: 16px;
-    color: #6B3DF4;
-    font-weight: 700;
-  }
+    .custom-total-table .highlight-row th,
+    .custom-total-table .highlight-row td {
+        font-size: 16px;
+        color: #6B3DF4;
+        font-weight: 700;
+    }
 </style>
 
 @section('content')
@@ -286,7 +286,7 @@
                 <div class="container">
                     <div class="row">
                         <!-- Sidebar -->
-                        @include('layouts.includes.user-sidebar',['activeMenu' => 'orders'])
+                        @include('layouts.includes.user-sidebar', ['activeMenu' => 'orders'])
 
                         <!-- Invoice Section -->
                         <div class="col-lg-8">
@@ -369,7 +369,15 @@
                                                                 @foreach ($item->attributes as $attr)
                                                                     <div style="font-size: 13px; margin-left: 8px;">
                                                                         <strong>{{ $attr->attribute->name ?? '' }}:</strong>
-                                                                        {{ $attr->attributeValue->value ?? '-' }}
+                                                                        @if ($attr->attributeValue)
+                                                                            {{ $attr->attributeValue->value }}
+                                                                        @elseif ($attr->length && $attr->width)
+                                                                            {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
+                                                                        @elseif ($attr->length)
+                                                                            {{ $attr->length }} {{ $attr->unit }}
+                                                                        @else
+                                                                            -
+                                                                        @endif
                                                                     </div>
                                                                 @endforeach
                                                             </div>
@@ -385,7 +393,8 @@
                                                     </td>
 
                                                     <td class="text-center">{{ $item->quantity }}</td>
-                                                    <td class="text-center"> {{ $item->quantity > 0 ? number_format($item->sub_total / $item->quantity, 2) : '0.00' }}
+                                                    <td class="text-center">
+                                                        {{ $item->quantity > 0 ? number_format($item->sub_total / $item->quantity, 2) : '0.00' }}
                                                     </td>
                                                     <td class="text-center">{{ number_format($item->sub_total, 2) }}</td>
                                                 </tr>
@@ -400,24 +409,27 @@
                                         <table class="table custom-total-table">
                                             <tr>
                                                 <th>Subtotal:</th>
-                                               <td class="text-right">£{{ number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2) }}</td>
+                                                <td class="text-right">
+                                                    £{{ number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2) }}
+                                                </td>
                                             </tr>
                                             <tr>
-                                                 <th>Delivery Charge:</th>
-                                                 <td class="text-right">£{{ number_format($quote->delivery_price, 2) }}</td>
+                                                <th>Delivery Charge:</th>
+                                                <td class="text-right">£{{ number_format($quote->delivery_price, 2) }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Proof Reading:</th>
                                                 <td class="text-right">£{{ number_format($quote->proof_price, 2) }}</td>
                                             </tr>
-                                             <tr>
-                                                <th>VAT ({{ (int)$quote->vat_percentage }}%):</th>
+                                            <tr>
+                                                <th>VAT ({{ (int) $quote->vat_percentage }}%):</th>
                                                 <td class="text-right">£{{ number_format($quote->vat_amount, 2) }}</td>
                                             </tr>
                                             <tr class="highlight-row">
-            <th class="text-primary">Total:</th>
-            <td class="text-right text-primary font-weight-bold">£{{ number_format($quote->grand_total, 2) }}</td>
-          </tr>
+                                                <th class="text-primary">Total:</th>
+                                                <td class="text-right text-primary font-weight-bold">
+                                                    £{{ number_format($quote->grand_total, 2) }}</td>
+                                            </tr>
                                         </table>
                                     </div>
                                 </div>
