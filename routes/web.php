@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AttributeGroupController;
 use App\Http\Controllers\Admin\AttributeGroupSubcategoryAssignmentController;
 use App\Http\Controllers\Admin\BindingController;
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BookmarkRibbonController;
 use App\Http\Controllers\Admin\CoverFinishController;
 use App\Http\Controllers\Admin\CoverFoilingController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\DustJacketColourController;
 use App\Http\Controllers\Admin\DustJacketFinishController;
 use App\Http\Controllers\Admin\EndpaperColourController;
+use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\HeadAndTailBandController;
 use App\Http\Controllers\Admin\ManagePaperSizeController;
 use App\Http\Controllers\Admin\OrientationController;
@@ -352,10 +354,21 @@ Route::group(['middleware' => 'auth'], function () {
         Route::view('order-details', 'admin.quotes.index')->name('quote.index');
         Route::resource('manage-department', DepartmentController::class);
 
-        Route::view('content/blogs', 'admin.content.blogs')->name('content.blogs');
-        Route::view('content/blogs/create', 'admin.content.blogs_create')->name('content.blogs.create'); // add blog
-        Route::view('content/faq', 'admin.content.faq')->name('content.faq');
         Route::view('content/manage-page-content', 'admin.content.manage_page_content')->name('content.manage.page.content');
+
+        Route::get('content/faq', [FaqController::class, 'index'])->name('content.faq');
+        Route::post('/faqs/store', [FaqController::class, 'store'])->name('faqs.store');
+        Route::post('faqs/update/{id}', [FaqController::class, 'update'])->name('faqs.update');
+        Route::delete('faqs/delete/{id}', [FaqController::class, 'destroy'])->name('faqs.delete');
+        Route::get('faqs/edit/{id}', [FaqController::class, 'edit'])->name('faqs.edit');
+
+
+        Route::get('content/blogs', [BlogController::class, 'index'])->name('content.blogs');
+        Route::post('/blogs/store', [BlogController::class, 'store'])->name('content.blogs.store');
+        Route::get('content/blogs/create', [BlogController::class, 'create'])->name('content.blogs.create');
+        Route::get('content/blogs/{id}/edit', [BlogController::class, 'edit'])->name('content.blogs.edit');
+        Route::delete('content/blogs/{id}', [BlogController::class, 'destroy'])->name('content.blogs.destroy');
+        Route::post('content/blogs/update/{id}', [BlogController::class, 'update'])->name('content.blogs.update');
 
         Route::get('content/dynamic-pages', [PageController::class, 'index'])->name('content.dynamic.pages');
         Route::prefix('pages')->name('pages.')->group(function () {

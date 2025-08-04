@@ -1,4 +1,21 @@
 <!--start footer section-->
+<style>
+	.footer-section .accordion-button {
+		color: #212529;
+		/* or your preferred dark text */
+		background-color: transparent;
+		border: 0px;
+	}
+
+	.footer-section .accordion-button:not(.collapsed) {
+		background-color: transparent;
+		box-shadow: none;
+	}
+
+	.footer-section .accordion-button:focus {
+		box-shadow: none;
+	}
+</style>
 <footer>
 	<section class="py-4 " style="    background: #80808029;">
 		<div class="container">
@@ -107,6 +124,48 @@
 
 			</div>
 
+			<!-- New row for full-width FAQ -->
+			<div class="row">
+				<div class="col-6">
+					<div class="footer-section mb-3">
+						<h6 class="mb-3 text-uppercase text-gray">Frequently Asked Questions</h6>
+						<div class="accordion" id="footerFaqAccordion">
+							<?php
+								use App\Models\Faq;
+								$footerFaqs = Faq::where('status', 'published')->take(4)->get();
+							?>
+							<?php $__currentLoopData = $footerFaqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+								<?php
+									$isFirst = $index === 0;
+									$questionNumber = 'Q' . ($index + 1);
+								?>
+								<div class="accordion-item bg-transparent">
+									<h2 class="accordion-header" id="heading<?php echo e($faq->id); ?>">
+										<button
+											class="accordion-button px-0 py-1 bg-transparent <?php echo e($isFirst ? '' : 'collapsed'); ?>"
+											type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo e($faq->id); ?>"
+											aria-expanded="<?php echo e($isFirst ? 'true' : 'false'); ?>"
+											aria-controls="collapse<?php echo e($faq->id); ?>">
+											<span class="me-2"><?php echo e($questionNumber); ?>.</span>
+											<?php echo e(Str::limit($faq->question, 60)); ?>
+
+										</button>
+									</h2>
+									<div id="collapse<?php echo e($faq->id); ?>"
+										class="accordion-collapse collapse <?php echo e($isFirst ? 'show' : ''); ?>"
+										aria-labelledby="heading<?php echo e($faq->id); ?>" data-bs-parent="#footerFaqAccordion">
+										<div class="accordion-body px-0 py-1 text-muted small">
+											<?php echo $faq->answer; ?>
+
+										</div>
+									</div>
+								</div>
+								<hr>
+							<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+						</div>
+					</div>
+				</div>
+			</div>
 			<hr />
 
 			<!-- Footer Bottom -->

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\CartController;
 use Illuminate\Http\Request;
@@ -101,9 +102,10 @@ Route::get('contact-us', function () {
 })->name('contact-us');
 
 
-Route::get('blogs', function () {
-    return view('front.blogs');
-})->name('blogs');
+Route::get('blogs', [BlogController::class, 'publicIndex'])->name('blogs');
+Route::get('/blog/{slug}', [BlogController::class, 'publicShow'])->name('blogs.show');
+Route::get('/blogs/search', [BlogController::class, 'search'])->name('blogs.search');
+
 
 Route::post('states-by-country', [CustomerController::class, 'statesByCountry'])->name('states-by-country');
 Route::post('cities-by-state', [CustomerController::class, 'citiesByState'])->name('cities-by-state');

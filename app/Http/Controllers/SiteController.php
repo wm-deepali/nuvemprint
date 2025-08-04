@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attribute;
+use App\Models\Blog;
 use App\Models\DeliveryCharge;
 use App\Models\PricingRule;
 use App\Models\ProofReading;
@@ -18,9 +19,14 @@ class SiteController extends Controller
     public function index()
     {
         $categories = Category::where('status', 'active')->get();
-        return view('front.index', compact('categories'));
+        $blogs = Blog::where('status', 'published')  // if you have status
+            ->latest()
+            ->take(6)
+            ->get();
 
+        return view('front.index', compact('categories', 'blogs'));
     }
+
 
     // public function subcateDetails($slug){
     //     $subcategory = Subcategory::with('details')->where('slug', $slug)->where('status', 'active')->first();

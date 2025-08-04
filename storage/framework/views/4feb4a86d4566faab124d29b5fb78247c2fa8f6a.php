@@ -1,10 +1,10 @@
-@extends('layouts.new-master')
 
-@section('title')
+
+<?php $__env->startSection('title'); ?>
 	Nuvem Prints Blogs
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 	<!--start page wrapper -->
 	<div class="page-wrapper">
@@ -36,53 +36,54 @@
 					<div class="row">
 						<div class="col-12 col-lg-9">
 							<div class="blog-right-sidebar p-3">
-								@foreach ($blogs as $blog)
+								<?php $__currentLoopData = $blogs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $blog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 									<div class="card mb-4">
-										<img src="{{ $blog->thumbnail_url }}" class="card-img-top" alt="{{ $blog->title }}">
+										<img src="<?php echo e($blog->thumbnail_url); ?>" class="card-img-top" alt="<?php echo e($blog->title); ?>">
 										<div class="card-body">
 											<div class="list-inline">
 												<span class="list-inline-item"><i class='bx bx-user me-1'></i>By Admin</span>
 												<span class="list-inline-item"><i
-														class='bx bx-calendar me-1'></i>{{ $blog->created_at->format('M d, Y') }}</span>
+														class='bx bx-calendar me-1'></i><?php echo e($blog->created_at->format('M d, Y')); ?></span>
 											</div>
-											<h4 class="mt-4">{{ $blog->title }}</h4>
-											<p>{{ \Illuminate\Support\Str::limit(strip_tags($blog->detail), 150) }}</p>
-											<a href="{{ route('blogs.show', $blog->slug) }}" class="btn btn-light btn-ecomm">
+											<h4 class="mt-4"><?php echo e($blog->title); ?></h4>
+											<p><?php echo e(\Illuminate\Support\Str::limit(strip_tags($blog->detail), 150)); ?></p>
+											<a href="<?php echo e(route('blogs.show', $blog->slug)); ?>" class="btn btn-light btn-ecomm">
 												Read More <i class='bx bx-chevrons-right'></i>
 											</a>
 										</div>
 									</div>
-								@endforeach
+								<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 								<hr>
 
 
 								<nav class="d-flex justify-content-between" aria-label="Page navigation">
 
-									{{-- Prev Button --}}
+									
 									<ul class="pagination">
-										<li class="page-item {{ $blogs->onFirstPage() ? 'disabled' : '' }}">
-											<a class="page-link" href="{{ $blogs->previousPageUrl() ?? 'javascript:;' }}">
+										<li class="page-item <?php echo e($blogs->onFirstPage() ? 'disabled' : ''); ?>">
+											<a class="page-link" href="<?php echo e($blogs->previousPageUrl() ?? 'javascript:;'); ?>">
 												<i class="bx bx-chevron-left"></i> Prev
 											</a>
 										</li>
 									</ul>
 
-									{{-- Page Numbers --}}
+									
 									<ul class="pagination">
-										@for ($i = 1; $i <= $blogs->lastPage(); $i++)
+										<?php for($i = 1; $i <= $blogs->lastPage(); $i++): ?>
 											<li
-												class="page-item d-none d-sm-block {{ $blogs->currentPage() == $i ? 'active' : '' }}">
-												<a class="page-link" href="{{ $blogs->url($i) }}">
-													{{ $i }}
+												class="page-item d-none d-sm-block <?php echo e($blogs->currentPage() == $i ? 'active' : ''); ?>">
+												<a class="page-link" href="<?php echo e($blogs->url($i)); ?>">
+													<?php echo e($i); ?>
+
 												</a>
 											</li>
-										@endfor
+										<?php endfor; ?>
 									</ul>
 
-									{{-- Next Button --}}
+									
 									<ul class="pagination">
-										<li class="page-item {{ $blogs->hasMorePages() ? '' : 'disabled' }}">
-											<a class="page-link" href="{{ $blogs->nextPageUrl() ?? 'javascript:;' }}"
+										<li class="page-item <?php echo e($blogs->hasMorePages() ? '' : 'disabled'); ?>">
+											<a class="page-link" href="<?php echo e($blogs->nextPageUrl() ?? 'javascript:;'); ?>"
 												aria-label="Next">
 												Next <i class="bx bx-chevron-right"></i>
 											</a>
@@ -106,17 +107,17 @@
 									<div class="blog-categories mb-3">
 										<h5 class="mb-4">Recent Posts</h5>
 
-										@foreach ($recentBlogs as $recent)
+										<?php $__currentLoopData = $recentBlogs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $recent): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 											<div class="d-flex align-items-center mb-3">
-												<img src="{{ $recent->thumbnail_url }}" width="75" alt="{{ $recent->title }}">
+												<img src="<?php echo e($recent->thumbnail_url); ?>" width="75" alt="<?php echo e($recent->title); ?>">
 												<div class="ms-3">
-													<a href="{{ route('blogs.show', $recent->slug) }}"
-														class="fs-6">{{ \Illuminate\Support\Str::limit($recent->title, 40) }}</a>
-													<p class="mb-0">{{ $recent->created_at->format('M d, Y') }}</p>
+													<a href="<?php echo e(route('blogs.show', $recent->slug)); ?>"
+														class="fs-6"><?php echo e(\Illuminate\Support\Str::limit($recent->title, 40)); ?></a>
+													<p class="mb-0"><?php echo e($recent->created_at->format('M d, Y')); ?></p>
 												</div>
 											</div>
 											<div class="my-3 border-bottom"></div>
-										@endforeach
+										<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 									</div>
 								</form>
 							</div>
@@ -129,4 +130,5 @@
 		</div>
 	</div>
 	<!--end page wrapper -->
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.new-master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/front/blogs.blade.php ENDPATH**/ ?>

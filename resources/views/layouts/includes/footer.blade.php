@@ -1,4 +1,21 @@
 <!--start footer section-->
+<style>
+	.footer-section .accordion-button {
+		color: #212529;
+		/* or your preferred dark text */
+		background-color: transparent;
+		border: 0px;
+	}
+
+	.footer-section .accordion-button:not(.collapsed) {
+		background-color: transparent;
+		box-shadow: none;
+	}
+
+	.footer-section .accordion-button:focus {
+		box-shadow: none;
+	}
+</style>
 <footer>
 	<section class="py-4 " style="    background: #80808029;">
 		<div class="container">
@@ -106,6 +123,46 @@
 
 			</div>
 
+			<!-- New row for full-width FAQ -->
+			<div class="row">
+				<div class="col-6">
+					<div class="footer-section mb-3">
+						<h6 class="mb-3 text-uppercase text-gray">Frequently Asked Questions</h6>
+						<div class="accordion" id="footerFaqAccordion">
+							@php
+								use App\Models\Faq;
+								$footerFaqs = Faq::where('status', 'published')->take(4)->get();
+							@endphp
+							@foreach($footerFaqs as $index => $faq)
+								@php
+									$isFirst = $index === 0;
+									$questionNumber = 'Q' . ($index + 1);
+								@endphp
+								<div class="accordion-item bg-transparent">
+									<h2 class="accordion-header" id="heading{{ $faq->id }}">
+										<button
+											class="accordion-button px-0 py-1 bg-transparent {{ $isFirst ? '' : 'collapsed' }}"
+											type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $faq->id }}"
+											aria-expanded="{{ $isFirst ? 'true' : 'false' }}"
+											aria-controls="collapse{{ $faq->id }}">
+											<span class="me-2">{{ $questionNumber }}.</span>
+											{{ Str::limit($faq->question, 60) }}
+										</button>
+									</h2>
+									<div id="collapse{{ $faq->id }}"
+										class="accordion-collapse collapse {{ $isFirst ? 'show' : '' }}"
+										aria-labelledby="heading{{ $faq->id }}" data-bs-parent="#footerFaqAccordion">
+										<div class="accordion-body px-0 py-1 text-muted small">
+											{!! $faq->answer !!}
+										</div>
+									</div>
+								</div>
+								<hr>
+							@endforeach
+						</div>
+					</div>
+				</div>
+			</div>
 			<hr />
 
 			<!-- Footer Bottom -->

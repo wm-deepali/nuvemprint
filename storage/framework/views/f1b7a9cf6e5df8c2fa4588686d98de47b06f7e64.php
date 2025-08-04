@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 
   <div class="app-content content">
     <div class="content-overlay"></div>
@@ -12,7 +12,7 @@
         <div class="col-12">
         <div class="breadcrumb-wrapper">
           <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
           <li class="breadcrumb-item active">Manage FAQs</li>
           </ol>
         </div>
@@ -46,20 +46,20 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($faqs as $faq)
+            <?php $__currentLoopData = $faqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <tr>
-          <td>{{ $faq->created_at->format('Y-m-d H:i') }}</td>
-          <td>{{ $faq->question }}</td>
-          <td>{{ $faq->answer }}</td>
-          <td>{{ $faq->status }}</td>
+          <td><?php echo e($faq->created_at->format('Y-m-d H:i')); ?></td>
+          <td><?php echo e($faq->question); ?></td>
+          <td><?php echo e($faq->answer); ?></td>
+          <td><?php echo e($faq->status); ?></td>
 
           <td>
-          <button class="btn btn-sm btn-info mr-1" onclick="editFaq({{ $faq->id }})">Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteFaq({{ $faq->id }})">Delete</button>
+          <button class="btn btn-sm btn-info mr-1" onclick="editFaq(<?php echo e($faq->id); ?>)">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteFaq(<?php echo e($faq->id); ?>)">Delete</button>
           </td>
 
         </tr>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
 
           </table>
@@ -84,7 +84,7 @@
       </div>
       <div class="modal-body">
         <form id="faqForm" method="POST">
-        @csrf
+        <?php echo csrf_field(); ?>
         <div class="form-group">
           <label for="question">Question</label>
           <input type="text" class="form-control" id="question" name="question" required>
@@ -116,7 +116,7 @@
   <script>
 
     function editFaq(id) {
-    $.get("{{ url('admin/faqs/edit') }}/" + id, function (data) {
+    $.get("<?php echo e(url('admin/faqs/edit')); ?>/" + id, function (data) {
       $('#faq_id').val(data.id);
       $('#question').val(data.question);
       $('#answer').val(data.answer);
@@ -139,10 +139,10 @@
     }).then((result) => {
       if (result.isConfirmed) {
       $.ajax({
-        url: '{{ url("admin/faqs/delete") }}/' + id,
+        url: '<?php echo e(url("admin/faqs/delete")); ?>/' + id,
         type: 'DELETE',
         data: {
-        _token: '{{ csrf_token() }}'
+        _token: '<?php echo e(csrf_token()); ?>'
         },
         success: function (response) {
         Swal.fire({
@@ -168,14 +168,14 @@
     e.preventDefault();
 
     let id = $('#faq_id').val();
-    let url = id ? '{{ url("admin/faqs/update") }}/' + id : '{{ route("admin.faqs.store") }}';
+    let url = id ? '<?php echo e(url("admin/faqs/update")); ?>/' + id : '<?php echo e(route("admin.faqs.store")); ?>';
 
     $.ajax({
       url: url,
       method: 'POST',
       data: $(this).serialize(),
       headers: {
-      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+      'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
       },
       success: function (response) {
       if (response.success) {
@@ -194,4 +194,5 @@
     });
   </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/admin/content/faq.blade.php ENDPATH**/ ?>

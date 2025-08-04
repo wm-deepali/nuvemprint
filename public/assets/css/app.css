@@ -2000,3 +2000,8 @@ justify-content: space-between;
 		.start-new:hover{
 			background-color: rgb(206, 205, 205) !important;
 		}
+
+    .blog-sharing i {
+    color: black !important; /* Facebook Blue */
+    font-size: 24px;
+}
