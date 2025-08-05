@@ -33,7 +33,7 @@
 
 <body class="horizontal-layout horizontal-menu  navbar-floating footer-static" data-open="hover" data-menu="horizontal-menu" data-col="">
   
-
+ <?php echo $__env->yieldPushContent('after-scripts'); ?>
   <?php echo $__env->make('partials.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
   <?php echo $__env->yieldContent('content'); ?>

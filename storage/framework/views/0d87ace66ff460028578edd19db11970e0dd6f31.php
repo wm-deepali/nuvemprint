@@ -116,6 +116,19 @@
   <script>
     CKEDITOR.replace('detail');
 
+    // Automatic slug from blog title in Edit form
+    $('#title').on('input', function () {
+    let slug = $(this).val()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')      // Replace spaces with hyphens
+      .replace(/[^\w\-]+/g, '')  // Remove all non-word chars
+      .replace(/\-\-+/g, '-')    // Replace multiple - with single -
+      .replace(/^-+|-+$/g, '');  // Trim - from start and end
+    $('#slug_url').val(slug);
+    });
+
+
     $('#thumbnail').change(function () {
     const input = this;
     if (input.files && input.files[0]) {

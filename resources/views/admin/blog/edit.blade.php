@@ -116,6 +116,19 @@
   <script>
     CKEDITOR.replace('detail');
 
+    // Automatic slug from blog title in Edit form
+    $('#title').on('input', function () {
+    let slug = $(this).val()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')      // Replace spaces with hyphens
+      .replace(/[^\w\-]+/g, '')  // Remove all non-word chars
+      .replace(/\-\-+/g, '-')    // Replace multiple - with single -
+      .replace(/^-+|-+$/g, '');  // Trim - from start and end
+    $('#slug_url').val(slug);
+    });
+
+
     $('#thumbnail').change(function () {
     const input = this;
     if (input.files && input.files[0]) {
@@ -161,10 +174,17 @@
       error: function (xhr) {
         let errors = xhr.responseJSON?.errors || {};
         let errorMessages = '';
+
+        // Collect all first error messages from each field
         $.each(errors, function (key, value) {
         errorMessages += value[0] + '\n';
         });
-        Swal.fire('Error:\n' + errorMessages);
+
+        Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: errorMessages.trim(),
+        });
       }
       });
     });

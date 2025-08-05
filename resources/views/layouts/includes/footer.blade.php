@@ -1,41 +1,30 @@
 <!--start footer section-->
-<style>
-	.footer-section .accordion-button {
-		color: #212529;
-		/* or your preferred dark text */
-		background-color: transparent;
-		border: 0px;
-	}
-
-	.footer-section .accordion-button:not(.collapsed) {
-		background-color: transparent;
-		box-shadow: none;
-	}
-
-	.footer-section .accordion-button:focus {
-		box-shadow: none;
-	}
-</style>
 <footer>
 	<section class="py-4 " style="    background: #80808029;">
 		<div class="container">
 			<div class="row row-cols-1 row-cols-lg-2 row-cols-xl-4">
+				@php
+					use App\Models\ContactInfo;
+					$contactFooter = ContactInfo::first();
+				@endphp
 				<!-- Contact Info -->
 				<div class="col">
 					<div class="footer-section1 mb-3">
 						<h6 class="mb-3 text-uppercase text-gray">Contact Info</h6>
 						<div class="address mb-3">
 							<p class="mb-0 text-uppercase text-gray">Address</p>
-							<p class="mb-0 font-12 text-gray">Unit 7 Lotherton Way Garforth Leeds LS252JY</p>
+							<p class="mb-0 font-12 text-gray">
+								{{ $contactFooter->address ?? "Unit 7 Lotherton Way Garforth Leeds LS252JY"}}</p>
 						</div>
 						<div class="phone mb-3">
 							<p class="mb-0 text-uppercase text-gray">Phone</p>
-							<p class="mb-0 font-13 text-gray">Toll Free: 01132 874724</p>
+							<p class="mb-0 font-13 text-gray">Toll Free:
+								{{ $contactFooter->contact_number ?? '01132 874724' }}</p>
 							<!-- <p class="mb-0 font-13">Mobile: +91-9810XXXXXX</p> -->
 						</div>
 						<div class="email mb-3">
 							<p class="mb-0 text-uppercase text-gray">Email</p>
-							<p class="mb-0 font-13 text-gray">andy@nuvemprint.com</p>
+							<p class="mb-0 font-13 text-gray">{{ $contactFooter->email ?? 'andy@nuvemprint.com' }}</p>
 						</div>
 						<div class="working-days mb-3">
 							<p class="mb-0 text-uppercase text-gray">WORKING HOURS</p>
@@ -123,46 +112,6 @@
 
 			</div>
 
-			<!-- New row for full-width FAQ -->
-			<div class="row">
-				<div class="col-6">
-					<div class="footer-section mb-3">
-						<h6 class="mb-3 text-uppercase text-gray">Frequently Asked Questions</h6>
-						<div class="accordion" id="footerFaqAccordion">
-							@php
-								use App\Models\Faq;
-								$footerFaqs = Faq::where('status', 'published')->take(4)->get();
-							@endphp
-							@foreach($footerFaqs as $index => $faq)
-								@php
-									$isFirst = $index === 0;
-									$questionNumber = 'Q' . ($index + 1);
-								@endphp
-								<div class="accordion-item bg-transparent">
-									<h2 class="accordion-header" id="heading{{ $faq->id }}">
-										<button
-											class="accordion-button px-0 py-1 bg-transparent {{ $isFirst ? '' : 'collapsed' }}"
-											type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $faq->id }}"
-											aria-expanded="{{ $isFirst ? 'true' : 'false' }}"
-											aria-controls="collapse{{ $faq->id }}">
-											<span class="me-2">{{ $questionNumber }}.</span>
-											{{ Str::limit($faq->question, 60) }}
-										</button>
-									</h2>
-									<div id="collapse{{ $faq->id }}"
-										class="accordion-collapse collapse {{ $isFirst ? 'show' : '' }}"
-										aria-labelledby="heading{{ $faq->id }}" data-bs-parent="#footerFaqAccordion">
-										<div class="accordion-body px-0 py-1 text-muted small">
-											{!! $faq->answer !!}
-										</div>
-									</div>
-								</div>
-								<hr>
-							@endforeach
-						</div>
-					</div>
-				</div>
-			</div>
 			<hr />
 
 			<!-- Footer Bottom -->

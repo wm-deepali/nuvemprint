@@ -230,6 +230,11 @@
     }
     }
 
+    document.getElementById('edit_page_name').addEventListener('input', function () {
+    const slug = this.value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+    document.getElementById('edit_slug').value = slug;
+    });
+
 
     document.getElementById('page_name').addEventListener('input', function () {
     const slug = this.value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');

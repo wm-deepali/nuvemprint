@@ -115,6 +115,21 @@
 @push('scripts')
   <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
   <script>
+
+    // Automatic slug from blog title
+    $('#title').on('input', function () {
+    // Convert title to a slug
+    let slug = $(this).val()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')      // Replace spaces with hyphens
+      .replace(/[^\w\-]+/g, '')  // Remove all non-word chars
+      .replace(/\-\-+/g, '-')    // Replace multiple - with single -
+      .replace(/^-+|-+$/g, '');  // Trim - from start and end
+    $('#slug_url').val(slug);
+    });
+
+
     // Thumbnail preview
     $('#thumbnail').change(function () {
     const input = this;
@@ -167,10 +182,15 @@
         let errors = xhr.responseJSON?.errors || {};
         let errorMessages = '';
         $.each(errors, function (key, value) {
-        errorMessages += value[0] + '\n';
+        errorMessages += value[0] + '\n'; // Shows first error per field
         });
-        Swal.fire('Error:\n' + errorMessages);
+        Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: errorMessages.trim(),
+        });
       }
+
       });
     });
     });

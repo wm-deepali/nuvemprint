@@ -44,4 +44,11 @@ class FaqController extends Controller
         $faq->delete();
         return response()->json(['success' => true, 'message' => 'FAQ deleted successfully.']);
     }
+
+
+    public function publicIndex()
+    {
+        $faqs = Faq::where('status', 'published')->get();
+        return view('front.faq', compact('faqs'));
+    }
 }

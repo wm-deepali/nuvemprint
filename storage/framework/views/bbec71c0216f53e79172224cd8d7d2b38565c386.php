@@ -64,6 +64,27 @@
 	.main-cat img {
 		width: 140px;
 	}
+
+	@media  only screen and (max-width: 600px) {
+		.logo a img {
+			width: 100px;
+		}
+
+		.header-wrapper .top-menu .social-link .nav-link {
+			font-size: 15px;
+			width: 30px;
+			height: 30px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: rgb(255 255 255 / 0%);
+			border: 1px solid rgb(255 255 255 / 0%);
+			text-align: center;
+			border-radius: 50%;
+			color: #6a6767;
+			margin: 0 3px;
+		}
+	}
 </style>
 
 <!--wrapper-->
@@ -100,7 +121,7 @@
 
 						<li class="nav-item"> <a class="nav-link text-gray" href="<?php echo e(route('blogs')); ?>">Blog</a>
 						</li>
-						<li class="nav-item"> <a class="nav-link text-gray" href="<?php echo e(route('shop-categories')); ?>">FAQ</a>
+						<li class="nav-item"> <a class="nav-link text-gray" href="<?php echo e(route('faq')); ?>">FAQ</a>
 						</li>
 						<li class="nav-item"> <a class="nav-link text-gray" href="<?php echo e(route('contact-us')); ?>">Help &
 								Support</a>
@@ -155,7 +176,7 @@
 							<div class="mobile-toggle-menu d-lg-none px-lg-2" data-trigger="#navbar_main"><i
 									class='bx bx-menu'></i>
 							</div>
-							<div class="logo d-none d-lg-flex">
+							<div class="logo  d-lg-flex">
 								<a href="<?php echo e(route('home')); ?>">
 									<img src="<?php echo e(URL::asset('assets/images/NuvemPrint.png')); ?>" class="logo-icon"
 										alt="" />
@@ -171,14 +192,26 @@
 							<span class="input-group-text cursor-pointer"><i class='bx bx-search'></i></span>
 						</div>
 					</div>
-					<div class="col col-md-auto order-3 d-none d-xl-flex align-items-center">
-						<div class="fs-1 text-gray"><i class='bx bx-headphone'></i>
+					<?php
+						use App\Models\ContactInfo;
+						$headerContact = ContactInfo::where('show_on_header', 1)->first();
+					?>
+
+					<?php if($headerContact): ?>
+						<div class="col col-md-auto order-3 d-none d-xl-flex align-items-center">
+							<div class="fs-1 text-gray">
+								<i class='bx bx-headphone'></i>
+							</div>
+							<div class="ms-2">
+								<p class="mb-0 font-13 text-gray">CALL US NOW</p>
+								<h5 class="mb-0 text-gray" style="color: gray !important;">
+									<?php echo e($headerContact->contact_number  ?? '+01132 874724'); ?>
+
+								</h5>
+							</div>
 						</div>
-						<div class="ms-2">
-							<p class="mb-0 font-13 text-gray">CALL US NOW</p>
-							<h5 class="mb-0 text-gray" style="color: gray !important;">+01132 874724</h5>
-						</div>
-					</div>
+					<?php endif; ?>
+
 					<div class="col col-md-auto order-2 order-md-4">
 						<div class="top-cart-icons">
 							<nav class="navbar navbar-expand">
@@ -190,10 +223,11 @@
 												data-bs-toggle="dropdown">
 												<i class='bx bx-user'></i> <i class='bx bx-chevron-down'></i>
 											</a>
-											<ul class="dropdown-menu">
-												<li><a class="dropdown-item"
-														href="<?php echo e(route('account-dashboard')); ?>">Dashboard</a></li>
-												<li><a class="dropdown-item" href="<?php echo e(route('account-logout')); ?>">Logout</a>
+											<ul class="dropdown-menu" style="background:#000;">
+												<li><a class="dropdown-item" href="<?php echo e(route('account-dashboard')); ?>"
+														style="color:gray;">Dashboard</a></li>
+												<li><a class="dropdown-item" href="<?php echo e(route('account-logout')); ?>"
+														style="color:gray;">Logout</a>
 												</li>
 											</ul>
 										</li>

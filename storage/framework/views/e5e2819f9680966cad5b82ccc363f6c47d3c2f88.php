@@ -1,12 +1,12 @@
-@extends('layouts.new-master')
 
-@section('title')
+
+<?php $__env->startSection('title'); ?>
   Nuvem Prints-Contact Us
-@endsection
+<?php $__env->stopSection(); ?>
 
 
 
-@section('content')
+<?php $__env->startSection('content'); ?>
   <!--start page wrapper -->
   <div class="page-wrapper">
     <div class="page-content">
@@ -31,19 +31,20 @@
     </section>
     <!--end breadcrumb-->
     <!--start page content-->
-    @php
+    <?php
     use App\Models\ContactInfo;
     $contactFooter = ContactInfo::first();
     $address = $contactFooter->full_address ?? "";
     $mapQuery = urlencode($address);
     $mapUrl = "https://maps.google.com/maps?q={$mapQuery}&t=m&z=16&output=embed&iwloc=near";
-    @endphp
+  
+    ?>
 
     <section class="py-4">
       <div class="container">
       <h3 class="d-none">Google Map</h3>
       <div class="contact-map p-3 bg-dark-1 rounded-0 shadow-none">
-        <iframe src="{{ $mapUrl }}" class="w-100" height="450" style="border:0;" allowfullscreen="" loading="lazy">
+        <iframe src="<?php echo e($mapUrl); ?>" class="w-100" height="450" style="border:0;" allowfullscreen="" loading="lazy">
         </iframe>
       </div>
       </div>
@@ -56,17 +57,18 @@
         <div class="p-3 ">
           <div class="address mb-3">
           <p class="mb-0 text-uppercase text-white">Address</p>
-          <p class="mb-0 font-12">{{ $contactFooter->full_address ?? "Unit 7 Lotherton Way Garforth Leeds LS252JY"}}
+          <p class="mb-0 font-12"><?php echo e($contactFooter->full_address ?? "Unit 7 Lotherton Way Garforth Leeds LS252JY"); ?>
+
           </p>
           </div>
           <div class="phone mb-3">
           <p class="mb-0 text-uppercase text-white">Phone</p>
-          <p class="mb-0 font-13">Toll Free {{ $contactFooter->contact_number ?? '01132 874724' }}</p>
+          <p class="mb-0 font-13">Toll Free <?php echo e($contactFooter->contact_number ?? '01132 874724'); ?></p>
           <!-- <p class="mb-0 font-13">Mobile : +91-9910XXXX</p> -->
           </div>
           <div class="email mb-3">
           <p class="mb-0 text-uppercase text-white">Email</p>
-          <p class="mb-0 font-13">{{ $contactFooter->email ?? 'andy@nuvemprint.com' }}</p>
+          <p class="mb-0 font-13"><?php echo e($contactFooter->email ?? 'andy@nuvemprint.com'); ?></p>
           </div>
           <div class="working-days mb-3">
           <p class="mb-0 text-uppercase text-white">WORKING DAYS</p>
@@ -237,4 +239,5 @@
     </div>
   </div>
   <!--end page wrapper -->
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.new-master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\new\resources\views/front/contact-us.blade.php ENDPATH**/ ?>

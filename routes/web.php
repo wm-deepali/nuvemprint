@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AttributeGroupSubcategoryAssignmentController;
 use App\Http\Controllers\Admin\BindingController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BookmarkRibbonController;
+use App\Http\Controllers\Admin\ContactInfoController;
 use App\Http\Controllers\Admin\CoverFinishController;
 use App\Http\Controllers\Admin\CoverFoilingController;
 use App\Http\Controllers\Admin\CoverPrintingColourController;
@@ -348,6 +349,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/quotes/payment-submit', [QuoteController::class, 'submitPayment'])->name('quotes.payment.submit');
         Route::get('/invoices/download/{quote}', [QuoteController::class, 'downloadInvoice'])->name('invoices.download');
         Route::post('/quotes/update-note', [QuoteController::class, 'updateNote'])->name('quote.update-note');
+
+
+
+        Route::get('header-contact', [ContactInfoController::class, 'index'])->name('header-contact.index');
+        Route::get('header-contact/create', [ContactInfoController::class, 'create'])->name('header-contact.create');
+        Route::post('header-contact', [ContactInfoController::class, 'store'])->name('header-contact.store');
+        Route::get('header-contact/{id}/edit', [ContactInfoController::class, 'edit'])->name('header-contact.edit');
+        Route::post('header-contact/update/{id}', [ContactInfoController::class, 'update'])->name('header-contact.update');
 
 
         // Route::view('quote-request', 'admin.customer_estimates.quote_request')->name('quote.request');

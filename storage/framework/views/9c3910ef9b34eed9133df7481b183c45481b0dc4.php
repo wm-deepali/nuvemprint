@@ -184,6 +184,12 @@
           </ul>
         </li>
 
+        <li>
+  <a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.header-contact.index')); ?>">
+    <span>Header & Contact Info</span>
+  </a>
+</li>
+
       </ul>
     </div>
   </div>
