@@ -80,7 +80,7 @@
         <div class="attribute-values <?php echo e(count($values) <= 4 ? 'color-print' : 'color-print1'); ?>">
             <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="print-color <?php echo e($value['is_default'] ? 'active' : ''); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
-                     data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
+                    data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
                     data-value-id="<?php echo e($value['id']); ?>" data-value="<?php echo e($value['value']); ?>">
                     <p><?php echo e($value['value']); ?></p>
                 </div>
@@ -101,7 +101,7 @@
         <div class="attribute-value color-print1">
             <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="choose-binding <?php echo e($value['is_default'] ? 'active' : ''); ?>" data-value="<?php echo e($value['value']); ?>"
-                     data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
+                    data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
                     data-attribute-id="<?php echo e($attribute['id']); ?>" data-value-id="<?php echo e($value['id']); ?>">
                     <div>
                         <img src="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default.png'))); ?>" alt="<?php echo e($value['value']); ?>"
@@ -137,6 +137,7 @@
                 <option value="">-- Select --</option>
                 <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <option value="<?php echo e($value['value']); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
+                        data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
                         data-value-id="<?php echo e($value['id']); ?>" <?php echo e($value['is_default'] ? 'selected' : ''); ?>>
                         <?php echo e($value['value']); ?>
 

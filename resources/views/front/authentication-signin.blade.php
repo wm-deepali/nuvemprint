@@ -132,7 +132,7 @@ Nuvem Prints -About Us
 									<div class="border p-4 rounded">
 										<div class="text-center">
 											<h3 class="">Sign in</h3>
-											<p>Don't have an account yet? <a href="{{ route('authentication-signup')}}" style="color:blue;">Sign up here</a>
+											<p>Don't have an ac yet? <a href="{{ route('authentication-signup')}}" style="color:blue;">Sign up here</a>
 											</p>
 										</div>
 										<div class="d-grid">

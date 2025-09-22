@@ -15,7 +15,7 @@
         <div class="page-wrapper">
             <div class="page-content">
                 <div>{!! $page->detail !!}</div>
-            </div>
+            </div>ca
         </div>
     @else
         <div class="page-wrapper">

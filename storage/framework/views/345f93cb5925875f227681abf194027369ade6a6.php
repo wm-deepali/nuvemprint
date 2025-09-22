@@ -1371,7 +1371,7 @@
                     $input.prop('checked', true);
                     $btn.addClass('active').attr('data-selected', 'true');
                 });
-                   calculateTotalPrice();
+                calculateTotalPrice();
             } else {
                 // Optionally reset selections when unchecked
                 $(target).find('input[type="radio"], input[type="checkbox"]').prop('checked', false);
