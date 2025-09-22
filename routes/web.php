@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AttributeGroupSubcategoryAssignmentController;
 use App\Http\Controllers\Admin\BindingController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BookmarkRibbonController;
+use App\Http\Controllers\Admin\CentralizedPaperPricingController;
 use App\Http\Controllers\Admin\ContactInfoController;
 use App\Http\Controllers\Admin\CoverFinishController;
 use App\Http\Controllers\Admin\CoverFoilingController;
@@ -21,10 +22,13 @@ use App\Http\Controllers\Admin\HeadAndTailBandController;
 use App\Http\Controllers\Admin\ManagePaperSizeController;
 use App\Http\Controllers\Admin\OrientationController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PaperRatesController;
 use App\Http\Controllers\Admin\PaperWeightController;
+use App\Http\Controllers\Admin\PaperWeightRatesController;
 use App\Http\Controllers\Admin\QuotePricingController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\AttributeValueController;
+use App\Http\Controllers\Admin\Sra3SheetController;
 use App\Http\Controllers\Admin\SubcategoryAttributeController;
 use App\Http\Controllers\Admin\SubcategoryAttributeValueController;
 use App\Http\Controllers\Admin\AttributeConditionController;
@@ -403,6 +407,29 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('attribute-conditions', AttributeConditionController::class);
         Route::resource('pricing-rules', PricingRuleController::class);
         Route::resource('quotes', QuoteController::class);
+
+        Route::prefix('centralized-paper-pricing')->name('centralized-paper-pricing.')->group(function () {
+            Route::resource('/', CentralizedPaperPricingController::class);
+        });
+
+        Route::prefix('sra3-sheet')->name('sra3-sheets.')->group(function () {
+            Route::resource('/', Sra3SheetController::class)->only(['create', 'edit', 'store', 'update'])->parameters([
+                '' => 'attribute' // means resource will use {attribute} instead of {sra3_sheet}
+            ]);
+        });
+
+         Route::prefix('paper-rates')->name('paper-rates.')->group(function () {
+            Route::resource('/', PaperRatesController::class)->only(['create', 'edit', 'store', 'update'])->parameters([
+                '' => 'attribute' // means resource will use {attribute} instead of {sra3_sheet}
+            ]);
+        });
+
+        Route::prefix('paper-weight-rates')->name('paper-weight-rates.')->group(function () {
+            Route::resource('/', PaperWeightRatesController::class)->only(['create', 'edit', 'store', 'update'])->parameters([
+                '' => 'attribute' // means resource will use {attribute} instead of {sra3_sheet}
+            ]);
+        });
+
 
         Route::get('attributes/{id}/values', [AttributeValueController::class, 'getValues']);
         Route::get('subcategories/{id}/attributes', [AttributeConditionController::class, 'getSubcategoryAttributes']);

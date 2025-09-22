@@ -68,6 +68,7 @@
             <div class="form-group">
               <label for="thumbnail">Thumbnail Image</label>
               <input type="file" class="form-control-file" id="thumbnail" name="thumbnail" accept="image/*">
+               <small class="form-text text-muted">Maximum file size: 2MB</small>
               <img id="thumbnail-preview" src="<?php echo e(asset('storage/' . $blog->thumbnail)); ?>"
               alt="Thumbnail Preview" style="max-height: 150px; margin-top: 10px;">
             </div>
@@ -75,6 +76,7 @@
             <div class="form-group">
               <label for="banner">Banner Image</label>
               <input type="file" class="form-control-file" id="banner" name="banner" accept="image/*">
+               <small class="form-text text-muted">Maximum file size: 4MB</small>
               <?php if($blog->banner): ?>
           <img id="banner-preview" src="<?php echo e(asset('storage/' . $blog->banner)); ?>" alt="Banner Preview"
           style="max-height: 150px; margin-top: 10px;">
@@ -174,10 +176,17 @@
       error: function (xhr) {
         let errors = xhr.responseJSON?.errors || {};
         let errorMessages = '';
+
+        // Collect all first error messages from each field
         $.each(errors, function (key, value) {
         errorMessages += value[0] + '\n';
         });
-        Swal.fire('Error:\n' + errorMessages);
+
+        Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: errorMessages.trim(),
+        });
       }
       });
     });

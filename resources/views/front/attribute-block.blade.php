@@ -35,6 +35,7 @@
                         <button type="button"
                             class="btn btn-light print-color text-start {{ $value['is_default'] ? 'active' : '' }}"
                             data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
+                            data-original-default="{{ $value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false' }}"
                             data-image="{{ asset('storage/' . ($value['image_path'] ?? 'default-preview.png')) }}" {{ $value['is_default'] ? 'data-selected=true' : '' }}>
                             {{ $value['value'] }}
                         </button>
@@ -64,6 +65,7 @@
 
 
     {{-- ========== PLAIN RADIO ========== --}}
+
 @elseif ($inputType === 'radio')
     <div class="{{ in_array($attribute['name'], ['Paper Weight', 'Cover Paper Weight']) ? 'col-md-12 attribute-wrapper' : 'col-md-6 attribute-wrapper' }} mb-3"
         data-attribute-id="{{ $attribute['id'] }}" data-is-required="{{ $attribute['is_required'] }}">
@@ -75,6 +77,7 @@
         <div class="attribute-values {{ count($values) <= 4 ? 'color-print' : 'color-print1' }}">
             @foreach ($values as $value)
                 <div class="print-color {{ $value['is_default'] ? 'active' : '' }}" data-attribute-id="{{ $attribute['id'] }}"
+                    data-original-default="{{ $value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false' }}"
                     data-value-id="{{ $value['id'] }}" data-value="{{ $value['value'] }}">
                     <p>{{ $value['value'] }}</p>
                 </div>
@@ -94,6 +97,7 @@
         <div class="attribute-value color-print1">
             @foreach ($values as $value)
                 <div class="choose-binding {{ $value['is_default'] ? 'active' : '' }}" data-value="{{ $value['value'] }}"
+                    data-original-default="{{ $value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false' }}"
                     data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}">
                     <div>
                         <img src="{{ asset('storage/' . ($value['image_path'] ?? 'default.png')) }}" alt="{{ $value['value'] }}"
@@ -128,6 +132,7 @@
                 <option value="">-- Select --</option>
                 @foreach ($values as $value)
                     <option value="{{ $value['value'] }}" data-attribute-id="{{ $attribute['id'] }}"
+                        data-original-default="{{ $value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false' }}"
                         data-value-id="{{ $value['id'] }}" {{ $value['is_default'] ? 'selected' : '' }}>
                         {{ $value['value'] }}
                     </option>
@@ -148,7 +153,8 @@
             default => 'sq in',
         };
     @endphp
-<div class="attribute-wrapper" data-attribute-id="{{ $attribute['id'] }}" data-attribute-type="select_area" data-is-required="{{ $attribute['is_required'] ? '1' : '0' }}">
+    <div class="attribute-wrapper" data-attribute-id="{{ $attribute['id'] }}" data-attribute-type="select_area"
+        data-is-required="{{ $attribute['is_required'] ? '1' : '0' }}">
 
         <label class="form-label d-flex align-items-center" style="gap: 5px;">
             {{ $attribute['name'] }}
@@ -164,7 +170,8 @@
                     data-area-unit="{{ $attribute['area_unit'] }}" data-attribute-id="{{ $attribute['id'] }}"
                     @if(!empty($attribute['max_height'])) max="{{ $attribute['max_height'] }}" @endif
                     placeholder="Enter length">
-                    <small class="text-danger length-warning" style="display: none;">Maximum length is {{ $attribute['max_height'] ?? '' }}</small>
+                <small class="text-danger length-warning" style="display: none;">Maximum length is
+                    {{ $attribute['max_height'] ?? '' }}</small>
             </div>
 
             <div class="col-6">
@@ -174,7 +181,8 @@
                     data-area-unit="{{ $attribute['area_unit'] }}" data-attribute-id="{{ $attribute['id'] }}"
                     @if(!empty($attribute['max_width'])) max="{{ $attribute['max_width'] }}" @endif
                     placeholder="Enter width">
-                    <small class="text-danger width-warning" style="display: none;">Maximum width is {{ $attribute['max_width'] ?? '' }}</small>
+                <small class="text-danger width-warning" style="display: none;">Maximum width is
+                    {{ $attribute['max_width'] ?? '' }}</small>
             </div>
         </div>
 

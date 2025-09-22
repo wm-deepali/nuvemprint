@@ -66,6 +66,7 @@
             <div class="form-group">
               <label for="thumbnail">Thumbnail Image</label>
               <input type="file" class="form-control-file" id="thumbnail" name="thumbnail" accept="image/*">
+              <small class="form-text text-muted">Maximum file size: 2MB</small>
               <img id="thumbnail-preview" src="#" alt="Thumbnail Preview"
               style="display:none; max-height: 150px; margin-top: 10px;">
             </div>
@@ -73,9 +74,11 @@
             <div class="form-group">
               <label for="banner">Banner Image</label>
               <input type="file" class="form-control-file" id="banner" name="banner" accept="image/*">
+              <small class="form-text text-muted">Maximum file size: 4MB</small>
               <img id="banner-preview" src="#" alt="Banner Preview"
               style="display:none; max-height: 150px; margin-top: 10px;">
             </div>
+
 
             </div>
 

@@ -118,6 +118,9 @@
                 href="<?php echo e(route('admin.pricing-rules.index')); ?>"><span>Price Rule Setting
                 </span></a></li>
             <li><a class="dropdown-item d-flex align-items-center"
+                href="<?php echo e(route('admin.centralized-paper-pricing.index')); ?>"><span>Centralized Paper
+                  Pricing</span></a></li>
+            <li><a class="dropdown-item d-flex align-items-center"
                 href="<?php echo e(route('admin.attribute-groups.index')); ?>"><span>Attributes Grouping</span></a></li>
             <li><a class="dropdown-item d-flex align-items-center"
                 href="<?php echo e(route('admin.group-assignments.index')); ?>"><span>Attributes Group Mapping</span></a></li>
@@ -179,16 +182,16 @@
                   <span>Manage VAT</span></a>
             </li>
             <li><a class="dropdown-item d-flex align-items-center"
-                 href="<?php echo e(route('admin.manage-department.index')); ?>"><span>Manage Departments</span></a>
+                href="<?php echo e(route('admin.manage-department.index')); ?>"><span>Manage Departments</span></a>
             </li>
           </ul>
         </li>
 
         <li>
-  <a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.header-contact.index')); ?>">
-    <span>Header & Contact Info</span>
-  </a>
-</li>
+          <a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.header-contact.index')); ?>">
+            <span>Header & Contact Info</span>
+          </a>
+        </li>
 
       </ul>
     </div>

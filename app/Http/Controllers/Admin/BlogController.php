@@ -29,7 +29,7 @@ class BlogController extends Controller
             'meta_title' => 'required|string|max:255',
             'meta_description' => 'required|string',
             'meta_keywords' => 'required|string',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
         ]);
 

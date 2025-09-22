@@ -625,7 +625,7 @@
     }
 </style>
 <style>
-    @media only screen and (max-width: 600px) {
+    @media  only screen and (max-width: 600px) {
         .tab-buttons {
             display: flex !important;
             gap: 0.5rem !important;
@@ -647,21 +647,21 @@
 <div class="row">
     <div class="col-md-7">
         <div class="reset-card">
-            <h5>Create Your {{ $subcategory->name ?? "Booklets" }}</h5>
+            <h5>Create Your <?php echo e($subcategory->name ?? "Booklets"); ?></h5>
             <button>Reset</button>
         </div>
         <form>
-            @if (!empty($attributeGroups) && count($attributeGroups))
-                @php
+            <?php if(!empty($attributeGroups) && count($attributeGroups)): ?>
+                <?php
                     $mainGroup = collect($attributeGroups)->first(function ($group) {
                         return str_contains(strtolower($group['group_name']), 'main attributes');
                     });
                     $otherGroups = collect($attributeGroups)->reject(function ($group) {
                         return str_contains(strtolower($group['group_name']), 'main attributes');
                     });
-                @endphp
+                ?>
                 <div class="calculation-card mt-3">
-                    {{-- Display attributes with values --}}
+                    
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="quantityInput" class="form-label">
@@ -670,30 +670,30 @@
                                     data-target="#helpModal">?</span>
                             </label>
                             <input type="number" class="form-control" id="quantityInput" placeholder="100"
-                                value="{{ $quantityDefaults['default'] ?? 100 }}" min="{{ $quantityDefaults['min'] ?? 1 }}"
-                                max="{{ $quantityDefaults['max'] ?? 10000 }}">
+                                value="<?php echo e($quantityDefaults['default'] ?? 100); ?>" min="<?php echo e($quantityDefaults['min'] ?? 1); ?>"
+                                max="<?php echo e($quantityDefaults['max'] ?? 10000); ?>">
                             <div class="invalid-feedback d-none" id="quantityError">
-                                Quantity must be between {{ $quantityDefaults['min'] ?? 1 }} and
-                                {{ $quantityDefaults['max'] ?? 10000 }}.
+                                Quantity must be between <?php echo e($quantityDefaults['min'] ?? 1); ?> and
+                                <?php echo e($quantityDefaults['max'] ?? 10000); ?>.
                             </div>
                         </div>
 
 
-                        {{-- Main Group Attributes --}}
-                        @isset($mainGroup['attributes'])
-                            @foreach ($mainGroup['attributes'] as $attribute)
-                                @include('front.attribute-block', ['attribute' => $attribute])
-                            @endforeach
-                        @endisset
+                        
+                        <?php if(isset($mainGroup['attributes'])): ?>
+                            <?php $__currentLoopData = $mainGroup['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php echo $__env->make('front.attribute-block', ['attribute' => $attribute], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                     </div>
 
-                    @if ($pagesDraggerRequired)
+                    <?php if($pagesDraggerRequired): ?>
                         <div id="composite-draggers" class="mt-3">
-                            {{-- Page draggers will be injected here via JS --}}
+                            
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    @if ($pagesDraggerRequired)
+                    <?php if($pagesDraggerRequired): ?>
                         <div class="form-row-section1 pages-dragger-wrapper">
                             <div class="s-row mb-3 pages-dragger">
                                 <label>Pages
@@ -701,45 +701,45 @@
                                         data-target="#helpModal">?</span>
                                 </label>
                                 <div class="page-slider">
-                                    <input type="range" name="pages[]" min="{{ $pagesDefaults['min'] ?? 1 }}"
-                                        max="{{ $pagesDefaults['max'] ?? 840 }}" value="{{ $pagesDefaults['default'] ?? 1 }}"
+                                    <input type="range" name="pages[]" min="<?php echo e($pagesDefaults['min'] ?? 1); ?>"
+                                        max="<?php echo e($pagesDefaults['max'] ?? 840); ?>" value="<?php echo e($pagesDefaults['default'] ?? 1); ?>"
                                         step="1" id="pageSlider">
                                     <div class="range-value">
                                         <button type="button">-</button>
-                                        <span id="pageValue">{{ $pagesDefaults['default'] ?? 1 }}</span>
+                                        <span id="pageValue"><?php echo e($pagesDefaults['default'] ?? 1); ?></span>
                                         <button type="button">+</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
 
                 </div>
-                {{-- OTHER GROUPS (With Group Header) --}}
-                @foreach ($otherGroups as $group)
-                    @php
+                
+                <?php $__currentLoopData = $otherGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $groupKey = \Illuminate\Support\Str::slug($group['group_name'], '_');
                         $isToggleable = $group['is_toggleable'] ?? false;
-                    @endphp
+                    ?>
 
                     <div class="calculation-card mt-3">
-                        @if ($isToggleable)
-                            {{-- Toggleable group with checkbox --}}
+                        <?php if($isToggleable): ?>
+                            
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input group-toggle" style="border: 1px solid #212529" type="checkbox"
-                                    id="toggle_{{ $groupKey }}" data-target="#section_{{ $groupKey }}">
-                                <label class="form-check-label" for="toggle_{{ $groupKey }}">{{ $group['group_name'] }}</label>
+                                    id="toggle_<?php echo e($groupKey); ?>" data-target="#section_<?php echo e($groupKey); ?>">
+                                <label class="form-check-label" for="toggle_<?php echo e($groupKey); ?>"><?php echo e($group['group_name']); ?></label>
                             </div>
-                        @else
-                            {{-- Non-toggleable header --}}
-                            <h5 class="mb-2">{{ $group['group_name'] }}</h5>
-                        @endif
-                        <div class="mt-3 {{ $isToggleable ? 'd-none' : '' }}" id="section_{{ $groupKey }}">
+                        <?php else: ?>
+                            
+                            <h5 class="mb-2"><?php echo e($group['group_name']); ?></h5>
+                        <?php endif; ?>
+                        <div class="mt-3 <?php echo e($isToggleable ? 'd-none' : ''); ?>" id="section_<?php echo e($groupKey); ?>">
                             <div class="row">
-                                @foreach ($group['attributes'] as $attribute)
-                                    @php
+                                <?php $__currentLoopData = $group['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php
                                         // Disable default selection if group is toggleable
                                         if ($group['is_toggleable'] ?? false) {
                                             $attribute['values'] = $attribute['values']->map(function ($val) {
@@ -749,107 +749,109 @@
                                             });
                                         }
                                         // dd($attribute); // check to confirm is_default: false now
-                                    @endphp
+                                    ?>
 
-                                    @include('front.attribute-block', ['attribute' => $attribute])
-                                @endforeach
+                                    <?php echo $__env->make('front.attribute-block', ['attribute' => $attribute], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                             </div>
                         </div>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-            @endif
+            <?php endif; ?>
         </form>
     </div>
     <div class="col-md-5">
         <div class="right-side-section">
-            @php
+            <?php
                 use Carbon\Carbon;
-            @endphp
+            ?>
 
-            @if ($deliveryChargesRequired)
+            <?php if($deliveryChargesRequired): ?>
                 <h5>Choose Price & Delivery Date</h5>
-                @foreach ($deliveryCharges as $key => $option)
-                    @php
+                <?php $__currentLoopData = $deliveryCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $deliveryDate = Carbon::now()->addDays($option['no_of_days']);
                         $formattedDate = $deliveryDate->format('D, jS M');
                         $detailsHtml = $option['details'] ?? null;
                         $title = $option['title'] ?? null;
-                    @endphp
+                    ?>
 
 
-                    <div class="estimate-card estimate-option {{ $option['is_default'] ? 'active' : 'mt-3' }}"
-                        data-price="{{ $option['price'] }}" data-date="{{ $formattedDate }}" data-id="{{ $option['id'] }}">
+                    <div class="estimate-card estimate-option <?php echo e($option['is_default'] ? 'active' : 'mt-3'); ?>"
+                        data-price="<?php echo e($option['price']); ?>" data-date="<?php echo e($formattedDate); ?>" data-id="<?php echo e($option['id']); ?>">
                         <div class="circle-point"></div>
                         <div class="est-card">
 
                             <div class="estimate-div">
-                                <div class="{{ $option['is_default'] ? 'ast-active' : '' }}">
+                                <div class="<?php echo e($option['is_default'] ? 'ast-active' : ''); ?>">
 
                                     <p class="m-0 text-black">Estimated Delivery:</p>
-                                    <h4 class="text-black mb-1">{{ $formattedDate }}</h4>
-                                    @if ($title)
-                                        <div class="title text-muted small d-none">{{ $title }}</div>
-                                    @endif
+                                    <h4 class="text-black mb-1"><?php echo e($formattedDate); ?></h4>
+                                    <?php if($title): ?>
+                                        <div class="title text-muted small d-none"><?php echo e($title); ?></div>
+                                    <?php endif; ?>
 
                                 </div>
                                 <div class="line-y"></div>
                                 <div>
                                     <h4 class="text-black final-price">
-                                        £{{ number_format($option['price'], 2) }}</h4>
+                                        £<?php echo e(number_format($option['price'], 2)); ?></h4>
                                 </div>
                             </div>
 
-                            @if (!empty($detailsHtml))
+                            <?php if(!empty($detailsHtml)): ?>
                                 <div class="line-x detail-section d-none"></div>
                                 <div class="disci text-black detail-section d-none">
-                                    {!! $detailsHtml !!}
+                                    <?php echo $detailsHtml; ?>
+
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
                         </div>
                     </div>
-                @endforeach
-            @else
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php else: ?>
                 <div class="text-black mb-3">
                     <h4 class="final-price">£0.00</h4>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            @if ($proofReadingRequired && !empty($proofReadings))
+            <?php if($proofReadingRequired && !empty($proofReadings)): ?>
                 <div class="form-row-section1 mt-3">
                     <div class="s-row mb-3">
                         <label for="proof-reading" style="    font-size: 1.25rem;">Proof Reading</label>
                         <div class="d-flex flex-wrap gap-3">
-                            @foreach ($proofReadings as $index => $option)
-                                @if (!empty($option['proof_type']) && isset($option['price']))
+                            <?php $__currentLoopData = $proofReadings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if(!empty($option['proof_type']) && isset($option['price'])): ?>
                                     <div class="selectable-proof-option border rounded p-2 text-center"
-                                        data-id="{{ $option['id'] }}" data-value="{{ $option['proof_type'] }}"
-                                        data-price="{{ $option['price'] }}"
+                                        data-id="<?php echo e($option['id']); ?>" data-value="<?php echo e($option['proof_type']); ?>"
+                                        data-price="<?php echo e($option['price']); ?>"
                                         style="width: 140px; cursor: pointer; background-color: #f9f9f9;">
-                                        <strong style="font-size: 13px;">{{ $option['proof_type'] }}</strong>
+                                        <strong style="font-size: 13px;"><?php echo e($option['proof_type']); ?></strong>
                                         <div class="text-muted" style="font-size: 12px;">
-                                            £{{ number_format($option['price'], 2) }}
+                                            £<?php echo e(number_format($option['price'], 2)); ?>
+
                                         </div>
                                     </div>
-                                @endif
-                            @endforeach
+                                <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
                 </div>
-            @endif
+            <?php endif; ?>
 
 
 
             <div class="addtobtn mt-3">
-                <button id="addToCartBtn" data-route="{{ route("cart.store") }}"
-                    data-subcategory-id="{{ $subcategory->id }}">Add to Cart</button>
-                @if ($deliveryChargesRequired)
+                <button id="addToCartBtn" data-route="<?php echo e(route("cart.store")); ?>"
+                    data-subcategory-id="<?php echo e($subcategory->id); ?>">Add to Cart</button>
+                <?php if($deliveryChargesRequired): ?>
                     <div class="note-dis">
                         <p>Delivery dates are estimated.</p>
                     </div>
-                @endif
+                <?php endif; ?>
 
             </div>
 
@@ -914,15 +916,16 @@
 
 
 <script>
-    const subcategoryId = {{ $subcategory->id }};
-    const attributeConditions = @json($conditionsMap);
+    const subcategoryId = <?php echo e($subcategory->id); ?>;
+    const attributeConditions = <?php echo json_encode($conditionsMap, 15, 512) ?>;
     const debouncedCalculateTotalPrice = debounce(calculateTotalPrice, 300);
-    const compositeMap = @json($compositeMap ?? []);
-    const compositeDraggerValues = @json($compositeDraggerValues ?? []);
+    const compositeMap = <?php echo json_encode($compositeMap ?? [], 15, 512) ?>;
+    const compositeDraggerValues = <?php echo json_encode($compositeDraggerValues ?? [], 15, 512) ?>;
     const pageRangeConfig = {
-        min: {{ $pagesDefaults['min'] ?? 1 }},
-        max: {{ $pagesDefaults['max'] ?? 840 }},
-        default: {{ $pagesDefaults['default'] ?? 1 }}
+        min: <?php echo e($pagesDefaults['min'] ?? 1); ?>,
+        max: <?php echo e($pagesDefaults['max'] ?? 840); ?>,
+        default: <?php echo e($pagesDefaults['default'] ?? 1); ?>
+
     };
     // const defaultPages = $defaultPages;
 
@@ -1090,10 +1093,10 @@
 
 
         $.ajax({
-            url: '{{ route('calculate.price') }}',
+            url: '<?php echo e(route('calculate.price')); ?>',
             method: 'POST',
             data: {
-                _token: '{{ csrf_token() }}',
+                _token: '<?php echo e(csrf_token()); ?>',
                 quantity,
                 pages,
                 attributes: selectedAttributes,
@@ -1148,8 +1151,8 @@
 
 
     $(function () {
-        const compositeMap = @json($compositeMap ?? []);
-        const compositeDraggerValues = @json($compositeDraggerValues ?? []);
+        const compositeMap = <?php echo json_encode($compositeMap ?? [], 15, 512) ?>;
+        const compositeDraggerValues = <?php echo json_encode($compositeDraggerValues ?? [], 15, 512) ?>;
 
         function renderCompositeDraggers(valueId) {
             const count = compositeMap[valueId] ?? 0;
@@ -1250,7 +1253,7 @@
                 // Clear image preview if exists
                 const previewImgSelector = `#preview-image-${attrId}`;
                 if ($(previewImgSelector).length) {
-                    $(previewImgSelector).attr('src', '{{ asset("storage/default-preview.png") }}');
+                    $(previewImgSelector).attr('src', '<?php echo e(asset("storage/default-preview.png")); ?>');
                 }
 
                 handleAttributeConditions(attrId, null);
@@ -1838,7 +1841,7 @@
             url: route,
             method: 'POST',
             data: {
-                _token: '{{ csrf_token() }}',
+                _token: '<?php echo e(csrf_token()); ?>',
                 quantity,
                 pages,
                 subcategory_id,
@@ -1870,4 +1873,4 @@
         });
     });
 
-</script>
+</script><?php /**PATH D:\web-mingo-project\new\resources\views/front/calculator.blade.php ENDPATH**/ ?>

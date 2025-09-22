@@ -68,7 +68,6 @@ class PricingRuleController extends Controller
     public function create()
     {
         $categories = Category::with('subcategories')->get();
-        $attributes = Attribute::with('values')->get();
         return view('admin.pricing-rules.create', compact('categories'));
     }
 
@@ -91,6 +90,8 @@ class PricingRuleController extends Controller
             'default_quantity' => 'required|integer|min:1',
             'proof_reading_required' => 'nullable|boolean',
             'delivery_charges_required' => 'nullable|boolean',
+            'centralized_paper_rates' => 'nullable|boolean',
+            'centralized_weight_rates' => 'nullable|boolean',
             'min_quantity' => 'nullable|integer|min:1|lte:max_quantity',
             'max_quantity' => 'nullable|integer|min:1|gte:min_quantity',
             'min_pages' => 'nullable|integer|min:1|lte:max_pages',
@@ -155,6 +156,8 @@ class PricingRuleController extends Controller
                 'max_pages' => $request->max_pages ?? null,
                 'proof_reading_required' => (int) $request->proof_reading_required,
                 'delivery_charges_required' => (int) $request->delivery_charges_required,
+                'centralized_paper_rates' => (int) $request->centralized_paper_rates,
+                'centralized_weight_rates' => (int) $request->centralized_weight_rates,
             ]);
 
             foreach ($request->rows as $row) {
@@ -277,6 +280,8 @@ class PricingRuleController extends Controller
             'max_quantity' => 'nullable|integer|min:1|gte:min_quantity',
             'min_pages' => 'nullable|integer|min:1|lte:max_pages',
             'max_pages' => 'nullable|integer|min:1|gte:min_pages',
+            'centralized_paper_rates' => 'nullable|boolean',
+            'centralized_weight_rates' => 'nullable|boolean',
             'default_pages' => [
                 'nullable',
                 'integer',
@@ -346,6 +351,8 @@ class PricingRuleController extends Controller
                 'max_pages' => $request->max_pages ?? null,
                 'proof_reading_required' => filter_var($request->proof_reading_required, filter: FILTER_VALIDATE_BOOLEAN),
                 'delivery_charges_required' => filter_var($request->delivery_charges_required, filter: FILTER_VALIDATE_BOOLEAN),
+                'centralized_paper_rates' => filter_var($request->centralized_paper_rates, filter: FILTER_VALIDATE_BOOLEAN),
+                'centralized_weight_rates' => filter_var($request->centralized_weight_rates, filter: FILTER_VALIDATE_BOOLEAN),
             ]);
 
             foreach ($request->input('rows', []) as $row) {
@@ -360,7 +367,7 @@ class PricingRuleController extends Controller
                     'extra_copy_charge' => $row['extra_copy_charge'] ?? null,
                     'extra_copy_charge_type' => $row['extra_copy_charge_type'] ?? null,
                     'flat_rate_per_page' => $row['flat_rate_per_page'] ?? null,
-                    
+
                     'max_width' => $row['max_width'] ?? null,
                     'max_height' => $row['max_height'] ?? null,
                 ];

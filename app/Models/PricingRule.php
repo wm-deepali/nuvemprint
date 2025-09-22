@@ -22,12 +22,16 @@ class PricingRule extends Model
         'max_pages',
         'proof_reading_required',
         'delivery_charges_required',
+        'centralized_paper_rates',
+        'centralized_weight_rates',
     ];
 
     protected $casts = [
         'pages_dragger_required' => 'boolean',
         'proof_reading_required' => 'boolean',
         'delivery_charges_required' => 'boolean',
+        'centralized_weight_rates' => 'boolean',
+        'centralized_paper_rates' => 'boolean',
     ];
 
 
