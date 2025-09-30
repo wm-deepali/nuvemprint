@@ -33,7 +33,7 @@
   <?php echo $__env->yieldContent('footer'); ?>
 
   <?php echo $__env->yieldPushContent('after-scripts'); ?>
-  	<script src="<?php echo e(URL::asset('assets/js/jquery.min.js')); ?>"></script>
+  <script src="<?php echo e(URL::asset('assets/js/jquery.min.js')); ?>"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const select = document.getElementById("countrySelect");
@@ -57,66 +57,6 @@
       }
     });
   </script>
-  <script>
-    const slider = document.querySelector('.slider');
-    const slides = document.querySelectorAll('.slide');
-    const prevBtn = document.querySelector('.prev');
-    const nextBtn = document.querySelector('.next');
-    let currentIndex = 0;
-    const totalSlides = slides.length / 2; // Original slides count
-
-    function updateSlider() {
-      const offset = -currentIndex * 33.33;
-      slider.style.transform = `translateX(${offset}%)`;
-      // Reset to cloned slides when reaching the end
-      if (currentIndex >= totalSlides) {
-        setTimeout(() => {
-          slider.style.transition = 'none';
-          currentIndex = 0;
-          slider.style.transform = `translateX(0)`;
-          setTimeout(() => {
-            slider.style.transition = 'transform 0.5s ease';
-          }, 50);
-        }, 500);
-      }
-      // Reset to original slides when going backward from start
-      if (currentIndex < 0) {
-        setTimeout(() => {
-          slider.style.transition = 'none';
-          currentIndex = totalSlides - 1;
-          slider.style.transform = `translateX(${-(currentIndex * 33.33)}%)`;
-          setTimeout(() => {
-            slider.style.transition = 'transform 0.5s ease';
-          }, 50);
-        }, 500);
-      }
-    }
-
-    nextBtn.addEventListener('click', () => {
-      currentIndex++;
-      updateSlider();
-    });
-
-    prevBtn.addEventListener('click', () => {
-      currentIndex--;
-      updateSlider();
-    });
-
-    // Auto slide every 5 seconds
-    let autoSlide = setInterval(() => {
-      currentIndex++;
-      updateSlider();
-    }, 5000);
-
-    // Pause on hover
-    sliderContainer.addEventListener('mouseover', () => clearInterval(autoSlide));
-    sliderContainer.addEventListener('mouseout', () => {
-      autoSlide = setInterval(() => {
-        currentIndex++;
-        updateSlider();
-      }, 5000);
-    });
-  </script>
 
   <script>
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -136,7 +76,68 @@
       });
     });
   </script>
+  <script>
+    const navLinks = document.querySelectorAll(".main-nav .nav-link");
+    const megaMenu = document.querySelector(".mega-dropdown");
+    const leftItems = document.querySelectorAll(".dropdown-left li");
+    const rightContents = document.querySelectorAll(".dropdown-right .content");
 
+    let isMenuOpen = false;
+
+    // Top menu click → open mega menu
+    navLinks.forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        let target = link.getAttribute("data-menu");
+
+        // Toggle open/close
+        if (isMenuOpen && megaMenu.dataset.active === target) {
+          megaMenu.style.display = "none";
+          isMenuOpen = false;
+          return;
+        }
+
+        megaMenu.style.display = "flex";
+        megaMenu.dataset.active = target;
+        isMenuOpen = true;
+
+        // left side active set (only on click)
+        leftItems.forEach(li => li.classList.remove("active"));
+        const leftTarget = document.querySelector(`.dropdown-left li[data-target="${target}"]`);
+        if (leftTarget) leftTarget.classList.add("active");
+
+        // right content show
+        rightContents.forEach(c => c.style.display = "none");
+        document.getElementById(target).style.display = "block";
+      });
+    });
+
+    // Left side click → update right content
+    leftItems.forEach(li => {
+      li.addEventListener("click", () => {
+        leftItems.forEach(x => x.classList.remove("active"));
+        li.classList.add("active");
+
+        let target = li.getAttribute("data-target");
+        rightContents.forEach(c => c.style.display = "none");
+        document.getElementById(target).style.display = "block";
+      });
+    });
+
+    // Outside click → close mega menu
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".main-nav") && !e.target.closest(".mega-dropdown")) {
+        megaMenu.style.display = "none";
+        isMenuOpen = false;
+      }
+    });
+    // Ensure menu is hidden initially
+    document.addEventListener("DOMContentLoaded", () => {
+      megaMenu.style.display = "none";
+      isMenuOpen = false;
+    });
+
+  </script>
 </body>
 
 </html><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/layouts/new-master.blade.php ENDPATH**/ ?>

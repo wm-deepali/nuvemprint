@@ -62,6 +62,7 @@ class SubCategoryController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'calculator_required' => 'nullable|boolean',
+            'is_premium' => 'required|in:no,yes'
         ]);
 
         if ($validator->fails()) {
@@ -96,6 +97,7 @@ class SubCategoryController extends Controller
                 'thumbnail' => $thumbnailPath,
                 'gallery' => $galleryPaths,
                 'status' => $request->status,
+                'is_premium' => $request->is_premium,
                 'calculator_required' => $request->calculator_required ?? 0,
             ]);
 
@@ -166,6 +168,7 @@ class SubCategoryController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'calculator_required' => 'nullable|boolean',
+            'is_premium' => 'required|in:no,yes'
         ]);
 
         if ($validator->fails()) {
@@ -213,6 +216,7 @@ class SubCategoryController extends Controller
                 'description' => $request->description,
                 'status' => $request->status,
                 'thumbnail' => $subcategory->thumbnail,
+                'is_premium' => $request->is_premium,
                 'gallery' => array_values($existingGallery), // reset keys
                 'calculator_required' => $request->calculator_required ?? 0,
             ]);

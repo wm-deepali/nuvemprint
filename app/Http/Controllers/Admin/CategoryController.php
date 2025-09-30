@@ -56,6 +56,7 @@ class CategoryController extends Controller
         $validator = Validator::make($requestData, [
             'name' => 'required|max:155',
             'status' => 'required',
+            'is_premium' => 'required|in:no,yes',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5024', // Updated to allow webp format and increased size limit
         ]);
 
@@ -71,6 +72,7 @@ class CategoryController extends Controller
                     'name' => $request->name,
                     'status' => $request->status,
                     'image' => $imagePath,
+                    'is_premium' => $request->is_premium,
                 ]);
 
                 DB::commit();
@@ -131,6 +133,7 @@ class CategoryController extends Controller
         $validator = Validator::make($requestData, [
             'name' => 'required|max:255',
             'status' => 'required',
+            'is_premium' => 'required|in:no,yes',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5024', // Updated to allow webp format and increased size limit
         ]);
 
@@ -151,6 +154,7 @@ class CategoryController extends Controller
                     'name' => $request->name,
                     'status' => $request->status,
                     'image' => $category->image,
+                    'is_premium' => $request->is_premium,
                 ]);
 
                 DB::commit();

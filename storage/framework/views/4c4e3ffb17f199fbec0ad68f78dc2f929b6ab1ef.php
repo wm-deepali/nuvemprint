@@ -13,8 +13,6 @@
     integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
-   
-
     /*.dropdown-menu {*/
     /*    -webkit-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);*/
     /*    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;*/
@@ -101,8 +99,8 @@
     .print-color.active,
     .print-color:focus {
         color: #495057;
-        background-color: #f8f3f3;
-        border: 2px solid #6bd3cc !important;
+        /*background-color: #f8f3f3;*/
+        /*border: 2px solid #6bd3cc !important;*/
         outline: 0;
         /*box-shadow: 0 0 0 0.1rem #6bd3cc !important;*/
     }
@@ -203,35 +201,53 @@
         cursor: pointer;
     }
 
-    .choose-binding.active {
-        background-color: #fff;
-        border: 1px solid #80bdff;
+    /*.choose-binding.active {*/
+    /*    background-color: #fff;*/
+    /*    border: 1px solid #80bdff;*/
+    /*    border-radius: 6px;*/
+    /*    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);*/
+    /*}*/
+    /* sirf image ke liye active style */
+    .choose-binding.active img {
+        border: 2px solid #80bdff;
         border-radius: 6px;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        box-shadow: 0 0 0 0.1rem rgb(173 175 177 / 25%);
+        padding: 7px;
+        margin-bottom: 5px;
     }
 
+    /* normal image */
     .choose-binding img {
         width: 100%;
         border: 1px solid gray;
         border-radius: 6px;
-        padding: 3px;
+        padding: 5px;
+        margin-bottom: 5px;
     }
+
+
+    /*.choose-binding img {*/
+    /*    width: 100%;*/
+    /*    border: 1px solid gray;*/
+    /*    border-radius: 6px;*/
+    /*    padding: 3px;*/
+    /*}*/
 
     .help-circle {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 14px;
-        height: 14px;
+        width: 18px;
+        height: 18px;
         border-radius: 50%;
         border: 1px solid #dbdbdb;
-        color: #b7b8b9;
+        color: #6f7070;
         font-weight: bold;
         font-size: 11px;
         cursor: pointer;
-        margin-left: 5px;
-        padding-left: 2px;
-        padding-top: 1px;
+        /*margin-left: 5px;*/
+        /*padding-left: 2px;*/
+        /*padding-top: 1px;*/
 
     }
 
@@ -243,7 +259,7 @@
     .form-label {
         display: flex;
         align-items: center;
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 600;
         gap: 5px;
     }
@@ -356,7 +372,7 @@
 
     .estimate-card.active .circle-point {
         border: 2px solid #6bd3cc;
-        background-color: white;
+        background-color: #fff;
     }
 
 
@@ -369,11 +385,38 @@
         align-items: center;
         padding: 15px;
         gap: 20px;
+        cursor: pointer;
+        background: #e9e9e924;
 
     }
 
+
+    .estimate-card-static {
+        width: 100%;
+        min-height: 15px;
+        border: 1px solid gray;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        gap: 20px;
+        cursor: pointer;
+        background: #e9e9e924;
+
+    }
+
+    .estimate-card-static.active {
+        border: 2px solid #6bd3cc;
+        background-color: #f8f3f3;
+    }
+
+    .estimate-card-static.active .circle-point {
+        border: 2px solid #6bd3cc;
+        background-color: #fff;
+    }
+
     .circle-point {
-        width: 20px;
+        width: 22px;
         height: 20px;
         border-radius: 50%;
         border: 1px solid gray;
@@ -538,10 +581,10 @@
         height: 20px;
         background-color: #ffffff;
         position: relative;
-        right: -1px;
-        right: 3px;
-        margin-top: -31px;
-        margin-top: -22px;
+
+        right: 5px;
+
+        margin-top: -30px;
         float: inline-end;
         border-top-left-radius: 3px;
     }
@@ -640,241 +683,334 @@
             display: none;
         }
     }
+
+    .cal-page {
+        width: 100%;
+        background: #f9f9f9;
+        padding: 50px 100px;
+    }
+
+    .page-slider input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        background: transparent;
+        /* background transparent kar dena */
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Track (gray line) */
+    .page-slider input[type="range"]::-webkit-slider-runnable-track {
+        height: 6px;
+        background: #e0e0e0;
+        border-radius: 3px;
+    }
+
+    .page-slider input[type="range"]::-moz-range-track {
+        height: 6px;
+        background: #e0e0e0;
+        border-radius: 3px;
+    }
+
+    /* Filled track (before thumb) */
+    .page-slider input[type="range"]::-webkit-slider-runnable-track {
+        background: linear-gradient(to right,
+                #007bff var(--value, 0%),
+                #e0e0e0 var(--value, 0%));
+    }
+
+    .page-slider input[type="range"]::-moz-range-progress {
+        background: #007bff;
+        height: 6px;
+        border-radius: 3px;
+    }
+
+    /* Thumb */
+    /* Thumb */
+    .page-slider input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        border: 4px solid #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-top: -8px;
+    }
+
+    .page-slider input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        border: 4px solid #007bff;
+        /* outer blue ring */
+        border-radius: 50%;
+        cursor: pointer;
+    }
 </style>
-
-<div class="row">
-    <div class="col-md-7">
-        <div class="reset-card">
-            <h5>Create Your <?php echo e($subcategory->name ?? "Booklets"); ?></h5>
-            <button>Reset</button>
-        </div>
-        <form>
-            <?php if(!empty($attributeGroups) && count($attributeGroups)): ?>
-                <?php
-                    $mainGroup = collect($attributeGroups)->first(function ($group) {
-                        return str_contains(strtolower($group['group_name']), 'main attributes');
-                    });
-                    $otherGroups = collect($attributeGroups)->reject(function ($group) {
-                        return str_contains(strtolower($group['group_name']), 'main attributes');
-                    });
-                ?>
-                <div class="calculation-card mt-3">
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="quantityInput" class="form-label">
-                                Quantity
-                                <span class="help-circle" data-label="Quantity" data-toggle="modal"
-                                    data-target="#helpModal">?</span>
-                            </label>
-                            <input type="number" class="form-control" id="quantityInput" placeholder="100"
-                                value="<?php echo e($quantityDefaults['default'] ?? 100); ?>" min="<?php echo e($quantityDefaults['min'] ?? 1); ?>"
-                                max="<?php echo e($quantityDefaults['max'] ?? 10000); ?>">
-                            <div class="invalid-feedback d-none" id="quantityError">
-                                Quantity must be between <?php echo e($quantityDefaults['min'] ?? 1); ?> and
-                                <?php echo e($quantityDefaults['max'] ?? 10000); ?>.
-                            </div>
-                        </div>
-
-
+<div class="cal-page">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="reset-card">
+                <h5 class="m-0">Create Your <?php echo e($subcategory->name ?? "Booklets"); ?></h5>
+                <button class="m-0">Reset</button>
+            </div>
+            <form>
+                <?php if(!empty($attributeGroups) && count($attributeGroups)): ?>
+                    <?php
+                        $mainGroup = collect($attributeGroups)->first(function ($group) {
+                            return str_contains(strtolower($group['group_name']), 'main attributes');
+                        });
+                        $otherGroups = collect($attributeGroups)->reject(function ($group) {
+                            return str_contains(strtolower($group['group_name']), 'main attributes');
+                        });
+                    ?>
+                    <div class="calculation-card mt-3">
                         
-                        <?php if(isset($mainGroup['attributes'])): ?>
-                            <?php $__currentLoopData = $mainGroup['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php echo $__env->make('front.attribute-block', ['attribute' => $attribute], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        <?php endif; ?>
-                    </div>
-
-                    <?php if($pagesDraggerRequired): ?>
-                        <div id="composite-draggers" class="mt-3">
-                            
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if($pagesDraggerRequired): ?>
-                        <div class="form-row-section1 pages-dragger-wrapper">
-                            <div class="s-row mb-3 pages-dragger">
-                                <label>Pages
-                                    <span class="help-circle" data-label="Pages" data-toggle="modal"
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="quantityInput" class="form-label">
+                                    Quantity
+                                    <span class="help-circle" data-label="Quantity" data-toggle="modal"
                                         data-target="#helpModal">?</span>
                                 </label>
-                                <div class="page-slider">
-                                    <input type="range" name="pages[]" min="<?php echo e($pagesDefaults['min'] ?? 1); ?>"
-                                        max="<?php echo e($pagesDefaults['max'] ?? 840); ?>" value="<?php echo e($pagesDefaults['default'] ?? 1); ?>"
-                                        step="1" id="pageSlider">
-                                    <div class="range-value">
-                                        <button type="button">-</button>
-                                        <span id="pageValue"><?php echo e($pagesDefaults['default'] ?? 1); ?></span>
-                                        <button type="button">+</button>
-                                    </div>
+                                <input type="number" class="form-control" id="quantityInput" placeholder="100"
+                                    value="<?php echo e($quantityDefaults['default'] ?? 100); ?>"
+                                    min="<?php echo e($quantityDefaults['min'] ?? 1); ?>" max="<?php echo e($quantityDefaults['max'] ?? 10000); ?>">
+                                <div class="invalid-feedback d-none" id="quantityError">
+                                    Quantity must be between <?php echo e($quantityDefaults['min'] ?? 1); ?> and
+                                    <?php echo e($quantityDefaults['max'] ?? 10000); ?>.
                                 </div>
                             </div>
-                        </div>
-                    <?php endif; ?>
 
 
-                </div>
-                
-                <?php $__currentLoopData = $otherGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php
-                        $groupKey = \Illuminate\Support\Str::slug($group['group_name'], '_');
-                        $isToggleable = $group['is_toggleable'] ?? false;
-                    ?>
-
-                    <div class="calculation-card mt-3">
-                        <?php if($isToggleable): ?>
                             
-
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input group-toggle" style="border: 1px solid #212529" type="checkbox"
-                                    id="toggle_<?php echo e($groupKey); ?>" data-target="#section_<?php echo e($groupKey); ?>">
-                                <label class="form-check-label" for="toggle_<?php echo e($groupKey); ?>"><?php echo e($group['group_name']); ?></label>
-                            </div>
-                        <?php else: ?>
-                            
-                            <h5 class="mb-2"><?php echo e($group['group_name']); ?></h5>
-                        <?php endif; ?>
-                        <div class="mt-3 <?php echo e($isToggleable ? 'd-none' : ''); ?>" id="section_<?php echo e($groupKey); ?>">
-                            <div class="row">
-                                <?php $__currentLoopData = $group['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <?php
-                                        // Disable default selection if group is toggleable
-                                        if ($group['is_toggleable'] ?? false) {
-                                            $attribute['values'] = $attribute['values']->map(function ($val) {
-                                                $val['original_is_default'] = $val['is_default'];
-                                                $val['is_default'] = false;
-                                                return $val;
-                                            });
-                                        }
-                                        // dd($attribute); // check to confirm is_default: false now
-                                    ?>
-
+                            <?php if(isset($mainGroup['attributes'])): ?>
+                                <?php $__currentLoopData = $mainGroup['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <?php echo $__env->make('front.attribute-block', ['attribute' => $attribute], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-            <?php endif; ?>
-        </form>
-    </div>
-    <div class="col-md-5">
-        <div class="right-side-section">
-            <?php
-                use Carbon\Carbon;
-            ?>
-
-            <?php if($deliveryChargesRequired): ?>
-                <h5>Choose Price & Delivery Date</h5>
-                <?php $__currentLoopData = $deliveryCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php
-                        $deliveryDate = Carbon::now()->addDays($option['no_of_days']);
-                        $formattedDate = $deliveryDate->format('D, jS M');
-                        $detailsHtml = $option['details'] ?? null;
-                        $title = $option['title'] ?? null;
-                    ?>
-
-
-                    <div class="estimate-card estimate-option <?php echo e($option['is_default'] ? 'active' : 'mt-3'); ?>"
-                        data-price="<?php echo e($option['price']); ?>" data-date="<?php echo e($formattedDate); ?>" data-id="<?php echo e($option['id']); ?>">
-                        <div class="circle-point"></div>
-                        <div class="est-card">
-
-                            <div class="estimate-div">
-                                <div class="<?php echo e($option['is_default'] ? 'ast-active' : ''); ?>">
-
-                                    <p class="m-0 text-black">Estimated Delivery:</p>
-                                    <h4 class="text-black mb-1"><?php echo e($formattedDate); ?></h4>
-                                    <?php if($title): ?>
-                                        <div class="title text-muted small d-none"><?php echo e($title); ?></div>
-                                    <?php endif; ?>
-
-                                </div>
-                                <div class="line-y"></div>
-                                <div>
-                                    <h4 class="text-black final-price">
-                                        £<?php echo e(number_format($option['price'], 2)); ?></h4>
-                                </div>
-                            </div>
-
-                            <?php if(!empty($detailsHtml)): ?>
-                                <div class="line-x detail-section d-none"></div>
-                                <div class="disci text-black detail-section d-none">
-                                    <?php echo $detailsHtml; ?>
-
-                                </div>
                             <?php endif; ?>
-
                         </div>
-                    </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            <?php else: ?>
-                <div class="text-black mb-3">
-                    <h4 class="final-price">£0.00</h4>
-                </div>
-            <?php endif; ?>
 
-            <?php if($proofReadingRequired && !empty($proofReadings)): ?>
-                <div class="form-row-section1 mt-3">
-                    <div class="s-row mb-3">
-                        <label for="proof-reading" style="    font-size: 1.25rem;">Proof Reading</label>
-                        <div class="d-flex flex-wrap gap-3">
-                            <?php $__currentLoopData = $proofReadings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php if(!empty($option['proof_type']) && isset($option['price'])): ?>
-                                    <div class="selectable-proof-option border rounded p-2 text-center"
-                                        data-id="<?php echo e($option['id']); ?>" data-value="<?php echo e($option['proof_type']); ?>"
-                                        data-price="<?php echo e($option['price']); ?>"
-                                        style="width: 140px; cursor: pointer; background-color: #f9f9f9;">
-                                        <strong style="font-size: 13px;"><?php echo e($option['proof_type']); ?></strong>
-                                        <div class="text-muted" style="font-size: 12px;">
-                                            £<?php echo e(number_format($option['price'], 2)); ?>
+                        <?php if($pagesDraggerRequired): ?>
+                            <div id="composite-draggers" class="mt-3">
+                                
+                            </div>
+                        <?php endif; ?>
 
+                        <?php if($pagesDraggerRequired): ?>
+                            <div class="form-row-section1 pages-dragger-wrapper">
+                                <div class="s-row mb-3 pages-dragger">
+                                    <label>Pages
+                                        <span class="help-circle" data-label="Pages" data-toggle="modal"
+                                            data-target="#helpModal">?</span>
+                                    </label>
+                                    <div class="page-slider">
+                                        <input type="range" name="pages[]" min="<?php echo e($pagesDefaults['min'] ?? 1); ?>"
+                                            max="<?php echo e($pagesDefaults['max'] ?? 840); ?>"
+                                            value="<?php echo e($pagesDefaults['default'] ?? 1); ?>" step="1" id="pageSlider">
+                                        <div class="range-value">
+                                            <button type="button">-</button>
+                                            <span id="pageValue"><?php echo e($pagesDefaults['default'] ?? 1); ?></span>
+                                            <button type="button">+</button>
                                         </div>
                                     </div>
-                                <?php endif; ?>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+
+                    </div>
+                    
+                    <?php $__currentLoopData = $otherGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
+                            $groupKey = \Illuminate\Support\Str::slug($group['group_name'], '_');
+                            $isToggleable = $group['is_toggleable'] ?? false;
+                        ?>
+
+                        <div class="calculation-card mt-3">
+                            <?php if($isToggleable): ?>
+                                
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input group-toggle" style="border: 1px solid #212529;margin-top: 9px;"
+                                        type="checkbox" id="toggle_<?php echo e($groupKey); ?>" data-target="#section_<?php echo e($groupKey); ?>">
+                                    <label class="form-check-label" for="toggle_<?php echo e($groupKey); ?>"
+                                        style="font-weight:600; font-size:22px;"><?php echo e($group['group_name']); ?></label>
+                                </div>
+                            <?php else: ?>
+                                
+                                <h5 class="mb-2"><?php echo e($group['group_name']); ?></h5>
+                            <?php endif; ?>
+                            <div class="mt-3 <?php echo e($isToggleable ? 'd-none' : ''); ?>" id="section_<?php echo e($groupKey); ?>">
+                                <div class="row">
+                                    <?php $__currentLoopData = $group['attributes']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
+                                            // Disable default selection if group is toggleable
+                                            if ($group['is_toggleable'] ?? false) {
+                                                $attribute['values'] = $attribute['values']->map(function ($val) {
+                                                    $val['original_is_default'] = $val['is_default'];
+                                                    $val['is_default'] = false;
+                                                    return $val;
+                                                });
+                                            }
+                                            // dd($attribute); // check to confirm is_default: false now
+                                        ?>
+
+                                        <?php echo $__env->make('front.attribute-block', ['attribute' => $attribute], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                <?php endif; ?>
+            </form>
+        </div>
+        <div class="col-md-5">
+            <div class="right-side-section">
+                <div class="estimate-card-static active estimate-option-static mb-3" data-date="<?php echo e($defaultDate); ?>">
+                    <div class="est-card">
+                        <div class="estimate-div">
+                            <div class="ast-active-static">
+                                <p class="m-0 text-black">Estimated Delivery:</p>
+                                <h4 class="text-black mb-1"><?php echo e($defaultDate); ?></h4>
+                                <div class="title-static text-muted small">Standard Delivery</div>
+                            </div>
+                            <div class="line-y"></div>
+                            <div>
+                                <h4 class="text-black final-price">£0</h4>
+                            </div>
+                        </div>
+                        <div class="line-x detail-section-static"></div>
+                        <div class="disci text-black detail-section-static">
+                            Delivery between <?php echo e($minDate); ?> – <?php echo e($maxDate); ?>. Includes standard packaging.
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
 
+                <hr>
 
+                <?php
+                    use Carbon\Carbon;
+                ?>
 
-            <div class="addtobtn mt-3">
-                <button id="addToCartBtn" data-route="<?php echo e(route("cart.store")); ?>"
-                    data-subcategory-id="<?php echo e($subcategory->id); ?>">Add to Cart</button>
                 <?php if($deliveryChargesRequired): ?>
-                    <div class="note-dis">
-                        <p>Delivery dates are estimated.</p>
+                    <h5>Choose Price & Delivery Date</h5>
+                    <?php $__currentLoopData = $deliveryCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
+                            $deliveryDate = Carbon::now()->addDays($option['no_of_days']);
+                            $formattedDate = $deliveryDate->format('D, jS M');
+                            $detailsHtml = $option['details'] ?? null;
+                            $title = $option['title'] ?? null;
+                        ?>
+
+
+                        <div class="estimate-card estimate-option <?php echo e($option['is_default'] ? 'active' : 'mt-3'); ?>"
+                            data-price="<?php echo e($option['price']); ?>" data-date="<?php echo e($formattedDate); ?>" data-id="<?php echo e($option['id']); ?>">
+                            <div class="circle-point"></div>
+                            <div class="est-card">
+
+                                <div class="estimate-div">
+                                    <div class="<?php echo e($option['is_default'] ? 'ast-active' : ''); ?>">
+
+                                        <p class="m-0 text-black">Estimated Delivery:</p>
+                                        <h4 class="text-black mb-1"><?php echo e($formattedDate); ?></h4>
+                                        <?php if($title): ?>
+                                            <div class="title text-muted small d-none"><?php echo e($title); ?></div>
+                                        <?php endif; ?>
+
+                                    </div>
+                                    <div class="line-y"></div>
+                                    <div>
+                                        <h4 class="text-black final-price">
+                                            £<?php echo e(number_format($option['price'], 2)); ?></h4>
+                                    </div>
+                                </div>
+
+                                <?php if(!empty($detailsHtml)): ?>
+                                    <div class="line-x detail-section d-none"></div>
+                                    <div class="disci text-black detail-section d-none">
+                                        <?php echo $detailsHtml; ?>
+
+                                    </div>
+                                <?php endif; ?>
+
+                            </div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php else: ?>
+                    <div class="text-black mb-3">
+                        <h4 class="final-price">£0.00</h4>
+                    </div>
+                <?php endif; ?>
+                <hr>
+                <?php if($proofReadingRequired && !empty($proofReadings)): ?>
+                    <div class="form-row-section1 mt-3">
+                        <div class="s-row mb-3">
+                            <label for="proof-reading" style="    font-size: 1.25rem;">Proof Reading</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <?php $__currentLoopData = $proofReadings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php if(!empty($option['proof_type']) && isset($option['price'])): ?>
+                                        <div class="selectable-proof-option border rounded p-2 text-center"
+                                            data-id="<?php echo e($option['id']); ?>" data-value="<?php echo e($option['proof_type']); ?>"
+                                            data-price="<?php echo e($option['price']); ?>"
+                                            style="width: 45%; cursor: pointer; background-color: #f9f9f9;">
+                                            <strong style="font-size: 13px;"><?php echo e($option['proof_type']); ?></strong>
+
+                                            <div class="text-muted" style="font-size: 24px; font-weight:600;">
+                                                £<?php echo e(number_format($option['price'], 2)); ?>
+
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </div>
                     </div>
                 <?php endif; ?>
 
+
+
+                <div class="addtobtn mt-3">
+                    <button id="addToCartBtn" data-route="<?php echo e(route("cart.store")); ?>"
+                        data-subcategory-id="<?php echo e($subcategory->id); ?>">Add to Cart</button>
+                    <?php if($deliveryChargesRequired): ?>
+                        <div class="note-dis">
+                            <p>Delivery dates are estimated.</p>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+
             </div>
 
+            <!--<div class="extra-card mt-3">-->
+            <!--    <img-->
+            <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
+            <!--    <div class="extra-card-details">-->
+            <!--        <h6 class="m-0">Print on Demand</h6>-->
+            <!--        <p>Download the free PDF template we created for your specifications.</p>-->
+            <!--        <a href="">Get a Qoute</a>-->
+            <!--    </div>-->
+            <!--</div>-->
+            <!--<div class="extra-card mt-3">-->
+            <!--    <img-->
+            <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
+            <!--    <div class="extra-card-details">-->
+            <!--        <h6 class="m-0">Print on Demand</h6>-->
+            <!--        <p>Download the free PDF template we created for your specifications.</p>-->
+            <!--        <a href="">Get a Qoute</a>-->
+            <!--    </div>-->
+            <!--</div>-->
         </div>
-
-        <!--<div class="extra-card mt-3">-->
-        <!--    <img-->
-        <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
-        <!--    <div class="extra-card-details">-->
-        <!--        <h6 class="m-0">Print on Demand</h6>-->
-        <!--        <p>Download the free PDF template we created for your specifications.</p>-->
-        <!--        <a href="">Get a Qoute</a>-->
-        <!--    </div>-->
-        <!--</div>-->
-        <!--<div class="extra-card mt-3">-->
-        <!--    <img-->
-        <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
-        <!--    <div class="extra-card-details">-->
-        <!--        <h6 class="m-0">Print on Demand</h6>-->
-        <!--        <p>Download the free PDF template we created for your specifications.</p>-->
-        <!--        <a href="">Get a Qoute</a>-->
-        <!--    </div>-->
-        <!--</div>-->
     </div>
 </div>
+
 
 <!-- Bootstrap 4 Modal -->
 <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel" aria-hidden="true">
@@ -1105,39 +1241,23 @@
             success: function (res) {
                 if (res.success) {
                     const calculatedPrice = parseFloat(res.total_price) || 0;
-
                     const selectedProofOption = $('.selectable-proof-option.active');
                     const proofPrice = parseFloat(selectedProofOption.data('price')) || 0;
+                    const selectedDeliveryOption = $('.estimate-card.active');
+                    const deliveryPrice = parseFloat(selectedDeliveryOption.data('price')) || 0;
 
-                    const total = calculatedPrice + proofPrice;
+                    const total = calculatedPrice + proofPrice + deliveryPrice;
                     const formattedTotal = '£' + total.toFixed(2);
-                    const estimateCards = $('.estimate-card');
 
-                    if (estimateCards.length > 0) {
-                        estimateCards.each(function () {
-                            const card = $(this);
-                            const deliveryCharge = parseFloat(card.data('price')) || 0;
-                            const cardTotal = deliveryCharge + total;
-                            const formattedCardTotal = '£' + cardTotal.toFixed(2);
-                            card.find('.final-price').text(formattedCardTotal);
-                        });
+                    // Find the static card that is active
+                    const staticCard = $('.estimate-card-static.active');
+
+                    if (staticCard.length > 0) {
+                        staticCard.find('.final-price').text(formattedTotal);
                     } else {
-                        // Fallback: no estimate card, update global/normal final-price
+                        // fallback to update any final-price display
                         $('.final-price').text(formattedTotal);
                     }
-
-                    // $('.estimate-card').each(function () {
-                    //     const card = $(this);
-                    //     const deliveryCharge = parseFloat(card.data('price')) || 0;
-
-                    //     const selectedProofOption = $('.selectable-proof-option.active');
-                    //     const proofPrice = parseFloat(selectedProofOption.data('price')) || 0;
-
-                    //     const total = deliveryCharge + calculatedPrice + proofPrice;
-                    //     const formattedTotal = '£' + total.toFixed(2);
-
-                    //     card.find('.final-price').text(formattedTotal);
-                    // });
                 }
             },
 
@@ -1510,9 +1630,7 @@
                 // Only insert <hr> if it's not the last one
                 if (index !== $attributeBlocks.length - 1) {
                     $col.after(`
-                    <div class="col-md-12 hr-wrapper" data-hr-for-index="${index}">
-                        <hr style="height: 0.8px; opacity: 0.25; color: inherit; border: 0;">
-                    </div>
+                   
                 `);
                 }
                 colSum = 0;
@@ -1663,8 +1781,27 @@
         forceSliderRedraw();
         calculatedAttributeRow();
 
+        const savedDeliveryCharge = JSON.parse(localStorage.getItem('selectedDeliveryCharge'));
+        if (savedDeliveryCharge && savedDeliveryCharge.id) {
+            // Find the estimate card matching saved ID
+            const selectedCard = document.querySelector(`.estimate-card[data-id="${savedDeliveryCharge.id}"]`);
+            if (selectedCard) {
+                // Remove active class from all cards first
+                document.querySelectorAll('.estimate-card.active').forEach(card => {
+                    card.classList.remove('active');
+                });
+                // Add active class to matched card
+                selectedCard.classList.add('active');
+                const selectedDate = $(this).data('date'); // e.g., "25 Sep, 2025"
+                $('.estimate-card-static .text-black.mb-1').text(selectedDate);
+                calculateTotalPrice();
+                // If you need to show/hide details or update other UI parts, do it here.
+            }
+        }
 
-        $('.estimate-option').on('click', function () {
+
+        $('.estimate-card').on('click', function () {
+            // Remove active from siblings and add to clicked
             $('.estimate-option').removeClass('active');
             $('.estimate-option .ast-active').removeClass('ast-active');
 
@@ -1676,7 +1813,15 @@
 
             $(this).find('.detail-section').removeClass('d-none');
             $(this).find('.title').removeClass('d-none');
+            calculateTotalPrice();
+
+            // Get selected delivery date from data-date attribute
+            const selectedDate = $(this).data('date'); // e.g., "25 Sep, 2025"
+
+            // Update the static card main date h4 text
+            $('.estimate-card-static .text-black.mb-1').text(selectedDate);
         });
+
 
         // Show details for the initially active card (based on is_default)
         const $initial = $('.estimate-option.active');
@@ -1821,7 +1966,7 @@
 
         const subcategory_id = $(this).data('subcategory-id');
 
-        const selectedCard = $('.estimate-card.active'); // or use `.selected`, however your logic marks it
+        const selectedCard = $('.estimate-card-static.active'); // or use `.selected`, however your logic marks it
 
         var finalPriceText = 0;
 

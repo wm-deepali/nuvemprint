@@ -31,6 +31,13 @@
               </div>
             </div>
 
+            <div class="form-group col-md-4">
+              <label>Image</label>
+              <input type="file" name="delivery_charges[0][image]" class="form-control" accept="image/*">
+              <span class="text-danger validation-err" id="delivery_charges_0_image-err"></span>
+            </div>
+
+
             <div class="form-group">
               <label>Details</label>
               <textarea name="delivery_charges[0][details]" id="details-0" class="form-control ck-editor"
@@ -84,6 +91,13 @@
             <span class="text-danger validation-err" id="delivery_charges_${valueIndex}_delivery-err"></span>
           </div>
         </div>
+
+        <div class="form-group col-md-4">
+    <label>Image</label>
+    <input type="file" name="delivery_charges[${valueIndex}][image]" class="form-control" accept="image/*">
+    <span class="text-danger validation-err" id="delivery_charges_${valueIndex}_image-err"></span>
+</div>
+
 
         <div class="form-group">
           <label>Details</label>

@@ -151,7 +151,7 @@
             <img src="<?php echo e(asset('storage/' . $gallery)); ?>" class="details-slide <?php echo e($y == 0 ? 'active' : ''); ?>" alt="">
           <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           <!-- <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet3-1.webp" class="details-slide active">
-                          <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet4-1.webp" class="details-slide"> -->
+                                  <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet4-1.webp" class="details-slide"> -->
         </div>
       <?php endif; ?>
 
@@ -166,19 +166,19 @@
       <?php endif; ?>
       <!-- Thumbnails -->
       <!-- <div class="details-thumbnails">
-              <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet3-1.webp" data-slide="0"
-                class="details-thumb active">
-              <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet4-1.webp" data-slide="1"
-                class="details-thumb">
-            </div> -->
+                  <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet3-1.webp" data-slide="0"
+                    class="details-thumb active">
+                  <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet4-1.webp" data-slide="1"
+                    class="details-thumb">
+                </div> -->
     </div>
   </div>
 
-  <div class="container py-5">
-    <?php if($subcategory->calculator_required): ?>
-      <?php echo $__env->make('front.calculator', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-    <?php endif; ?>
-  </div>
+  <!--<div class="container ">-->
+  <?php if($subcategory->calculator_required): ?>
+    <?php echo $__env->make('front.calculator', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+  <?php endif; ?>
+  <!--</div>-->
 
   <div class="details-page-tab-container">
     <!-- Tabs -->
@@ -216,43 +216,24 @@
       </div>
     </div>
 
-    <!-- Slider -->
     <div class="details-related-slider-wrapper">
       <div class="details-related-slider">
-        <!-- Slide 1 -->
-        <div class="details-related-slide">
-          <div class="details-related-card">
-            <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/wall-calendar-11.webp" alt="">
-            <h3>Product 1</h3>
+        <?php $__currentLoopData = $relatedSubcategories->chunk(3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $chunk): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <div class="details-related-slide">
+            <?php $__currentLoopData = $chunk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $related): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <div class="details-related-card">
+                <img
+                  src="<?php echo e($related->thumbnail ? asset('storage/' . $related->thumbnail) : 'https://d1e8vjamx1ssze.cloudfront.net/product-images/wall-calendar-11.webp'); ?>"
+                  alt="<?php echo e($related->name); ?>">
+                <h3><?php echo e($related->name); ?></h3>
+              </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           </div>
-          <div class="details-related-card">
-            <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/wire-booklet-11.webp" alt="">
-            <h3>Product 2</h3>
-          </div>
-          <div class="details-related-card">
-            <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/zine1-1.webp" alt="">
-            <h3>Product 3</h3>
-          </div>
-        </div>
-
-        <!-- Slide 2 -->
-        <div class="details-related-slide">
-          <div class="details-related-card">
-            <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/stapled-booklet-1-1.webp" alt="">
-            <h3>Product 4</h3>
-          </div>
-          <div class="details-related-card">
-            <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/image-26-07-2025-at-2104.webp" alt="">
-            <h3>Product 5</h3>
-          </div>
-          <div class="details-related-card">
-            <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/stapledprogrammeopenconference.webp" alt="">
-            <h3>Product 6</h3>
-          </div>
-        </div>
-        <!-- Add more slides as needed -->
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
       </div>
     </div>
+
+  
   </div>
 
   <script>
@@ -269,16 +250,18 @@
 
     // Next slide
     nextBtn.addEventListener('click', () => {
-      currentIndex = (currentIndex + 1) % slides.length; // infinite loop
+      currentIndex = (currentIndex + 1) % slides.length;
       showSlide(currentIndex);
     });
 
     // Previous slide
     prevBtn.addEventListener('click', () => {
-      currentIndex = (currentIndex - 1 + slides.length) % slides.length; // infinite loop
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
       showSlide(currentIndex);
     });
+
   </script>
+
   <script>
     // Tabs logic
     const pageTabBtns = document.querySelectorAll('.details-page-tab-btn');

@@ -9,7 +9,7 @@
 		<!-- Left Side Logo & Info -->
 		<div class="footer-logo">
 			<a href="#" class="logo"><img src="{{ asset('assets') }}/images/NuvemPrint.png"></a>
-			<p>Mixam is a leading online printing platform that creates customisable print products for a global
+			<p>Nuvem is a leading online printing platform that creates customisable print products for a global
 				audience.
 				We make print easy, accessible, and affordable with competitive pricing, exceptional materials and pro
 				customer service.</p>
@@ -66,7 +66,8 @@
 			</ul>
 		</div>
 
-		<?php $fsubcates = footerSubCategories(); $fcates = footerCategories(); ?>
+		<?php $fsubcates = footerSubCategories();
+$fcates = footerCategories(); ?>
 		<!-- Popular Items -->
 		<div class="footer-section">
 			<h4>Popular Items</h4>
@@ -87,9 +88,12 @@
 			<ul>
 				@if(isset($fcates) && count($fcates) > 0)
 					@foreach($fcates as $fcate)
-						<li><a href="#">{{ $fcate->name }}</a></li>
+						<li>
+							<a href="{{ route('category-products', ['slug' => $fcate->slug]) }}">{{ $fcate->name }}</a>
+						</li>
 					@endforeach
 				@endif
+
 			</ul>
 		</div>
 
@@ -97,7 +101,7 @@
 
 	<!-- Bottom Bar -->
 	<div class="footer-bottom">
-		<p>© 2003 - 2025, Mixam UK Limited. All rights reserved.</p>
+		<p>© 2003 - 2025, Nuvem Print. All rights reserved.</p>
 		<div class="payments">
 			<img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal">
 			<img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Stripe_Logo%2C_revised_2016.svg" alt="Stripe">

@@ -85,6 +85,31 @@ if (!function_exists('menuCategories')) {
 	}
 	
 }
+
+if (!function_exists('getFilteredSubcategories')) {
+    /**
+     * Get subcategories filtered by category slug, or all unique subcategories if no slug provided.
+     *
+     * @param string|null $slug
+     * @return \Illuminate\Support\Collection
+     */
+    function getFilteredSubcategories(?string $slug = null)
+    {
+        if ($slug) {
+            $category = Category::where('slug', $slug)
+                ->where('status', 'active')
+                ->with('subcategories')
+                ->first();
+
+            return $category ? $category->subcategories : collect();
+        }
+
+        $menucats = menuCategories();
+
+        return $menucats->flatMap->subcategories->unique('id');
+    }
+}
+
 if (!function_exists('footerSubCategories')) {
 	function footerSubCategories(){
 		$subcategories = Subcategory::where('status', 'active')->where('is_premium', 'yes')->get();
@@ -94,7 +119,7 @@ if (!function_exists('footerSubCategories')) {
 }
 if (!function_exists('footerCategories')) {
 	function footerCategories(){
-		$categories = category::where('status', 'active')->get();
+		$categories = category::where('status', 'active')->where('is_premium', 'yes')->get();
 		return $categories;
 	}
 	

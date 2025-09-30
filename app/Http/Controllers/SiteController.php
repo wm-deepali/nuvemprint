@@ -43,6 +43,19 @@ class SiteController extends Controller
 
         $subcategoryId = $subcategory->id;
 
+        // Get category IDs of current subcategory
+       $categoryIds = $subcategory->categories()->pluck('categories.id')->toArray();
+
+        // Fetch related subcategories that share these categories, exclude current subcategory
+        $relatedSubcategories = Subcategory::whereHas('categories', function ($query) use ($categoryIds) {
+            $query->whereIn('categories.id', $categoryIds);
+        })
+            ->where('id', '!=', $subcategory->id)
+            ->where('status', 'active')
+            ->limit(6) // limit number as needed
+            ->get();
+
+
         // NEW: Check if calculator is required
         $calculatorRequired = $subcategory->calculator_required;
 
@@ -68,7 +81,9 @@ class SiteController extends Controller
         $deliveryChargesRequired = false;
         $proofReadingRequired = false;
         $proofReadings = collect();
-
+        $minDate = null;
+        $maxDate = null;
+        $defaultDate = null;
 
         if ($calculatorRequired) {
             $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
@@ -115,6 +130,19 @@ class SiteController extends Controller
                     $deliveryCharges = DeliveryCharge::orderByDesc('is_default')
                         ->orderBy('no_of_days')
                         ->get();
+
+                    if ($deliveryCharges->isNotEmpty()) {
+                        // Convert no_of_days to actual dates assuming today as base
+                        $dates = $deliveryCharges->map(function ($dc) {
+                            return now()->addDays($dc->no_of_days);
+                        });
+
+                        $minDate = $dates->min()->format('D, jS M');
+                        $maxDate = $dates->max()->format('D, jS M');
+
+                        $defaultDeliveryCharge = $deliveryCharges->firstWhere('is_default', true);
+                        $defaultDate = $defaultDeliveryCharge ? now()->addDays($defaultDeliveryCharge->no_of_days)->format('D, jS M') : $minDate;
+                    }
                 }
 
                 $proofReadingRequired = $pricingRule->proof_reading_required;
@@ -253,7 +281,7 @@ class SiteController extends Controller
             $compositeMap = collect($compositeDraggerValues)->pluck('component_count', 'id');
             $compositeMap = $compositeMap->prepend('-- Select --', '');
         }
-
+        // dd($relatedSubcategories->toArray());
         return view('front.subcategory-detail', compact(
             'subcategory',
             'attributeGroups',
@@ -266,8 +294,12 @@ class SiteController extends Controller
             'pagesDefaults',
             'deliveryChargesRequired',
             'deliveryCharges',
+            'minDate',
+            'maxDate',
+            'defaultDate',
             'proofReadingRequired',
-            'proofReadings'
+            'proofReadings',
+            'relatedSubcategories'
         ));
 
     }
@@ -524,12 +556,12 @@ class SiteController extends Controller
                         // dd($total);
                         // Use Regular Pricing
                         $attrs = PricingRuleAttribute::with(['quantityRanges', 'attribute', 'dependencies'])
-                        ->where('attribute_id', $attributeId)
-                        ->where('value_id', $valueId)
-                        ->where('pricing_rule_id', $pricingRule->id)
-                        ->get();
-                        
-                        
+                            ->where('attribute_id', $attributeId)
+                            ->where('value_id', $valueId)
+                            ->where('pricing_rule_id', $pricingRule->id)
+                            ->get();
+
+
                         $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
                             foreach ($item->dependencies as $dep) {
                                 $selected = $selectedAttributes[$dep->parent_attribute_id] ?? null;

@@ -9,7 +9,7 @@
 
 	<!-- Black Strip Banner -->
 	<div class="promo-strip">
-		Sign up for an account and earn <span>2×</span> points on your first order.
+		<span>Sign up</span> for an account and earn <span>2×</span> points on your first order.
 	</div>
 
 	<!-- Hero Section -->
@@ -20,6 +20,11 @@
 		<div class="hero-input">
 			<input type="text" placeholder="Type a project idea and I'll help you bring it to life...">
 			<button><i class="fa fa-arrow-right"></i></button>
+		</div>
+		<div class="banner-part-button">
+			<button>I want to order...</button>
+			<button>I want to Publish...</button>
+			<button>I need help with...</button>
 		</div>
 	</div>
 	<div class="section-container">
@@ -48,17 +53,10 @@
 						Mixam's
 						free design tools make it effortless to create professional, print-ready files-no experience needed.
 					</p>
-					<p>From free downloadable templates to AI-powered design tools, you have everything you need to bring
-						your
-						vision to life!</p>
-					<ul>
-						<li>Free templates, fonts, and graphics</li>
-						<li>AI-powered layout tools</li>
-						<li>Built-in quality checks</li>
-					</ul>
+
 				</div>
 				<div class="video-content">
-					<video autoplay loop muted playsinline>
+					<video autoplay loop muted playsinline style="height:19rem;">
 						<source
 							src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/printShareDesign/Create_teal.mp4"
 							type="video/mp4">
@@ -275,4 +273,56 @@
 			</div>
 		</div>
 	</section>
+
+	<script>
+		const slider = document.querySelector('.slider');
+		const slides = document.querySelectorAll('.slide');
+		const prevBtn = document.querySelector('.prev');
+		const nextBtn = document.querySelector('.next');
+		let currentIndex = 0;
+		const totalSlides = slides.length / 2; // Original slides count
+
+		function updateSlider() {
+			const offset = -currentIndex * 33.33;
+			slider.style.transform = `translateX(${offset}%)`;
+			// Reset to cloned slides when reaching the end
+			if (currentIndex >= totalSlides) {
+				setTimeout(() => {
+					slider.style.transition = 'none';
+					currentIndex = 0;
+					slider.style.transform = `translateX(0)`;
+					setTimeout(() => {
+						slider.style.transition = 'transform 0.5s ease';
+					}, 50);
+				}, 500);
+			}
+			// Reset to original slides when going backward from start
+			if (currentIndex < 0) {
+				setTimeout(() => {
+					slider.style.transition = 'none';
+					currentIndex = totalSlides - 1;
+					slider.style.transform = `translateX(${-(currentIndex * 33.33)}%)`;
+					setTimeout(() => {
+						slider.style.transition = 'transform 0.5s ease';
+					}, 50);
+				}, 500);
+			}
+		}
+
+		nextBtn.addEventListener('click', () => {
+			currentIndex++;
+			updateSlider();
+		});
+
+		prevBtn.addEventListener('click', () => {
+			currentIndex--;
+			updateSlider();
+		});
+
+		// Auto slide every 5 seconds
+		let autoSlide = setInterval(() => {
+			currentIndex++;
+			updateSlider();
+		}, 5000);
+	</script>
 @endsection

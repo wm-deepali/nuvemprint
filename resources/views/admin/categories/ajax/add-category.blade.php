@@ -31,6 +31,15 @@
                         <div class="text-danger validation-err" id="image-err"></div>
                     </div>
 
+                     <div class="form-group">
+                        <label>Popular</label>
+                        <select name="is_premium" id="is_premium" class="form-control">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                        <div class="text-danger validation-err" id="_premium-err"></div>
+                    </div>
+
                     <div class="form-group text-right">
                         <button type="button" class="btn btn-info" id="add-category-btn">Submit</button>
                     </div>

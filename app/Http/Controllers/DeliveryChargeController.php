@@ -34,6 +34,7 @@ class DeliveryChargeController extends Controller
             'delivery_charges.*.price' => 'required|numeric|min:0',
             'delivery_charges.*.title' => 'required|string|max:255',
             'delivery_charges.*.is_default' => 'nullable|boolean',
+            'delivery_charges.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // image validation
         ]);
 
         if ($validator->fails()) {
@@ -43,31 +44,23 @@ class DeliveryChargeController extends Controller
         foreach ($request->delivery_charges as $index => $valueData) {
             $data = [
                 'no_of_days' => $valueData['no_of_days'],
-                'details' => $valueData['details'],
+                'details' => $valueData['details'] ?? null,
                 'price' => $valueData['price'],
                 'title' => $valueData['title'],
                 'is_default' => !empty($valueData['is_default']) ? 1 : 0,
             ];
-            // Save record
+
+            // Handle image upload
+            if (isset($valueData['image']) && is_file($valueData['image'])) {
+                $imagePath = $valueData['image']->store('delivery_charges', 'public');
+                $data['image'] = $imagePath;
+            }
+
             DeliveryCharge::create($data);
         }
 
         return $this->respondSuccess($request, 'Delivery Charges created successfully.');
     }
-
-
-
-    public function edit($id)
-    {
-        $DeliveryCharge = DeliveryCharge::findOrFail($id);
-        $view = view('admin.delivery-charge.edit', ['DeliveryCharge' => $DeliveryCharge])->render();
-
-        return response()->json([
-            'success' => true,
-            'html' => $view,
-        ]);
-    }
-
 
     public function update(Request $request, $id)
     {
@@ -79,6 +72,7 @@ class DeliveryChargeController extends Controller
             'price' => 'required|numeric|min:0',
             'title' => 'required|string|max:255',
             'is_default' => 'nullable|boolean',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // image validation
         ]);
 
         if ($validator->fails()) {
@@ -92,12 +86,34 @@ class DeliveryChargeController extends Controller
             'title',
         ]);
 
-        // Handle the checkbox - if it's missing, treat it as unchecked (false)
+        // Handle the checkbox for is_default
         $data['is_default'] = $request->has('is_default') ? true : false;
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            if ($DeliveryCharge->image && \Storage::disk('public')->exists($DeliveryCharge->image)) {
+                \Storage::disk('public')->delete($DeliveryCharge->image); // remove old image
+            }
+            $data['image'] = $request->file('image')->store('delivery_charges', 'public');
+        }
 
         $DeliveryCharge->update($data);
 
         return $this->respondSuccess($request, 'Delivery Charges updated successfully.');
+    }
+
+
+
+
+    public function edit($id)
+    {
+        $DeliveryCharge = DeliveryCharge::findOrFail($id);
+        $view = view('admin.delivery-charge.edit', ['DeliveryCharge' => $DeliveryCharge])->render();
+
+        return response()->json([
+            'success' => true,
+            'html' => $view,
+        ]);
     }
 
 

@@ -14,6 +14,7 @@ class DeliveryCharge extends Model
         'details',
         'no_of_days',
         'title',
+        'image',
         'is_default'
     ];
 

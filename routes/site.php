@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\PageController;
@@ -37,9 +36,7 @@ Route::get('/stl', function () {
 });
 Route::get('/', [SiteController::class, 'index'])->name('home');
 Route::get('{slug}/details', [SiteController::class, 'subcateDetails'])->name('subcategory-details');
-
 Route::get('/page/{slug}', [PageController::class, 'show'])->name('page.show');
-
 Route::post('/calculate-price', [SiteController::class, 'calculate'])->name('calculate.price');
 
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -98,6 +95,21 @@ Route::get('about-us', function () {
     return view('front.about-us');
 })->name('about-us');
 
+// Route to show all subcategories (all products)
+Route::get('/all-products', function () {
+    $subcategories = getFilteredSubcategories(null);
+    return view('front.all-products', compact('subcategories'));
+})->name('all-products');
+
+// Route to show subcategories filtered by category slug
+Route::get('/category/{slug}', function ($slug) {
+    $subcategories = getFilteredSubcategories($slug);
+    return view('front.category-products', compact('subcategories', 'slug'));
+})->name('category-products');
+
+
+
+
 Route::get('contact-us', function () {
     return view('front.contact-us');
 })->name('contact-us');
@@ -155,7 +167,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('account-dashboard', [CustomerController::class, 'dashboard'])->name('account-dashboard');
         Route::get('account-orders', [CustomerController::class, 'orders'])->name('account-orders');
         Route::get('/view-invoice/{quote}', [CustomerController::class, 'viewInvoice'])->name('view-invoice');
-         Route::get('/order-details/{quote}', [CustomerController::class, 'orderDetails'])->name('order-details');
+        Route::get('/order-details/{quote}', [CustomerController::class, 'orderDetails'])->name('order-details');
         Route::get('account-downloads', [CustomerController::class, 'downloads'])->name('account-downloads');
         Route::get('account-addresses', [CustomerController::class, 'addresses'])->name('account-addresses');
         Route::get('account-payment-methods', [CustomerController::class, 'paymentmethods'])->name('account-payment-methods');

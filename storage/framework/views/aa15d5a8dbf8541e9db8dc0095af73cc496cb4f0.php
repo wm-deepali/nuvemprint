@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
   <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
@@ -11,7 +11,7 @@
             <div class="col-12">
               <div class="breadcrumb-wrapper">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                  <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
                   <li class="breadcrumb-item active">Category</li>
                 </ol>
               </div>
@@ -48,45 +48,46 @@
                       </tr>
                     </thead>
                     <tbody>
-                      @foreach ($categories as $category)
+                      <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
-                          <td>{{ $loop->iteration }}</td>
-                          <td>{{ $category->name }}</td>
-                          <td>{{ $category->slug }}</td>
+                          <td><?php echo e($loop->iteration); ?></td>
+                          <td><?php echo e($category->name); ?></td>
+                          <td><?php echo e($category->slug); ?></td>
                           <td>
-                            @if($category->image)
-                              <img src="{{ asset('storage/' . $category->image) }}" alt="Image" width="50" height="50"
+                            <?php if($category->image): ?>
+                              <img src="<?php echo e(asset('storage/' . $category->image)); ?>" alt="Image" width="50" height="50"
                                 class="rounded">
-                            @else
+                            <?php else: ?>
                               <span class="text-muted">No Image</span>
-                            @endif
+                            <?php endif; ?>
                           </td>
                           <td>
-                            <span class="badge badge-{{ $category->is_premium == 'yes' ? 'success' : 'secondary' }}">
-                              {{ $category->is_premium }}
+                            <span class="badge badge-<?php echo e($category->is_premium == 'yes' ? 'success' : 'secondary'); ?>">
+                              <?php echo e($category->is_premium); ?>
+
                             </span>
                           </td>
-                          <td>{{ ucfirst($category->status) }}</td>
+                          <td><?php echo e(ucfirst($category->status)); ?></td>
 
-                          <td>{{ $category->created_at->format('d M Y, h:i A') }}</td>
+                          <td><?php echo e($category->created_at->format('d M Y, h:i A')); ?></td>
 
                           <td>
                             <ul class="list-inline">
                               <li class="list-inline-item">
                                 <a href="javascript:void(0)" class="btn btn-primary btn-sm edit-category"
-                                  data-id="{{ $category->id }}">
+                                  data-id="<?php echo e($category->id); ?>">
                                   <i class="fas fa-pencil-alt"></i>
                                 </a>
                               </li>
                               <li class="list-inline-item">
-                                <a href="javascript:void(0)" onclick="deleteConfirmation({{ $category->id }})">
+                                <a href="javascript:void(0)" onclick="deleteConfirmation(<?php echo e($category->id); ?>)">
                                   <i class="fa fa-trash text-danger"></i>
                                 </a>
                               </li>
                             </ul>
                           </td>
                         </tr>
-                      @endforeach
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                   </table>
                 </div>
@@ -99,9 +100,9 @@
   </div>
 
   <div class="modal fade" id="category-modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
     $.ajaxSetup({
       headers: {
@@ -121,7 +122,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: `{{ url('admin/manage-categories') }}/${id}`,
+            url: `<?php echo e(url('admin/manage-categories')); ?>/${id}`,
             type: "DELETE",
             dataType: "json",
             success: function (result) {
@@ -143,7 +144,7 @@
       // open create modal
       $(document).on('click', '#add-category', function () {
         $.ajax({
-          url: "{{ url('admin/manage-categories/create') }}",
+          url: "<?php echo e(url('admin/manage-categories/create')); ?>",
           type: "GET",
           dataType: "json",
           success: function (result) {
@@ -163,7 +164,7 @@
         const formData = new FormData(form);
 
         $.ajax({
-          url: "{{ url('admin/manage-categories') }}",
+          url: "<?php echo e(url('admin/manage-categories')); ?>",
           type: 'POST',
           processData: false,
           contentType: false,
@@ -192,7 +193,7 @@
       $(document).on("click", ".edit-category", function () {
         const id = $(this).data('id');
         $.ajax({
-          url: `{{ url('admin/manage-categories') }}/${id}/edit`,
+          url: `<?php echo e(url('admin/manage-categories')); ?>/${id}/edit`,
           type: "GET",
           dataType: "json",
           success: function (result) {
@@ -216,7 +217,7 @@
         const id = $(this).data('category-id');
 
         $.ajax({
-          url: `{{ url('admin/manage-categories') }}/${id}`,
+          url: `<?php echo e(url('admin/manage-categories')); ?>/${id}`,
           type: 'POST',
           processData: false,
           contentType: false,
@@ -243,4 +244,5 @@
 
     });
   </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/categories/index.blade.php ENDPATH**/ ?>

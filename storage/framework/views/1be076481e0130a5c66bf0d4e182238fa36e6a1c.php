@@ -6,25 +6,25 @@
         </div>
         <div class="modal-body">
             <form id="subcategory-form" enctype="multipart/form-data">
-                @csrf
+                <?php echo csrf_field(); ?>
 
                 <div class="form-row">
-                    {{-- Categories --}}
+                    
                     <div class="form-group col-md-6">
                         <label>Select Categories</label>
                         <div class="form-control" style="height:150px; overflow-y:scroll;">
-                            @foreach($categories as $category)
+                            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="form-check">
-                                    <input type="checkbox" name="category_ids[]" value="{{ $category->id }}"
+                                    <input type="checkbox" name="category_ids[]" value="<?php echo e($category->id); ?>"
                                         class="form-check-input">
-                                    <label class="form-check-label">{{ $category->name }}</label>
+                                    <label class="form-check-label"><?php echo e($category->name); ?></label>
                                 </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                         <div class="text-danger validation-err" id="category_ids-err"></div>
                     </div>
 
-                    {{-- Description --}}
+                    
                     <div class="form-group col-md-6">
                         <label>Description</label>
                         <textarea name="description" id="description" class="form-control" rows="3"
@@ -39,21 +39,21 @@
                         <div class="text-danger validation-err" id="name-err"></div>
                     </div>
 
-                    {{-- Thumbnail --}}
+                    
                     <div class="form-group col-md-6">
                         <label>Thumbnail</label>
                         <input type="file" name="thumbnail" class="form-control">
                     </div>
                 </div>
 
-                {{-- Gallery --}}
+                
                 <div class="form-group">
                     <label>Gallery (multiple)</label>
                     <input type="file" id="gallery-input" class="form-control" multiple>
                     <div id="gallery-preview-list" class="row mt-2"></div>
                 </div>
 
-                {{-- Tabbed Sections --}}
+                
                 <ul class="nav nav-tabs" id="tabContent">
                     <li class="nav-item">
                         <a class="nav-link active" data-toggle="tab" href="#info">Information</a>
@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="form-row pt-1">
-                    {{-- Calculator Required --}}
+                    
                     <div class="form-group col-md-4">
                         <label>Calculator Required</label>
                         <select name="calculator_required" id="calculator_required" class="form-control">
@@ -95,7 +95,7 @@
                         <div class="text-danger validation-err" id="calculator_required-err"></div>
                     </div>
 
-                    {{-- Status --}}
+                    
                     <div class="form-group col-md-4">
                         <label>Status</label>
                         <select name="status" id="status" class="form-control">
@@ -106,7 +106,7 @@
                     </div>
 
                     <div class="form-group col-md-4">
-                        <label>Popular</label>
+                        <label>Premium</label>
                         <select name="is_premium" id="is_premium" class="form-control">
                             <option value="no" selected>No</option>
                             <option value="yes">Yes</option>
@@ -121,4 +121,4 @@
             </form>
         </div>
     </div>
-</div>
+</div><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/subcategories/ajax/add-subcategory.blade.php ENDPATH**/ ?>

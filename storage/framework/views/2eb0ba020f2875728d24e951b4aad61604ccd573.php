@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
   <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
@@ -11,7 +11,7 @@
             <div class="col-12">
               <div class="breadcrumb-wrapper">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                  <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
                   <li class="breadcrumb-item active">Sub Category</li>
                 </ol>
               </div>
@@ -50,47 +50,49 @@
                       </tr>
                     </thead>
                     <tbody>
-                      @foreach ($subcategories as $subcategory)
+                      <?php $__currentLoopData = $subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategory): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
-                          <td>{{ $loop->iteration }}</td>
+                          <td><?php echo e($loop->iteration); ?></td>
                           <td>
-                            @foreach ($subcategory->categories as $cat)
-                              <span class="badge badge-secondary">{{ $cat->name }}</span>
-                            @endforeach
+                            <?php $__currentLoopData = $subcategory->categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                              <span class="badge badge-secondary"><?php echo e($cat->name); ?></span>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                           </td>
-                          <td>{{ $subcategory->name }}</td>
-                          <td>{{ $subcategory->slug }}</td>
+                          <td><?php echo e($subcategory->name); ?></td>
+                          <td><?php echo e($subcategory->slug); ?></td>
                           <td>
-                            <span class="badge badge-{{ $subcategory->calculator_required ? 'success' : 'secondary' }}">
-                              {{ $subcategory->calculator_required ? 'Yes' : 'No' }}
-                            </span>
-                          </td>
-                          <td>
-                            <span class="badge badge-{{ $subcategory->is_premium == 'yes' ? 'success' : 'secondary' }}">
-                              {{ $subcategory->is_premium }}
-                            </span>
-                          </td>
-                          <td>{{ ucfirst($subcategory->status) }}</td>
+                            <span class="badge badge-<?php echo e($subcategory->calculator_required ? 'success' : 'secondary'); ?>">
+                              <?php echo e($subcategory->calculator_required ? 'Yes' : 'No'); ?>
 
-                          <td>{{ $subcategory->created_at->format('d M Y, h:i A') }}</td>
+                            </span>
+                          </td>
+                          <td>
+                            <span class="badge badge-<?php echo e($subcategory->is_premium == 'yes' ? 'success' : 'secondary'); ?>">
+                              <?php echo e($subcategory->is_premium); ?>
+
+                            </span>
+                          </td>
+                          <td><?php echo e(ucfirst($subcategory->status)); ?></td>
+
+                          <td><?php echo e($subcategory->created_at->format('d M Y, h:i A')); ?></td>
 
                           <td>
                             <ul class="list-inline">
                               <li class="list-inline-item">
                                 <a href="javascript:void(0)" class="btn btn-primary btn-sm edit-subcategory"
-                                  subcategory_id="{{ $subcategory->id }}">
+                                  subcategory_id="<?php echo e($subcategory->id); ?>">
                                   <i class="fas fa-pencil-alt"></i>
                                 </a>
                               </li>
                               <li class="list-inline-item">
-                                <a href="javascript:void(0)" onclick="deleteConfirmation({{ $subcategory->id }})">
+                                <a href="javascript:void(0)" onclick="deleteConfirmation(<?php echo e($subcategory->id); ?>)">
                                   <i class="fa fa-trash text-danger"></i>
                                 </a>
                               </li>
                             </ul>
                           </td>
                         </tr>
-                      @endforeach
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                   </table>
                 </div>
@@ -102,11 +104,11 @@
     </div>
   </div>
 
-  {{-- Modal --}}
+  
   <div class="modal fade" id="subcategory-modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
     let galleryFiles = [];
     let galleryFileIndex = 0;
@@ -126,7 +128,7 @@
 
     $(document).ready(function () {
       $(document).on('click', '#add-subcategory', function () {
-        $.get("{{ url('admin/manage-subcategories/create') }}", function (result) {
+        $.get("<?php echo e(url('admin/manage-subcategories/create')); ?>", function (result) {
           if (result.success) {
             $("#subcategory-modal").html(result.html).modal('show');
             ClassicEditorInit();
@@ -138,7 +140,7 @@
 
       $(document).on('click', '.edit-subcategory', function () {
         const id = $(this).attr('subcategory_id');
-        $.get(`{{ url('admin/manage-subcategories') }}/${id}/edit`, function (result) {
+        $.get(`<?php echo e(url('admin/manage-subcategories')); ?>/${id}/edit`, function (result) {
           if (result.success) {
             $("#subcategory-modal").html(result.html).modal('show');
             ClassicEditorInit();
@@ -202,14 +204,14 @@
 
       $(document).on("click", "#add-subcategory-btn", function () {
         const formData = prepareFormData();
-        sendSubcategoryAjax("POST", "{{ url('admin/manage-subcategories') }}", formData, this);
+        sendSubcategoryAjax("POST", "<?php echo e(url('admin/manage-subcategories')); ?>", formData, this);
       });
 
       $(document).on("click", "#update-subcategory-btn", function () {
         const id = $(this).attr("subcategory_id");
         const formData = prepareFormData();
         formData.append('_method', 'PUT');
-        sendSubcategoryAjax("POST", `{{ url('admin/manage-subcategories') }}/${id}`, formData, this);
+        sendSubcategoryAjax("POST", `<?php echo e(url('admin/manage-subcategories')); ?>/${id}`, formData, this);
       });
 
       function sendSubcategoryAjax(method, url, formData, button) {
@@ -256,7 +258,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: `{{ url('admin/manage-subcategories') }}/${id}`,
+            url: `<?php echo e(url('admin/manage-subcategories')); ?>/${id}`,
             type: "DELETE",
             dataType: "json",
             success: function (result) {
@@ -273,4 +275,5 @@
     }
 
   </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/subcategories/index.blade.php ENDPATH**/ ?>

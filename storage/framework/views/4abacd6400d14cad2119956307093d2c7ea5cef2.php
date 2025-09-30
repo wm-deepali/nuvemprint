@@ -12,19 +12,19 @@
 
             <div class="form-group col-md-6">
               <label>No Of Days <span class="text-danger">*</span></label>
-              <input type="number" value="{{ $DeliveryCharge->no_of_days }}" name="no_of_days" class="form-control"
+              <input type="number" value="<?php echo e($DeliveryCharge->no_of_days); ?>" name="no_of_days" class="form-control"
                 step="1" placeholder="Enter No Of Days">
               <span class="validation-err no_of_days-err text-danger"></span>
             </div>
             <div class="form-group col-md-6">
               <label>Price <span class="text-danger">*</span></label>
-              <input type="text" name="price" class="form-control" value="{{ $DeliveryCharge->price }}">
+              <input type="text" name="price" class="form-control" value="<?php echo e($DeliveryCharge->price); ?>">
               <span class="validation-err price-err text-danger"></span>
             </div>
             <div class="form-group col-md-6">
               <label>Delivery Title</label>
               <input type="text" name="title" class="form-control" placeholder="Enter title"
-                value="{{ $DeliveryCharge->title }}">
+                value="<?php echo e($DeliveryCharge->title); ?>">
               <span class="validation-err title-err text-danger"></span>
             </div>
             <div class="form-group col-md-6">
@@ -32,12 +32,12 @@
               <input type="file" name="image" class="form-control" accept="image/*">
               <span class="validation-err image-err text-danger"></span>
   
-              @if($DeliveryCharge->image)
+              <?php if($DeliveryCharge->image): ?>
                 <div class="mt-2">
-                  <img src="{{ asset('storage/' . $DeliveryCharge->image) }}" alt="Current Image"
+                  <img src="<?php echo e(asset('storage/' . $DeliveryCharge->image)); ?>" alt="Current Image"
                     style="max-height: 100px;">
                 </div>
-              @endif
+              <?php endif; ?>
             </div>
 
           </div>
@@ -47,12 +47,12 @@
           <div class="form-group" id="delivery -input-wrapper-0">
             <label>Details </label>
             <textarea name="details" id="details" class="form-control"
-              rows="4">{{ $DeliveryCharge->details ?? '' }}</textarea>
+              rows="4"><?php echo e($DeliveryCharge->details ?? ''); ?></textarea>
             <span class="validation-err details-err text-danger"></span>
           </div>
 
           <div class="form-check mb-2">
-            <input type="checkbox" name="is_default" value="1" class="form-check-input" id="is_default" {{ $DeliveryCharge->is_default ? 'checked' : '' }}>
+            <input type="checkbox" name="is_default" value="1" class="form-check-input" id="is_default" <?php echo e($DeliveryCharge->is_default ? 'checked' : ''); ?>>
             <label class="form-check-label" for="is_default">Set as Default</label>
           </div>
 
@@ -61,9 +61,9 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary mr-1" data-dismiss="modal">Cancel</button>
           <button type="button" id="update-delivery-charge-btn" class="btn btn-primary"
-            data-id="{{ $DeliveryCharge->id }}">Update</button>
+            data-id="<?php echo e($DeliveryCharge->id); ?>">Update</button>
         </div>
 
     </form>
   </div>
-</div>
+</div><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/delivery-charge/edit.blade.php ENDPATH**/ ?>

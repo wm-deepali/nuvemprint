@@ -6,10 +6,20 @@
     }
 
     .custom-select {
-        border: 2px solid #e0e0e0 !important;
-        color: black !important;
-        border-radius: .375rem !important;
-    }
+    width: 100%;
+    height: 38px;
+    padding: 0px 35px 0px 10px; /* Right side extra space */
+    border: 2px solid #e0e0e0 !important;
+    color: black !important;
+    border-radius: .375rem !important;
+    appearance: none;           /* Default arrow remove */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url("data:image/svg+xml;utf8,<svg fill='black' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>")
+        no-repeat right 10px center; /* Custom arrow */
+    background-size: 12px;
+}
+
 </style>
 
 
