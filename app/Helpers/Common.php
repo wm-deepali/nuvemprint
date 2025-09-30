@@ -92,6 +92,13 @@ if (!function_exists('footerSubCategories')) {
 	}
 	
 }
+if (!function_exists('footerCategories')) {
+	function footerCategories(){
+		$categories = category::where('status', 'active')->get();
+		return $categories;
+	}
+	
+}
 if (!function_exists('countrylist')) {
 	function countrylist(){
 		$countries = Country::get();

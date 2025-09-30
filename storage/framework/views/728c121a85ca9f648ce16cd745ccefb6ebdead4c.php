@@ -1,10 +1,10 @@
-@extends('layouts.new-master')
 
-@section('title')
+
+<?php $__env->startSection('title'); ?>
   Nuvem Prints
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('after-styles')
+<?php $__env->startPush('after-styles'); ?>
   <style>
     .details-faq-container {
       /* max-width: 800px; */
@@ -81,12 +81,12 @@
       text-align: right;
     }
   </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
   <div class="details-tab">
     <div class="details-tab-left">
-      <h2 class="details-heading">{{$subcategory->name}}</h2>
+      <h2 class="details-heading"><?php echo e($subcategory->name); ?></h2>
 
       <!-- Tabs -->
       <div class="details-tabs">
@@ -97,7 +97,7 @@
       <!-- Tab content -->
       <div class="details-tab-content">
         <div id="details-tab1" class="details-content active">
-          <p>{{$subcategory->description}}</p>
+          <p><?php echo e($subcategory->description); ?></p>
         </div>
         <div id="details-tab2" class="details-content">
           <div class="details-faq-container">
@@ -145,25 +145,25 @@
     <div class="details-tab-right">
       <!-- Main slider -->
       <?php $galleries = $subcategory->gallery; ?>
-      @if(isset($galleries) && count($galleries) > 0)
+      <?php if(isset($galleries) && count($galleries) > 0): ?>
         <div class="details-main-slider">
-          @foreach($galleries as $y => $gallery)
-            <img src="{{ asset('storage/' . $gallery) }}" class="details-slide {{ $y == 0 ? 'active' : '' }}" alt="">
-          @endforeach
+          <?php $__currentLoopData = $galleries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $y => $gallery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <img src="<?php echo e(asset('storage/' . $gallery)); ?>" class="details-slide <?php echo e($y == 0 ? 'active' : ''); ?>" alt="">
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           <!-- <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet3-1.webp" class="details-slide active">
                           <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet4-1.webp" class="details-slide"> -->
         </div>
-      @endif
+      <?php endif; ?>
 
 
-      @if(isset($galleries) && count($galleries) > 0)
+      <?php if(isset($galleries) && count($galleries) > 0): ?>
         <div class="details-thumbnails">
-          @foreach($galleries as $y => $gallery)
-            <img src="{{ asset('storage/' . $gallery) }}" data-slide="{{ $y }}"
-              class="details-thumb {{ $y == 0 ? 'active' : '' }}">
-          @endforeach
+          <?php $__currentLoopData = $galleries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $y => $gallery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <img src="<?php echo e(asset('storage/' . $gallery)); ?>" data-slide="<?php echo e($y); ?>"
+              class="details-thumb <?php echo e($y == 0 ? 'active' : ''); ?>">
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-      @endif
+      <?php endif; ?>
       <!-- Thumbnails -->
       <!-- <div class="details-thumbnails">
               <img src="https://d1e8vjamx1ssze.cloudfront.net/product-images/booklet3-1.webp" data-slide="0"
@@ -175,9 +175,9 @@
   </div>
 
   <div class="container py-5">
-    @if($subcategory->calculator_required)
-      @include('front.calculator')
-    @endif
+    <?php if($subcategory->calculator_required): ?>
+      <?php echo $__env->make('front.calculator', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?>
   </div>
 
   <div class="details-page-tab-container">
@@ -192,16 +192,16 @@
     <!-- Tab Content -->
     <div class="details-page-tab-content">
       <div id="info" class="details-page-tab-content-item active">
-        <p>{!! $subcategory->details->information !!}</p>
+        <p><?php echo $subcategory->details->information; ?></p>
       </div>
       <div id="sizes" class="details-page-tab-content-item">
-        <p>{!! $subcategory->details->available_sizes !!}</p>
+        <p><?php echo $subcategory->details->available_sizes; ?></p>
       </div>
       <div id="binding" class="details-page-tab-content-item">
-        <p>{!! $subcategory->details->binding_options !!}</p>
+        <p><?php echo $subcategory->details->binding_options; ?></p>
       </div>
       <div id="paper" class="details-page-tab-content-item">
-        <p>{!! $subcategory->details->paper_types !!}</p>
+        <p><?php echo $subcategory->details->paper_types; ?></p>
       </div>
     </div>
   </div>
@@ -349,4 +349,5 @@
     });
   </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.new-master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/front/subcategory-detail.blade.php ENDPATH**/ ?>
