@@ -33,8 +33,17 @@ class CentralizedPaperPricingController extends Controller
             ->where('attribute_id', $paperWeight->id)
             ->get();
 
+        $coverPaperWeight = Attribute::where('name', 'Cover Paper Weight')->firstOrFail();
+        $coverPaperWeightPricing = CentralizedAttributePricing::with([
+            'attribute',
+            'value',
+            'dependencies.attribute',
+            'dependencies.value',
+        ])
+            ->where('attribute_id', $coverPaperWeight->id)
+            ->get();
         // dd($paperWeightPricing->toArray());
-        return view('admin.centralized-paper-pricing.index', compact('paperSizePricing', 'attribute', 'sra3Counts', 'paperWeightPricing', 'paperWeight'));
+        return view('admin.centralized-paper-pricing.index', compact('paperSizePricing', 'attribute', 'sra3Counts', 'paperWeightPricing', 'paperWeight', 'coverPaperWeightPricing', 'coverPaperWeight'));
     }
 
 }

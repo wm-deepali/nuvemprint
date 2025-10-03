@@ -92,6 +92,7 @@ class PricingRuleController extends Controller
             'delivery_charges_required' => 'nullable|boolean',
             'centralized_paper_rates' => 'nullable|boolean',
             'centralized_weight_rates' => 'nullable|boolean',
+            'centralized_cover_weight_rates' => 'nullable|boolean',
             'min_quantity' => 'nullable|integer|min:1|lte:max_quantity',
             'max_quantity' => 'nullable|integer|min:1|gte:min_quantity',
             'min_pages' => 'nullable|integer|min:1|lte:max_pages',
@@ -158,6 +159,7 @@ class PricingRuleController extends Controller
                 'delivery_charges_required' => (int) $request->delivery_charges_required,
                 'centralized_paper_rates' => (int) $request->centralized_paper_rates,
                 'centralized_weight_rates' => (int) $request->centralized_weight_rates,
+                'centralized_cover_weight_rates' => (int) $request->centralized_cover_weight_rates,
             ]);
 
             foreach ($request->rows as $row) {
@@ -282,6 +284,7 @@ class PricingRuleController extends Controller
             'max_pages' => 'nullable|integer|min:1|gte:min_pages',
             'centralized_paper_rates' => 'nullable|boolean',
             'centralized_weight_rates' => 'nullable|boolean',
+            'centralized_cover_weight_rates' => 'nullable|boolean',
             'default_pages' => [
                 'nullable',
                 'integer',
@@ -353,6 +356,7 @@ class PricingRuleController extends Controller
                 'delivery_charges_required' => filter_var($request->delivery_charges_required, filter: FILTER_VALIDATE_BOOLEAN),
                 'centralized_paper_rates' => filter_var($request->centralized_paper_rates, filter: FILTER_VALIDATE_BOOLEAN),
                 'centralized_weight_rates' => filter_var($request->centralized_weight_rates, filter: FILTER_VALIDATE_BOOLEAN),
+                'centralized_cover_weight_rates' => filter_var($request->centralized_cover_weight_rates, filter: FILTER_VALIDATE_BOOLEAN),
             ]);
 
             foreach ($request->input('rows', []) as $row) {

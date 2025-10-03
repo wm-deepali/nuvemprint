@@ -1,6 +1,4 @@
-<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"-->
-<!--    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">-->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+<script src="https://code.jquery.com/npm/bootstrap@4.1.3"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
@@ -99,10 +97,10 @@
     .print-color.active,
     .print-color:focus {
         color: #495057;
-        /*background-color: #f8f3f3;*/
-        /*border: 2px solid #6bd3cc !important;*/
+        background-color: #fff;
+        border-color: #80bdff;
         outline: 0;
-        /*box-shadow: 0 0 0 0.1rem #6bd3cc !important;*/
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
 
     .print-color:hover {
@@ -751,6 +749,7 @@
         cursor: pointer;
     }
 </style>
+
 <div class="cal-page">
     <div class="row">
         <div class="col-md-7">
@@ -877,7 +876,7 @@
                     <div class="est-card">
                         <div class="estimate-div">
                             <div class="ast-active-static">
-                                <p class="m-0 text-black">Estimated Delivery:</p>
+                                <p class="m-0 text-black">Estimated Price:</p>
                                 <h4 class="text-black mb-1"><?php echo e($defaultDate); ?></h4>
                                 <div class="title-static text-muted small">Standard Delivery</div>
                             </div>
@@ -989,24 +988,7 @@
 
             </div>
 
-            <!--<div class="extra-card mt-3">-->
-            <!--    <img-->
-            <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
-            <!--    <div class="extra-card-details">-->
-            <!--        <h6 class="m-0">Print on Demand</h6>-->
-            <!--        <p>Download the free PDF template we created for your specifications.</p>-->
-            <!--        <a href="">Get a Qoute</a>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="extra-card mt-3">-->
-            <!--    <img-->
-            <!--        src="https://d1e8vjamx1ssze.cloudfront.net/coloratura/images/price-calculator/tooltips_and_thumbnails/print-template-thumbnail.png" />-->
-            <!--    <div class="extra-card-details">-->
-            <!--        <h6 class="m-0">Print on Demand</h6>-->
-            <!--        <p>Download the free PDF template we created for your specifications.</p>-->
-            <!--        <a href="">Get a Qoute</a>-->
-            <!--    </div>-->
-            <!--</div>-->
+
         </div>
     </div>
 </div>
@@ -1088,18 +1070,20 @@
 
     function forceSliderRedraw() {
         const $slider = $('#pageSlider');
-        const slider = $slider[0]; // get DOM element
-        const value = parseFloat($slider.val()) || 0;
-        const min = parseFloat($slider.attr('min')) || 0;
-        const max = parseFloat($slider.attr('max')) || 100;
+        if ($slider.length) {
+            const slider = $slider[0]; // get DOM element
+            const value = parseFloat($slider.val()) || 0;
+            const min = parseFloat($slider.attr('min')) || 0;
+            const max = parseFloat($slider.attr('max')) || 100;
 
-        const percent = ((value - min) / (max - min)) * 100;
+            const percent = ((value - min) / (max - min)) * 100;
 
-        // Method 1: For CSS using --value
-        slider.style.setProperty('--value', `${percent}%`);
+            // Method 1: For CSS using --value
+            slider.style.setProperty('--value', `${percent}%`);
 
-        // Method 2: For CSS using background linear-gradient directly
-        slider.style.background = `linear-gradient(to right, #007bff 0%, #007bff ${percent}%, #ddd ${percent}%, #ddd 100%)`;
+            // Method 2: For CSS using background linear-gradient directly
+            slider.style.background = `linear-gradient(to right, #007bff 0%, #007bff ${percent}%, #ddd ${percent}%, #ddd 100%)`;
+        }
     }
 
 
@@ -1117,18 +1101,23 @@
 
         let selectedAttributes = {};
 
-        $('.attribute-wrapper .active').each(function () {
+
+        $('.attribute-wrapper:visible .active').each(function () {
             const attrId = $(this).data('attribute-id');
             const valueId = $(this).data('value-id');
             if (attrId && valueId) selectedAttributes[attrId] = valueId;
         });
 
+
         $('select.custom-select').each(function () {
-            const selected = $(this).find('option:selected');
-            const attrId = selected.data('attribute-id');
-            const valueId = selected.data('value-id');
-            if (attrId && valueId) selectedAttributes[attrId] = valueId;
+            if ($(this).closest('.attribute-wrapper').is(':visible')) {
+                const selected = $(this).find('option:selected');
+                const attrId = selected.data('attribute-id');
+                const valueId = selected.data('value-id');
+                if (attrId && valueId) selectedAttributes[attrId] = valueId;
+            }
         });
+
 
         // Include select_area attributes (length and width)
         $('.attribute-wrapper').each(function () {
@@ -1238,6 +1227,14 @@
                 subcategory_id: subcategoryId,
 
             },
+            beforeSend: function () {
+                // Inside your price calculation AJAX function
+                const staticCard = $('.estimate-card-static.active');
+                if (staticCard.length) {
+                    staticCard.find('.final-price').html('Loading...');
+                }
+
+            },
             success: function (res) {
                 if (res.success) {
                     const calculatedPrice = parseFloat(res.total_price) || 0;
@@ -1246,20 +1243,55 @@
                     const selectedDeliveryOption = $('.estimate-card.active');
                     const deliveryPrice = parseFloat(selectedDeliveryOption.data('price')) || 0;
 
+                    // Get delivery title from active estimate card's hidden title div or fallback to default
+                    const deliveryTitleElement = selectedDeliveryOption.find('.title.text-muted.small');
+                    const deliveryTitle = deliveryTitleElement.length && deliveryTitleElement.text().trim() !== ''
+                        ? deliveryTitleElement.text().trim()
+                        : 'Standard Delivery';
+
                     const total = calculatedPrice + proofPrice + deliveryPrice;
                     const formattedTotal = '£' + total.toFixed(2);
 
-                    // Find the static card that is active
+                    // Update price display
                     const staticCard = $('.estimate-card-static.active');
-
                     if (staticCard.length > 0) {
+                        // Remove any old percentage info first
+                        staticCard.find('.percentage-charge-info').remove();
+
+                        // Update final price
                         staticCard.find('.final-price').text(formattedTotal);
+
+                        // --- Show first percentage charge below the price ---
+                        const firstPercentageCharge = res.percentage_charges?.[0];
+                        if (firstPercentageCharge) {
+                            let percentageHtml = `<div class="text-muted small mt-1">` +
+                                `${firstPercentageCharge.attribute} (${firstPercentageCharge.value}) added ${firstPercentageCharge.percent}%` +
+                                `</div>`;
+
+                            // Append new info
+                            staticCard.find('.final-price').after(
+                                `<div class="percentage-charge-info">${percentageHtml}</div>`
+                            );
+                        }
+
+                        const deliveryTextDiv = staticCard.find('.title-static.text-muted.small');
+
+                        const formattedDeliveryPrice = '£' + deliveryPrice.toFixed(2);
+                        if (deliveryPrice > 0) {
+                            if (!deliveryTextDiv.text().includes('(')) {
+                                deliveryTextDiv.text(`${deliveryTitle} (with delivery charges: ${formattedDeliveryPrice})`);
+                            }
+                        } else {
+                            // Show basic title if no delivery price
+                            deliveryTextDiv.text(deliveryTitle);
+                        }
                     } else {
-                        // fallback to update any final-price display
-                        $('.final-price').text(formattedTotal);
+                        // Remove old percentage info globally if no static card
+                        $('.percentage-charge-info').remove();
                     }
                 }
             },
+
 
             error: function (xhr) {
                 console.error(xhr.responseText);
@@ -1520,9 +1552,17 @@
         const decrementBtn = valueDisplay.previousElementSibling;
         const incrementBtn = valueDisplay.nextElementSibling;
 
+
         function updateSliderFill(sliderElement) {
-            const percent = ((sliderElement.value - sliderElement.min) / (sliderElement.max - sliderElement.min)) * 100;
-            sliderElement.style.setProperty('--value', `${percent}%`);
+            if (!sliderElement) return; // Return early if no slider
+
+            const value = sliderElement.value;  // safe to use after check
+            const min = parseFloat(sliderElement.min) || 0;
+            const max = parseFloat(sliderElement.max) || 100;
+
+            const percent = ((value - min) / (max - min)) * 100;
+
+            sliderElement.style.setProperty('--value', percent);
         }
 
 
@@ -1775,85 +1815,92 @@
     });
 
 
+    function debounce(fn, delay) {
+        let timer = null;
+        return function (...args) {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(this, args), delay);
+        }
+    }
+
+    // Use debouncedCalculateTotalPrice instead of calculateTotalPrice below
+
     $(document).ready(function () {
         applyInitialHideConditions();
-        calculateTotalPrice();
         forceSliderRedraw();
         calculatedAttributeRow();
 
         const savedDeliveryCharge = JSON.parse(localStorage.getItem('selectedDeliveryCharge'));
         if (savedDeliveryCharge && savedDeliveryCharge.id) {
-            // Find the estimate card matching saved ID
             const selectedCard = document.querySelector(`.estimate-card[data-id="${savedDeliveryCharge.id}"]`);
             if (selectedCard) {
-                // Remove active class from all cards first
                 document.querySelectorAll('.estimate-card.active').forEach(card => {
                     card.classList.remove('active');
                 });
-                // Add active class to matched card
                 selectedCard.classList.add('active');
-                const selectedDate = $(this).data('date'); // e.g., "25 Sep, 2025"
+
+                const selectedDate = $(selectedCard).data('date');
                 $('.estimate-card-static .text-black.mb-1').text(selectedDate);
-                calculateTotalPrice();
-                // If you need to show/hide details or update other UI parts, do it here.
+
+                const titleDiv = $(selectedCard).find('.title.text-muted.small');
+                const selectedTitle = titleDiv.length && titleDiv.text().trim() !== '' ?
+                    titleDiv.text().trim() : 'Standard Delivery';
+
+                const staticTitleDiv = $('.estimate-card-static .title-static.text-muted.small');
+                staticTitleDiv.text(selectedTitle);
+
+                debouncedCalculateTotalPrice();
             }
+        } else {
+            debouncedCalculateTotalPrice();
         }
 
-
         $('.estimate-card').on('click', function () {
-            // Remove active from siblings and add to clicked
             $('.estimate-option').removeClass('active');
             $('.estimate-option .ast-active').removeClass('ast-active');
-
             $('.detail-section').addClass('d-none');
             $('.title').addClass('d-none');
 
             $(this).addClass('active');
             $(this).find('div').first().addClass('ast-active');
-
             $(this).find('.detail-section').removeClass('d-none');
             $(this).find('.title').removeClass('d-none');
-            calculateTotalPrice();
 
-            // Get selected delivery date from data-date attribute
-            const selectedDate = $(this).data('date'); // e.g., "25 Sep, 2025"
-
-            // Update the static card main date h4 text
+            const selectedDate = $(this).data('date');
             $('.estimate-card-static .text-black.mb-1').text(selectedDate);
+
+            const titleDiv = $(this).find('.title');
+            const selectedTitle = titleDiv.length && titleDiv.text().trim() !== '' ? titleDiv.text().trim() : 'Standard Delivery';
+            $('.estimate-card-static .title-static.text-muted.small').text(selectedTitle);
+
+            debouncedCalculateTotalPrice();
         });
-
-
-        // Show details for the initially active card (based on is_default)
-        const $initial = $('.estimate-option.active');
-        $initial.find('.detail-section').removeClass('d-none');
-        $initial.find('.title').removeClass('d-none');
 
         $('.selectable-proof-option').on('click', function () {
             const $this = $(this);
-            // If already active → unselect
             if ($this.hasClass('active')) {
                 $this.removeClass('active');
             } else {
-                // Otherwise, make it active and unselect others
                 $('.selectable-proof-option').removeClass('active');
                 $this.addClass('active');
             }
 
-            calculateTotalPrice(); // always recalculate
+            debouncedCalculateTotalPrice();
         });
-
     });
+
 
 
     $('#addToCartBtn').on('click', function () {
         let isValid = true;
         let missingFields = [];
 
+
         $('.attribute-wrapper').each(function () {
             const $wrapper = $(this);
             const isRequired = $wrapper.data('is-required');
 
-            if (isRequired) {
+            if (isRequired && $wrapper.is(':visible')) {  // Add visibility check
                 const hasActive = $wrapper.find('.attr-select.active, .print-color.active, .choose-binding.active').length > 0;
                 const hasSelect = $wrapper.find('select.custom-select option:selected').filter(function () {
                     return $(this).val() !== '';
@@ -1861,12 +1908,12 @@
 
                 if (!hasActive && !hasSelect) {
                     isValid = false;
-
                     const label = $wrapper.find('label').clone().children().remove().end().text().trim();
                     missingFields.push(label || 'Required attribute');
                 }
             }
         });
+
 
         if (!isValid) {
             alert(`Please select the following required options:\n- ${missingFields.join('\n- ')}`);
@@ -1882,18 +1929,21 @@
 
         const selectedAttributes = {};
 
-        $('.attribute-wrapper .active').each(function () {
+        $('.attribute-wrapper:visible .active').each(function () {
             const attrId = $(this).data('attribute-id');
             const valueId = $(this).data('value-id');
             if (attrId && valueId) selectedAttributes[attrId] = valueId;
         });
 
         $('select.custom-select').each(function () {
-            const selected = $(this).find('option:selected');
-            const attrId = selected.data('attribute-id');
-            const valueId = selected.data('value-id');
-            if (attrId && valueId) selectedAttributes[attrId] = valueId;
+            if ($(this).closest('.attribute-wrapper').is(':visible')) {
+                const selected = $(this).find('option:selected');
+                const attrId = selected.data('attribute-id');
+                const valueId = selected.data('value-id');
+                if (attrId && valueId) selectedAttributes[attrId] = valueId;
+            }
         });
+
 
         // Add select_area attribute values
         $('.attribute-wrapper[data-attribute-type="select_area"]').each(function () {

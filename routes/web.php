@@ -2,35 +2,20 @@
 
 use App\Http\Controllers\Admin\AttributeGroupController;
 use App\Http\Controllers\Admin\AttributeGroupSubcategoryAssignmentController;
-use App\Http\Controllers\Admin\BindingController;
 use App\Http\Controllers\Admin\BlogController;
-use App\Http\Controllers\Admin\BookmarkRibbonController;
 use App\Http\Controllers\Admin\CentralizedPaperPricingController;
 use App\Http\Controllers\Admin\ContactInfoController;
-use App\Http\Controllers\Admin\CoverFinishController;
-use App\Http\Controllers\Admin\CoverFoilingController;
-use App\Http\Controllers\Admin\CoverPrintingColourController;
-use App\Http\Controllers\Admin\CoverTypeController;
-use App\Http\Controllers\Admin\CoverWeightController;
 use App\Http\Controllers\Admin\CustomerEstimateController;
 use App\Http\Controllers\Admin\DepartmentController;
-use App\Http\Controllers\Admin\DustJacketColourController;
-use App\Http\Controllers\Admin\DustJacketFinishController;
-use App\Http\Controllers\Admin\EndpaperColourController;
 use App\Http\Controllers\Admin\FaqController;
-use App\Http\Controllers\Admin\HeadAndTailBandController;
-use App\Http\Controllers\Admin\ManagePaperSizeController;
-use App\Http\Controllers\Admin\OrientationController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PaperRatesController;
-use App\Http\Controllers\Admin\PaperWeightController;
 use App\Http\Controllers\Admin\PaperWeightRatesController;
 use App\Http\Controllers\Admin\QuotePricingController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\AttributeValueController;
 use App\Http\Controllers\Admin\Sra3SheetController;
 use App\Http\Controllers\Admin\SubcategoryAttributeController;
-use App\Http\Controllers\Admin\SubcategoryAttributeValueController;
 use App\Http\Controllers\Admin\AttributeConditionController;
 use App\Http\Controllers\Admin\PricingRuleController;
 use App\Http\Controllers\Admin\QuoteController;
@@ -62,14 +47,13 @@ use App\Http\Controllers\Admin\{
     SliderController,
     CategoryController,
     SubCategoryController,
-    PrintingColourController
 };
 use App\Http\Controllers\Admin\BookTypeController;
 use App\Http\Controllers\Admin\PageTypeController;
 use App\Http\Controllers\Admin\PageRangeController;
 use App\Http\Controllers\Admin\QuantityRangeController;
 use Illuminate\Support\Facades\Artisan;
-
+use App\Http\Controllers\Admin\CoverPaperWeightRatesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -418,7 +402,7 @@ Route::group(['middleware' => 'auth'], function () {
             ]);
         });
 
-         Route::prefix('paper-rates')->name('paper-rates.')->group(function () {
+        Route::prefix('paper-rates')->name('paper-rates.')->group(function () {
             Route::resource('/', PaperRatesController::class)->only(['create', 'edit', 'store', 'update'])->parameters([
                 '' => 'attribute' // means resource will use {attribute} instead of {sra3_sheet}
             ]);
@@ -426,6 +410,12 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::prefix('paper-weight-rates')->name('paper-weight-rates.')->group(function () {
             Route::resource('/', PaperWeightRatesController::class)->only(['create', 'edit', 'store', 'update'])->parameters([
+                '' => 'attribute' // means resource will use {attribute} instead of {sra3_sheet}
+            ]);
+        });
+
+        Route::prefix('cover-paper-weight-rates')->name('cover-paper-weight-rates.')->group(function () {
+            Route::resource('/', CoverPaperWeightRatesController::class)->only(['create', 'edit', 'store', 'update'])->parameters([
                 '' => 'attribute' // means resource will use {attribute} instead of {sra3_sheet}
             ]);
         });

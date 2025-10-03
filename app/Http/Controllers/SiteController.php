@@ -5,6 +5,7 @@ use App\Models\Attribute;
 use App\Models\Blog;
 use App\Models\CentralizedAttributePricing;
 use App\Models\DeliveryCharge;
+use App\Models\Faq;
 use App\Models\PricingRule;
 use App\Models\ProofReading;
 use App\Models\Subcategory;
@@ -18,13 +19,14 @@ class SiteController extends Controller
 {
     public function index()
     {
-        $categories = Category::where('status', 'active')->get();
+        // $categories = Category::where('status', 'active')->get();
         $blogs = Blog::where('status', 'published')  // if you have status
             ->latest()
             ->take(6)
             ->get();
 
-        return view('front.index', compact('categories', 'blogs'));
+        $faqs = Faq::where('status', 'published')->take(6)->get();
+        return view('front.index', compact( 'blogs', 'faqs'));
     }
 
 
@@ -44,7 +46,7 @@ class SiteController extends Controller
         $subcategoryId = $subcategory->id;
 
         // Get category IDs of current subcategory
-       $categoryIds = $subcategory->categories()->pluck('categories.id')->toArray();
+        $categoryIds = $subcategory->categories()->pluck('categories.id')->toArray();
 
         // Fetch related subcategories that share these categories, exclude current subcategory
         $relatedSubcategories = Subcategory::whereHas('categories', function ($query) use ($categoryIds) {
@@ -141,7 +143,7 @@ class SiteController extends Controller
                         $maxDate = $dates->max()->format('D, jS M');
 
                         $defaultDeliveryCharge = $deliveryCharges->firstWhere('is_default', true);
-                        $defaultDate = $defaultDeliveryCharge ? now()->addDays($defaultDeliveryCharge->no_of_days)->format('D, jS M') : $minDate;
+                        $defaultDate = $defaultDeliveryCharge ? now()->addDays($defaultDeliveryCharge->no_of_days)->format('D, jS M') : '';
                     }
                 }
 
@@ -281,7 +283,7 @@ class SiteController extends Controller
             $compositeMap = collect($compositeDraggerValues)->pluck('component_count', 'id');
             $compositeMap = $compositeMap->prepend('-- Select --', '');
         }
-        // dd($relatedSubcategories->toArray());
+        // dd($attributeGroups->toArray());
         return view('front.subcategory-detail', compact(
             'subcategory',
             'attributeGroups',
@@ -317,6 +319,10 @@ class SiteController extends Controller
         $componentPages = [];
         $total = 0;
 
+        // collect setup/base charges separately
+        $baseAmountCharges = 0;
+        $basePercentageCharges = [];
+
         // Step 1: Get the pricing rule for the subcategory
         $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
 
@@ -333,7 +339,7 @@ class SiteController extends Controller
         // Step 3: Check centralized flags
         $useCentralizedPaper = $pricingRule->centralized_paper_rates;
         $useCentralizedWeight = $pricingRule->centralized_weight_rates;
-
+        $useCentralizedCoverWeight = $pricingRule->centralized_cover_weight_rates;
 
         // Step 4: Extract page count for component values inside composite values
         if ($request->has('composite_pages')) {
@@ -426,7 +432,17 @@ class SiteController extends Controller
                     }
 
                     if ($attr->attribute->has_setup_charge ?? false) {
-                        $total += $attr->price_modifier_value ?? 0;
+                        $modifier = floatval($attr->price_modifier_value ?? 0);
+                        if ($attr->base_charges_type === 'amount') {
+                            $baseAmountCharges += $modifier;
+                        } elseif ($attr->base_charges_type === 'percentage') {
+                            $basePercentageCharges[] = [
+                                'attribute' => $attr->attribute->name,
+                                'value' => $attr->value->value ?? null, // assuming relation exists
+                                'percent' => $modifier,
+                            ];
+
+                        }
                     }
                 }
             }
@@ -442,7 +458,7 @@ class SiteController extends Controller
                             ->where('value_id', $valueId)
                             ->get();
 
-                        $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
+                            $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
                             foreach ($item->dependencies as $dep) {
                                 $selected = $selectedAttributes[$dep->attribute_id] ?? null;
                                 $matches = $expandedAttributes[$dep->attribute_id] ?? ($selected ? [$selected] : []);
@@ -452,7 +468,6 @@ class SiteController extends Controller
                             }
                             return true;
                         });
-
 
                         foreach ($validAttrs as $attr) {
                             $pages = $defaultPages;
@@ -487,7 +502,6 @@ class SiteController extends Controller
                             } else {
                                 $total += 0;
                             }
-
                         }
 
                     } elseif ($useCentralizedPaper && in_array(strtolower($attribute->name), ['paper size'])) {
@@ -552,6 +566,53 @@ class SiteController extends Controller
                             }
                         }
 
+                    }
+                    elseif ($useCentralizedCoverWeight && in_array(strtolower($attribute->name), ['cover paper weight'])) {
+                        // Use Centralized Pricing
+                        $attrs = CentralizedAttributePricing::with(['quantityRanges', 'attribute', 'dependencies'])
+                            ->where('attribute_id', $attributeId)
+                            ->where('value_id', $valueId)
+                            ->get();
+
+                        $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
+                            foreach ($item->dependencies as $dep) {
+                                $selected = $selectedAttributes[$dep->attribute_id] ?? null;
+                                $matches = $expandedAttributes[$dep->attribute_id] ?? ($selected ? [$selected] : []);
+                                if (!in_array($dep->value_id, $matches)) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        });
+
+
+                        foreach ($validAttrs as $attr) {
+                            // Default sheet count
+                            $sheetCount = 1;
+
+                            // Try to fetch paper size attribute value from selectedAttributes
+                            $paperSizeAttr = Attribute::whereRaw('LOWER(name) = ?', ['paper size'])->first();
+                            if ($paperSizeAttr && isset($selectedAttributes[$paperSizeAttr->id])) {
+                                $paperSizeValueId = $selectedAttributes[$paperSizeAttr->id];
+
+                                // Handle array case
+                                if (is_array($paperSizeValueId)) {
+                                    $paperSizeValueId = $paperSizeValueId[0]; // Take first if multiple
+                                }
+
+                                $sheetInfo = \App\Models\Sra3SheetCount::where('attribute_value_id', $paperSizeValueId)->first();
+                                // dd($sheetInfo);
+                                if ($sheetInfo && $sheetInfo->sheet_count > 0) {
+                                    $sheetCount = $sheetInfo->sheet_count;
+                                }
+                                $pricePerSheet = ($attr->price ?? 0) / $sheetCount;
+                                $total += $pricePerSheet * $quantity;
+                            } else {
+                                $total += 0;
+                            }
+
+                        }
+
                     } else {
                         // dd($total);
                         // Use Regular Pricing
@@ -572,7 +633,6 @@ class SiteController extends Controller
                             }
                             return true;
                         });
-                        // dd('here', $validAttrs->toArray());
 
                         foreach ($validAttrs as $attr) {
                             $basis = $attr->attribute->pricing_basis ?? null;
@@ -613,7 +673,17 @@ class SiteController extends Controller
                             }
 
                             if ($attr->attribute->has_setup_charge ?? false) {
-                                $total += $attr->price_modifier_value ?? 0;
+                                $modifier = floatval($attr->price_modifier_value ?? 0);
+                                if ($attr->base_charges_type === 'amount') {
+                                    $baseAmountCharges += $modifier;
+                                } elseif ($attr->base_charges_type === 'percentage') {
+                                    $basePercentageCharges[] = [
+                                        'attribute' => $attr->attribute->name,
+                                        'value' => $attr->value->value ?? null, // assuming relation exists
+                                        'percent' => $modifier,
+                                    ];
+
+                                }
                             }
                         }
 
@@ -622,11 +692,21 @@ class SiteController extends Controller
             }
         }
 
+        // --- Apply setup charges at the very end ---
+        $total += $baseAmountCharges;
+        // dd($basePercentageCharges, $total);
+        foreach ($basePercentageCharges as $charge) {
+            $total += ($total * ($charge['percent'] / 100));
+        }
+
+
         return response()->json([
             'success' => true,
             'total_price' => round($total, 2),
             'formatted_price' => '£' . number_format($total, 2),
+            'percentage_charges' => $basePercentageCharges, // 👈 send breakdown
         ]);
+
     }
 
 

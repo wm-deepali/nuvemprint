@@ -3,56 +3,99 @@
 <?php $__env->startSection('title'); ?>
 	Nuvem Prints
 <?php $__env->stopSection(); ?>
+<style>
+	.faq-item span {
+		font-size: 1.2em;
+		transition: transform 0.3s ease;
+	}
 
+	.faq-item.active span {
+		transform: rotate(45deg);
+	}
+
+	.faq-answer {
+		display: none;
+		/*padding: 15px 0 5px;*/
+		color: #666;
+		line-height: 1.6;
+		background: #fff;
+		padding: 10px;
+	}
+
+	.faq-item.active+.faq-answer {
+		display: block;
+	}
+
+	@media (max-width: 768px) {
+		.faq-container {
+			flex-direction: column;
+		}
+
+		.faq-left,
+		.faq-right {
+			width: 100%;
+		}
+	}
+</style>
 
 <?php $__env->startSection('content'); ?>
 
 	<!-- Black Strip Banner -->
-	<div class="promo-strip">
-		<span>Sign up</span> for an account and earn <span>2×</span> points on your first order.
-	</div>
+
 
 	<!-- Hero Section -->
 	<div class="hero-section">
-		<h1>The Smarter Way to Print</h1>
-		<p>Get fast quotes, expert advice, and easily find the perfect options for your project. Tell me what you need, like
-			"Quote for 100 flyers" or "Best paper for a colouring book".</p>
-		<div class="hero-input">
-			<input type="text" placeholder="Type a project idea and I'll help you bring it to life...">
-			<button><i class="fa fa-arrow-right"></i></button>
-		</div>
+		<h1>Print Smarter. Print Better.</h1>
+		<p>At <strong>Nuvem Print</strong>, getting the perfect print is easier than ever. From instant quotes to tailored
+			options, we help you choose the right materials, finishes, and formats for your project. Whether it’s books,
+			flyers, posters, or banners, our advanced printing ensures professional quality every time.</p>
+		<!--<div class="hero-input">-->
+		<!--<input type="text" placeholder="Type a project idea and I'll help you bring it to life...">-->
+		<!--	<button>Get Started <i class="fa fa-arrow-right"></i></button>-->
+		<!--</div>-->
 		<div class="banner-part-button">
-			<button>I want to order...</button>
-			<button>I want to Publish...</button>
-			<button>I need help with...</button>
+			<a href="<?php echo e(route('all-products')); ?>">
+				<button>Get Started <i class="fa fa-arrow-right"></i></button>
+			</a>
+
 		</div>
 	</div>
 	<div class="section-container">
 		<div class="container">
-			<h1 class="main-title">Everything You Need - All in One Place</h1>
-			<p class="subtitle">See how Mixam simplifies every step of your creative journey with powerful tools, premium
-				printing, and seamless workflows.</p>
+			<h1 class="main-title">From Ideas to Print – Everything You Need Here</h1>
+			<p class="subtitle">Bring your vision to life with high-quality printing solutions tailored to your needs. Fast,
+				reliable, and all in one place – from concept to finished product.</p>
 
 			<div class="tab-buttons">
 				<button class="tab-button active" data-tab="create">
-					<i class="fas fa-edit me-1"></i> Create
+					<i class="fas fa-edit me-1"></i> Create Quotes
 				</button>
 				<button class="tab-button" data-tab="print">
 					<i class="fas fa-print me-1"></i> Print
 				</button>
-				<button class="tab-button" data-tab="share">
-					<i class="fas fa-share me-1"></i> Share
+				<button class="tab-button" data-tab="order">
+					<i class="fas fa-share me-1"></i> Customise Order
 				</button>
+				<button class="tab-button" data-tab="contact">
+					<i class="far fa-address-card me-1"></i> Contact Us
+				</button>
+
 			</div>
 
 			<!-- Create Tab Content -->
 			<div id="create-content" class="content-wrapper active">
 				<div class="text-content">
-					<h3>Design without Limits. Create Beautiful, Print-Ready files in Minutes.</h3>
-					<p>Whether you're starting from scratch or need to make final edits to your existing artwork file,
-						Mixam's
-						free design tools make it effortless to create professional, print-ready files-no experience needed.
+					<h3>Create Quotes Instantly</h3>
+					<p>Get quick and accurate quotations for all your printing and publishing needs. Whether it’s
+						<strong>book publishing, brochures, magazines, </strong> or any other custom print project,<strong>
+							Nuvem Print’s </strong>smart quote system lets you design, customize, and view prices in real
+						time. No waiting, no hidden charges—just transparent pricing tailored to your requirements.
 					</p>
+					<div class="tab-part-button">
+						<a href="<?php echo e(route('all-products')); ?>">
+							<button><i class="fas fa-edit me-1"></i> Create</button>
+						</a>
+					</div>
 
 				</div>
 				<div class="video-content">
@@ -69,86 +112,94 @@
 			<!-- Print Tab Content -->
 			<div id="print-content" class="content-wrapper">
 				<div class="text-content">
-					<h3>Premium Printing. High-Quality Results Every Time.</h3>
-					<p>Get professional printing services with a wide range of options. From business cards to large format
-						prints, we handle it all with precision and speed.</p>
-					<p>Choose from premium paper stocks, finishes, and binding to make your project stand out.</p>
-					<ul>
-						<li>Multiple paper options</li>
-						<li>Fast turnaround times</li>
-						<li>Quality assurance</li>
-					</ul>
+					<h3>Print With Perfection</h3>
+					<p>Bring your ideas to life with our high-quality printing services. From books and magazines to flyers,
+						business cards, and marketing materials, <strong>Nuvem Print</strong> delivers sharp colors, crisp
+						details, and flawless finishes. Whatever you need printed, we ensure professional results every
+						time—on time.
+					</p>
+					<div class="tab-part-button">
+						<a href="<?php echo e(route('all-products')); ?>">
+							<button><i class="fas fa-print me-1"></i> Start Now</button>
+						</a>
+					</div>
+
 				</div>
-				<div class="image-content">
-					<div class="floating-ui">
-						<ul>
-							<li>Paper selection</li>
-							<li>Finishing options</li>
-							<li>Proofing tools</li>
-						</ul>
-					</div>
-					<div class="image-stack">
-						<div class="image-item">
-							<img src="https://via.placeholder.com/200x150/FFEAA7/000000?text=Print+Preview"
-								alt="Print Image 1">
-						</div>
-						<div class="image-item">
-							<img src="https://via.placeholder.com/200x150/DDA0DD/000000?text=Paper+Stock"
-								alt="Print Image 2">
-						</div>
-						<div class="image-item">
-							<img src="https://via.placeholder.com/200x150/98D8C8/000000?text=Finished+Product"
-								alt="Print Image 3">
-						</div>
-					</div>
+				<div class="video-content">
+					<video autoplay loop muted playsinline style="height:19rem;">
+						<source
+							src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/printShareDesign/Create_teal.mp4"
+							type="video/mp4">
+						Your browser does not support the video tag.
+					</video>
+
 				</div>
 			</div>
 
 			<!-- Share Tab Content -->
-			<div id="share-content" class="content-wrapper">
+			<div id="order-content" class="content-wrapper">
 				<div class="text-content">
-					<h3>Share & Sell. Reach Your Global Audience.</h3>
-					<p>Easily share your designs and sell your printed products through our integrated platform. Connect
-						with
-						customers worldwide effortlessly.</p>
-					<p>From social sharing to e-commerce integration, everything is designed for seamless distribution.</p>
-					<ul>
-						<li>Social media integration</li>
-						<li>Online storefront</li>
-						<li>Analytics dashboard</li>
-					</ul>
-				</div>
-				<div class="image-content">
-					<div class="floating-ui">
-						<ul>
-							<li>Share links</li>
-							<li>Sell directly</li>
-							<li>Track sales</li>
-						</ul>
+					<h3>Custom Orders Made Simple</h3>
+					<p>Have a unique project in mind? <strong>Nuvem Prints</strong> offers fully customizable printing and
+						publishing solutions tailored to your exact requirements. From special sizes and finishes to
+						personalized designs, our team helps you bring your vision to reality. Share your details, and we’ll
+						craft a solution that’s as unique as your project.
+					</p>
+					<div class="tab-part-button">
+						<a href="<?php echo e(route('all-products')); ?>">
+							<button><i class="fas fa-share me-1"></i> Customise Now</button>
+						</a>
 					</div>
-					<div class="image-stack">
-						<div class="image-item">
-							<img src="https://via.placeholder.com/200x150/FD79A8/FFFFFF?text=Share+Icon"
-								alt="Share Image 1">
-						</div>
 
+				</div>
+				<div class="video-content">
+					<video autoplay loop muted playsinline style="height:19rem;">
+						<source
+							src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/printShareDesign/Create_teal.mp4"
+							type="video/mp4">
+						Your browser does not support the video tag.
+					</video>
+
+				</div>
+			</div>
+			<div id="contact-content" class="content-wrapper">
+				<div class="text-content">
+					<h3>Get in Touch</h3>
+					<p>Have questions or ready to start your <strong>printing project? </strong>Reach out to Nuvem Print’s
+						friendly team today. Whether you need a quote, guidance on your design, or support with a custom
+						order, we’re here to help—fast, easy, and hassle-free.
+					</p>
+					<div class="tab-part-button">
+						<a href="<?php echo e(route('contact-us')); ?>">
+							<button><i class="far fa-address-card me-1"></i> Get in Touch</button>
+						</a>
 					</div>
+
+				</div>
+				<div class="video-content">
+					<video autoplay loop muted playsinline style="height:19rem;">
+						<source
+							src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/printShareDesign/Create_teal.mp4"
+							type="video/mp4">
+						Your browser does not support the video tag.
+					</video>
+
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="ideas-to-print-section">
-		<h1 class="ideas-to-print-title">From Ideas to Print - See what's Possible</h1>
+		<h1 class="ideas-to-print-title">From Ideas to Print – Everything You Need Here</h1>
 		<div class="ideas-to-print-grid">
 			<div class="ideas-to-print-card">
 				<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/hardcover.webp"
 					alt="Hardcover">
-				<h4>Hardcover</h4>
+				<h4>Hardback</h4>
 			</div>
 			<div class="ideas-to-print-card">
 				<img src="	https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/paperback.webp"
 					alt="Paperback">
-				<h4>Paperback</h4>
+				<h4>Softback</h4>
 			</div>
 			<div class="ideas-to-print-card">
 				<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/booklets.webp"
@@ -158,27 +209,27 @@
 			<div class="ideas-to-print-card">
 				<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/catalogs.webp"
 					alt="Catalogs">
-				<h4>Catalogs</h4>
+				<h4>Catalogue</h4>
 			</div>
 			<div class="ideas-to-print-card">
 				<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/hardcover.webp"
 					alt="Hardcover">
-				<h4>Hardcover</h4>
+				<h4>Brochures</h4>
 			</div>
 			<div class="ideas-to-print-card">
 				<img src="	https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/paperback.webp"
 					alt="Paperback">
-				<h4>Paperback</h4>
+				<h4>Posters</h4>
 			</div>
 			<div class="ideas-to-print-card">
 				<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/booklets.webp"
 					alt="Booklets">
-				<h4>Booklets</h4>
+				<h4>Banners</h4>
 			</div>
 			<div class="ideas-to-print-card">
 				<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/products/us/catalogs.webp"
 					alt="Catalogs">
-				<h4>Catalogs</h4>
+				<h4>Autobiography</h4>
 			</div>
 		</div>
 	</div>
@@ -190,66 +241,60 @@
 				<div class="slide">
 					<div class="slide-card">
 						<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/people/passionProjectsAndPersonalPrinting.webp"
-							alt="Nonprofits">
+							alt="Authors & Writers">
 						<div class="slide-content">
-							<h4>Nonprofits & Community Organizations</h4>
-							<p>Amplify your cause with affordable, high-quality printing.</p>
+							<h4>Authors & Writers</h4>
+							<p>Turn your manuscript into a beautifully printed book with ease—professional quality, ready to
+								share with the world.</p>
 						</div>
 					</div>
 				</div>
 				<div class="slide">
 					<div class="slide-card">
 						<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/people/entrepreneursAndSmallBusinesses.webp"
-							alt="Creators">
+							alt="Designers & Illustrators">
 						<div class="slide-content">
-							<h4>Creators, Artists & Self-Publishers</h4>
-							<p>Print, sell, and profit—bring your creative vision to life with professional quality
-								printing.</p>
+							<h4>Designers & Illustrators</h4>
+							<p>Bring your artwork to life on high-quality prints—perfect colors, crisp details, and stunning
+								finishes every time.</p>
 						</div>
 					</div>
 				</div>
 				<div class="slide">
 					<div class="slide-card">
 						<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/people/creatorsArtistsAndSelfPublishers.webp"
-							alt="Businesses">
+							alt="Entrepreneurs & Small Businesses">
 						<div class="slide-content">
-							<h4>Large Businesses & Enterprises</h4>
-							<p>Scale your business with high-volume printing services customized for your needs.</p>
+							<h4>Entrepreneurs & Small Businesses</h4>
+							<p>From brochures to business cards, print marketing materials that make your brand stand out
+								and leave a lasting impression.</p>
 						</div>
 					</div>
 				</div>
 				<div class="slide">
 					<div class="slide-card">
 						<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/people/passionProjectsAndPersonalPrinting.webp"
-							alt="Nonprofits">
+							alt="Students & Educators">
 						<div class="slide-content">
-							<h4>Nonprofits & Community Organizations</h4>
-							<p>Amplify your cause with affordable, high-quality printing.</p>
+							<h4>Students & Educators</h4>
+							<p>Create educational materials, notebooks, and projects with professional-quality printing
+								that’s easy and affordable.</p>
 						</div>
 					</div>
 				</div>
 				<div class="slide">
 					<div class="slide-card">
 						<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/people/entrepreneursAndSmallBusinesses.webp"
-							alt="Creators">
+							alt="Self-Publishers & Hobbyists">
 						<div class="slide-content">
-							<h4>Creators, Artists & Self-Publishers</h4>
-							<p>Print, sell, and profit—bring your creative vision to life with professional quality
-								printing.</p>
-						</div>
-					</div>
-				</div>
-				<div class="slide">
-					<div class="slide-card">
-						<img src="https://d1e8vjamx1ssze.cloudfront.net/public/images/homepage/v2/people/creatorsArtistsAndSelfPublishers.webp"
-							alt="Businesses">
-						<div class="slide-content">
-							<h4>Large Businesses & Enterprises</h4>
-							<p>Scale your business with high-volume printing services customized for your needs.</p>
+							<h4>Self-Publishers & Hobbyists</h4>
+							<p>Print, sell, and showcase your creations—Nuvem Print helps you turn passion projects into
+								tangible products.</p>
 						</div>
 					</div>
 				</div>
 			</div>
+
 			<div class="slider-nav">
 				<button class="prev">&lt;</button>
 				<button class="next">&gt;</button>
@@ -265,14 +310,39 @@
 					out FAQ Page.</p>
 			</div>
 			<div class="faq-right">
-				<div class="faq-item">Can I see a sample of my print before placing a large order? <span>+</span></div>
-				<div class="faq-item">How long does production and shipping take? <span>+</span></div>
-				<div class="faq-item">What is your returns and refund policy? <span>+</span></div>
-				<div class="faq-item">How does Mixam's PrintLink work? <span>+</span></div>
-				<div class="faq-item">What's the difference between PrintLink and bulk printing? <span>+</span></div>
+				<?php $__currentLoopData = $faqs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $faq): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+					<div class="faq-item"> <?php echo e(Str::limit($faq->question, 60)); ?> <span>+</span></div>
+					<div class="faq-answer"><?php echo $faq->answer; ?></div>
+				<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 			</div>
 		</div>
 	</section>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const faqItems = document.querySelectorAll('.faq-item');
+			faqItems.forEach(item => {
+				item.addEventListener('click', () => {
+					// Close all other items
+					faqItems.forEach(otherItem => {
+						if (otherItem !== item) {
+							otherItem.classList.remove('active');
+							const otherAnswer = otherItem.nextElementSibling;
+							if (otherAnswer && otherAnswer.classList.contains('faq-answer')) {
+								otherAnswer.style.display = 'none';
+							}
+						}
+					});
+
+					// Toggle the clicked item
+					item.classList.toggle('active');
+					const answer = item.nextElementSibling;
+					if (answer && answer.classList.contains('faq-answer')) {
+						answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+					}
+				});
+			});
+		});
+	</script>
 
 	<script>
 		const slider = document.querySelector('.slider');
