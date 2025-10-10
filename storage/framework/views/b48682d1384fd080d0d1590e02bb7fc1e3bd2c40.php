@@ -27,9 +27,9 @@
                 </option>
                 <option value="select_area" <?php echo e($attribute->input_type == 'select_area' ? 'selected' : ''); ?>>Select Area
                 </option>
+                <option value="number" <?php echo e($attribute->input_type == 'number' ? 'selected' : ''); ?>>Number</option>
                 <!-- <option value="checkbox" <?php echo e($attribute->input_type == 'checkbox' ? 'selected' : ''); ?>>Checkbox</option> -->
                 <!-- <option value="text" <?php echo e($attribute->input_type == 'text' ? 'selected' : ''); ?>>Text</option> -->
-                <!-- <option value="number" <?php echo e($attribute->input_type == 'number' ? 'selected' : ''); ?>>Number</option> -->
                 <!-- <option value="range" <?php echo e($attribute->input_type == 'range' ? 'selected' : ''); ?>>Range</option> -->
                 <!-- <option value="select_icon" <?php echo e($attribute->input_type == 'select_icon' ? 'selected' : ''); ?>>Select Icon</option> -->
                 <!-- <option value="toggle" <?php echo e($attribute->input_type == 'toggle' ? 'selected' : ''); ?>>Toggle</option> -->
@@ -68,6 +68,7 @@
                   Upon Quantity Range</option>
                 <option value="per_extra_copy" <?php echo e($attribute->pricing_basis == 'per_extra_copy' ? 'selected' : ''); ?>>Per
                   Extra Copy (Multiply by Product Qnty)</option>
+                <option value="multiply_by_quantity" <?php echo e($attribute->pricing_basis == 'multiply_by_quantity' ? 'selected' : ''); ?>>Multiply by Quantity Price</option>
               </select>
             </div>
           </div>
@@ -163,17 +164,17 @@
               <label>Dependency Parents <span class="text-danger">*</span></label>
               <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
                 <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $parentAttr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-              <?php if($parentAttr->id != $attribute->id): ?> 
-            <div class="form-check">
-            <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
-            value="<?php echo e($parentAttr->id); ?>" id="edit-dep-<?php echo e($parentAttr->id); ?>" <?php echo e($attribute->parents->contains('id', $parentAttr->id) ? 'checked' : ''); ?>>
-            <label class="form-check-label" for="edit-dep-<?php echo e($parentAttr->id); ?>">
-            <?php echo e($parentAttr->name); ?>
+                  <?php if($parentAttr->id != $attribute->id): ?> 
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
+                        value="<?php echo e($parentAttr->id); ?>" id="edit-dep-<?php echo e($parentAttr->id); ?>" <?php echo e($attribute->parents->contains('id', $parentAttr->id) ? 'checked' : ''); ?>>
+                      <label class="form-check-label" for="edit-dep-<?php echo e($parentAttr->id); ?>">
+                        <?php echo e($parentAttr->name); ?>
 
-            </label>
-            </div>
-          <?php endif; ?>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      </label>
+                    </div>
+                  <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </div>
             </div>
           </div>

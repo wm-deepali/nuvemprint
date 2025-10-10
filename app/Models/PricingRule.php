@@ -24,7 +24,8 @@ class PricingRule extends Model
         'delivery_charges_required',
         'centralized_paper_rates',
         'centralized_weight_rates',
-        'centralized_cover_weight_rates'
+        'centralized_cover_weight_rates',
+        'quantity_input_required'
     ];
 
     protected $casts = [
@@ -33,7 +34,8 @@ class PricingRule extends Model
         'delivery_charges_required' => 'boolean',
         'centralized_weight_rates' => 'boolean',
         'centralized_paper_rates' => 'boolean',
-        'centralized_cover_weight_rates' => 'boolean'
+        'centralized_cover_weight_rates' => 'boolean',
+        'quantity_input_required' => 'boolean'
     ];
 
 

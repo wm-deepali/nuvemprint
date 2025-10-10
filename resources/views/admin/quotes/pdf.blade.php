@@ -8,7 +8,7 @@
     <style>
         {!! file_get_contents(public_path('admin_assets/css/bootstrap.min.css')) !!}
         {!! file_get_contents(public_path('admin_assets/css/style.css')) !!}
- </style>
+    </style>
 </head>
 
 <body>
@@ -111,6 +111,8 @@
                                                             {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
                                                         @elseif($attr->length)
                                                             {{ $attr->length }} {{ $attr->unit }}
+                                                        @elseif($attr->numeric_value !== null)
+                                                            {{ number_format($attr->numeric_value, 0) }}
                                                         @else
                                                             -
                                                         @endif

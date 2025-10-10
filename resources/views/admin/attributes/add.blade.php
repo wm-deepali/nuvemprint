@@ -27,9 +27,9 @@
                     <option value="radio">Radio</option>
                     <option value="select_image">Select Image</option>
                     <option value="select_area">Select Area</option>
+                    <option value="number">Number</option>
                     <!-- <option value="checkbox">Checkbox</option> -->
                     <!-- <option value="text">Text</option> -->
-                    <!-- <option value="number">Number</option> -->
                     <!-- <option value="range">Range</option> -->
                     <!-- <option value="select_icon">Select Icon</option> -->
                     <!-- <option value="toggle">Toggle</option> -->
@@ -49,6 +49,7 @@
                     <option value="fixed_per_page">Fixed Price Per Page</option>
                     <option value="per_product">Depends Upon Quantity Range</option>
                     <option value="per_extra_copy">Per Extra Copy (Multiply by Product Qnty)</option>
+                    <option value="multiply_by_quantity">Multiply by Quantity Price</option>
                   </select>
                   <small class="text-danger validation-err" id="attributes_0_pricing_basis-err"></small>
                 </div>
@@ -161,15 +162,15 @@
                   <label>Dependency Parent <span class="text-danger">*</span></label>
                   <div class="border p-1 rounded" style="max-height: 200px; overflow-y: auto;">
                     @foreach ($attributes as $attribute)
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input dependency-checkbox"
-              name="attributes[0][dependency_parent][]" value="{{ $attribute->id }}"
-              id="dep-0-{{ $attribute->id }}">
-              <label class="form-check-label" for="dep-0-{{ $attribute->id }}">
-              {{ $attribute->name }}
-              </label>
-            </div>
-          @endforeach
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input dependency-checkbox"
+                          name="attributes[0][dependency_parent][]" value="{{ $attribute->id }}"
+                          id="dep-0-{{ $attribute->id }}">
+                        <label class="form-check-label" for="dep-0-{{ $attribute->id }}">
+                          {{ $attribute->name }}
+                        </label>
+                      </div>
+                    @endforeach
                   </div>
                 </div>
               </div>
@@ -229,7 +230,7 @@
       const $pricingSelect = $item.find('select[name$="[pricing_basis]"]');
       const $placeholder = $pricingSelect.find('option[value=""]');
       console.log($placeholder);
-      
+
 
       if ($pricingSelect.find('option[value="per_page"]').length === 0) {
         $placeholder.after('<option value="per_page">Depends Upon No. of Pages</option>');
@@ -317,8 +318,8 @@
           <option value="dropdown">Dropdown</option>
           <option value="radio">Radio</option>
           <option value="select_image">Select Image</option>
-            <option value="select_area">Select Area</option>
-         
+          <option value="select_area">Select Area</option>
+          <option value="number">Number</option>
         </select>
         <small class="text-danger" id="attributes.${attributeIndex}.input_type-err"></small>
       </div>
@@ -332,6 +333,7 @@
           <option value="fixed_per_page">Fixed Price Per Page</option>
           <option value="per_product">Depends Upon Quantity Range</option>
           <option value="per_extra_copy">Per Extra Copy (Multiply by Product Qnty)</option>
+          <option value="multiply_by_quantity">Multiply by Quantity Price</option>
         </select>
         <small class="text-danger" id="attributes.${attributeIndex}.pricing_basis-err"></small>
       </div>
@@ -435,15 +437,15 @@
                   <label for="parent-${attributeIndex}">Dependency Parent <span class="text-danger">*</span></label>
                   <div class="border p-1 rounded" style="max-height: 200px; overflow-y: auto;">
                     @foreach ($attributes as $attribute)
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input dependency-checkbox"
-              name="attributes[${attributeIndex}][dependency_parent][]" value="{{ $attribute->id }}"
-              id="dep-${attributeIndex}-{{ $attribute->id }}">
-              <label class="form-check-label" for="dep-${attributeIndex}-{{ $attribute->id }}">
-              {{ $attribute->name }}
-              </label>
-            </div>
-            @endforeach
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input dependency-checkbox"
+                        name="attributes[${attributeIndex}][dependency_parent][]" value="{{ $attribute->id }}"
+                        id="dep-${attributeIndex}-{{ $attribute->id }}">
+                        <label class="form-check-label" for="dep-${attributeIndex}-{{ $attribute->id }}">
+                        {{ $attribute->name }}
+                        </label>
+                      </div>
+                    @endforeach
                   </div>
                 </div>
               </div>

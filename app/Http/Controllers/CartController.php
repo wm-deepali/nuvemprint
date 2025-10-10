@@ -40,24 +40,35 @@ class CartController extends Controller
 
         foreach ($item['attributes'] as $attrId => $val) {
             $attribute = Attribute::find($attrId);
-
-            if (!$attribute)
+            if (!$attribute) {
                 continue;
+            }
 
             $attrName = strtolower(trim($attribute->name));
 
-            // Case 1: Custom area attribute
-            if (is_array($val) && isset($val['type']) && $val['type'] === 'select_area') {
-                $area = $val['area'] ?? null;
-                $length = $val['length'] ?? null;
-                $width = $val['width'] ?? null;
-                $unit = $val['unit'] ?? '';
+            if (is_array($val)) {
+                // Handle select_area attribute as before
+                if (isset($val['type']) && $val['type'] === 'select_area') {
+                    $area = $val['area'] ?? null;
+                    $length = $val['length'] ?? null;
+                    $width = $val['width'] ?? null;
+                    $unit = $val['unit'] ?? '';
 
-                $attributes[] = [
-                    'attribute_name' => $attribute->name,
-                    'value_name' => "{$area} {$unit} (L: {$length} × W: {$width})",
-                ];
+                    $attributes[] = [
+                        'attribute_name' => $attribute->name,
+                        'value_name' => "{$area} {$unit} (L: {$length} × W: {$width})",
+                    ];
+                }
+                // Handle number attribute (added)
+                elseif (isset($val['input_type']) && $val['input_type'] === 'number') {
+                    $numberValue = $val['value'] ?? null;
+                    $attributes[] = [
+                        'attribute_name' => $attribute->name,
+                        'value_name' => $numberValue,
+                    ];
+                }
             } else {
+                // Existing normal attribute value handling
                 $value = AttributeValue::find($val);
                 if ($value) {
                     $attributes[] = [
@@ -65,7 +76,6 @@ class CartController extends Controller
                         'value_name' => $value->value,
                     ];
 
-                    // Optional use for weight/size detection
                     if ($attrName === 'paper weight') {
                         $paperWeight = $value->value;
                     } elseif ($attrName === 'paper size') {
@@ -74,6 +84,8 @@ class CartController extends Controller
                 }
             }
         }
+
+
 
         // Total weight calculation (optional)
         $totalWeight = null;
@@ -319,17 +331,28 @@ class CartController extends Controller
             if (!$attribute)
                 continue;
 
-            if (is_array($val) && isset($val['type']) && $val['type'] === 'select_area') {
-                $length = $val['length'] ?? null;
-                $width = $val['width'] ?? null;
-                $area = $val['area'] ?? null;
-                $unit = $val['unit'] ?? '';
-
-                $attributes[] = [
-                    'attribute_name' => $attribute->name,
-                    'value_name' => "{$area} {$unit} (L: {$length} × W: {$width})",
-                ];
+            if (is_array($val)) {
+                // Handle select_area attributes
+                if (isset($val['type']) && $val['type'] === 'select_area') {
+                    $length = $val['length'] ?? null;
+                    $width = $val['width'] ?? null;
+                    $area = $val['area'] ?? null;
+                    $unit = $val['unit'] ?? '';
+                    $attributes[] = [
+                        'attribute_name' => $attribute->name,
+                        'value_name' => "{$area} {$unit} (L: {$length} × W: {$width})",
+                    ];
+                }
+                // Handle number attributes
+                elseif (isset($val['input_type']) && $val['input_type'] === 'number') {
+                    $numberValue = $val['value'] ?? null;
+                    $attributes[] = [
+                        'attribute_name' => $attribute->name,
+                        'value_name' => $numberValue,
+                    ];
+                }
             } else {
+                // Existing handling for attribute values
                 $value = AttributeValue::find($val);
                 if ($value) {
                     $attributes[] = [
@@ -339,6 +362,7 @@ class CartController extends Controller
                 }
             }
         }
+
 
         $cart['attributes_resolved'] = $attributes;
         $cart['subcategory_name'] = $subcategory->name ?? 'Unknown';
@@ -520,107 +544,119 @@ class CartController extends Controller
         try {
 
 
-        $dateString = $data['delivery']['date'];
-        if ($dateString) {
-            // Step 1: Remove weekday and ordinal suffix
-            $cleaned = preg_replace('/\w{3},\s*(\d+)(st|nd|rd|th)\s+(\w+)/', '$1 $3', $dateString); // "1 Aug"
+            $dateString = $data['delivery']['date'];
+            if ($dateString) {
+                // Step 1: Remove weekday and ordinal suffix
+                $cleaned = preg_replace('/\w{3},\s*(\d+)(st|nd|rd|th)\s+(\w+)/', '$1 $3', $dateString); // "1 Aug"
 
-            // Step 2: Append current year
-            $cleaned .= ' ' . now()->year; // "1 Aug 2025"
+                // Step 2: Append current year
+                $cleaned .= ' ' . now()->year; // "1 Aug 2025"
 
-            // Step 3: Convert to Carbon date
-            $date = Carbon::createFromFormat('j M Y', $cleaned);
+                // Step 3: Convert to Carbon date
+                $date = Carbon::createFromFormat('j M Y', $cleaned);
 
-            // Store in DB format
-            $formattedDate = $date->format('Y-m-d'); // e.g. "2025-08-01"
-        }
-
-        // Create Quote
-        $quote = Quote::create([
-            'quote_number' => $data['quote_id'],
-            'customer_id' => $customer->id, // Or use given customer
-            'vat_amount' => $data['vat_amount'],
-            'vat_percentage' => $data['vat_percentage'],
-            'grand_total' => $data['grand_total'],
-            'proof_type' => $data['proof']['proof_type'] ?? null,
-            'proof_price' => $data['proof']['price'] ?? 0,
-            'delivery_price' => $data['delivery']['price'] ?? 0,
-            'delivery_date' => $formattedDate ?? null,
-            'notes' => $data['details'] ?? null,
-        ]);
-
-        // Create QuoteItem
-        $itemData = $data['items'];
-        $quoteItem = QuoteItem::create([
-            'quote_id' => $quote->id,
-            'subcategory_id' => $itemData['subcategory_id'], // or get name from DB
-            'quantity' => $itemData['quantity'],
-            'pages' => $itemData['pages'],
-            'sub_total' => $itemData['sub_total'],
-        ]);
-
-        // Save Attributes
-        foreach ($itemData['attributes'] as $attrId => $valData) {
-            if (is_array($valData) && isset($valData['type']) && $valData['type'] === 'select_area') {
-                QuoteItemAttribute::create([
-                    'quote_item_id' => $quoteItem->id,
-                    'attribute_id' => $attrId,
-                    'value_id' => null,
-                    'unit' => $valData['unit'] ?? null,
-                    'length' => $valData['length'] ?? null,
-                    'width' => $valData['width'] ?? null,
-                ]);
-            } else {
-                QuoteItemAttribute::create([
-                    'quote_item_id' => $quoteItem->id,
-                    'attribute_id' => $attrId,
-                    'value_id' => $valData,
-                ]);
+                // Store in DB format
+                $formattedDate = $date->format('Y-m-d'); // e.g. "2025-08-01"
             }
-        }
 
+            // Create Quote
+            $quote = Quote::create([
+                'quote_number' => $data['quote_id'],
+                'customer_id' => $customer->id, // Or use given customer
+                'vat_amount' => $data['vat_amount'],
+                'vat_percentage' => $data['vat_percentage'],
+                'grand_total' => $data['grand_total'],
+                'proof_type' => $data['proof']['proof_type'] ?? null,
+                'proof_price' => $data['proof']['price'] ?? 0,
+                'delivery_price' => $data['delivery']['price'] ?? 0,
+                'delivery_date' => $formattedDate ?? null,
+                'notes' => $data['details'] ?? null,
+            ]);
 
-        // Save Billing Address
-        $billing = $data['billing'];
-        QuoteBillingAddress::create([
-            'quote_id' => $quote->id,
-            'first_name' => $billing['first_name'],
-            'last_name' => $billing['last_name'],
-            'email' => $billing['email'],
-            'mobile' => $billing['mobile'],
-            'country' => $billing['country'],
-            'address' => $billing['address'],
-        ]);
+            // Create QuoteItem
+            $itemData = $data['items'];
+            $quoteItem = QuoteItem::create([
+                'quote_id' => $quote->id,
+                'subcategory_id' => $itemData['subcategory_id'], // or get name from DB
+                'quantity' => $itemData['quantity'],
+                'pages' => $itemData['pages'],
+                'sub_total' => $itemData['sub_total'],
+            ]);
 
-        // Save Delivery Address
-        $delivery = $data['delivery_address'];
-        QuoteDeliveryAddress::create([
-            'quote_id' => $quote->id,
-            'first_name' => $delivery['first_name'],
-            'last_name' => $delivery['last_name'],
-            'mobile' => $delivery['mobile'],
-            'country' => $delivery['country'],
-            'address' => $delivery['address'],
-            'delivery_instructions' => $delivery['delivery_instructions'],
-            'plain_packaging' => $delivery['plain_packaging'],
-            'same_as_billing' => $delivery['same_as_billing'],
-        ]);
+            // Save Attributes
+            foreach ($itemData['attributes'] as $attrId => $valData) {
+                $attribute = Attribute::find($attrId);
+                if (!$attribute)
+                    continue;
 
-        if (isset($data['image'])) {
-            // Save Images
-            foreach ($data['images'] as $img) {
-                QuoteDocument::create([
-                    'quote_id' => $quote->id,
-                    'path' => $img['path'],
-                    'name' => $img['name'],
-                    'type' => $img['type'],
-                ]);
+                if (is_array($valData) && isset($valData['type']) && $valData['type'] === 'select_area') {
+                    QuoteItemAttribute::create([
+                        'quote_item_id' => $quoteItem->id,
+                        'attribute_id' => $attrId,
+                        'value_id' => null,
+                        'unit' => $valData['unit'] ?? null,
+                        'length' => $valData['length'] ?? null,
+                        'width' => $valData['width'] ?? null,
+                    ]);
+                } elseif (is_array($valData) && isset($valData['input_type']) && $valData['input_type'] === 'number') {
+                    QuoteItemAttribute::create([
+                        'quote_item_id' => $quoteItem->id,
+                        'attribute_id' => $attrId,
+                        'value_id' => null, // no value_id reference
+                        'numeric_value' => floatval($valData['value']),
+                    ]);
+                } else {
+                    QuoteItemAttribute::create([
+                        'quote_item_id' => $quoteItem->id,
+                        'attribute_id' => $attrId,
+                        'value_id' => $valData,
+                    ]);
+                }
             }
-        }
 
-        DB::commit();
-        session()->forget('cart');
-        return response()->json(['message' => 'Quote saved successfully', 'quote_id' => $quote->quote_number]);
+
+
+            // Save Billing Address
+            $billing = $data['billing'];
+            QuoteBillingAddress::create([
+                'quote_id' => $quote->id,
+                'first_name' => $billing['first_name'],
+                'last_name' => $billing['last_name'],
+                'email' => $billing['email'],
+                'mobile' => $billing['mobile'],
+                'country' => $billing['country'],
+                'address' => $billing['address'],
+            ]);
+
+            // Save Delivery Address
+            $delivery = $data['delivery_address'];
+            QuoteDeliveryAddress::create([
+                'quote_id' => $quote->id,
+                'first_name' => $delivery['first_name'],
+                'last_name' => $delivery['last_name'],
+                'mobile' => $delivery['mobile'],
+                'country' => $delivery['country'],
+                'address' => $delivery['address'],
+                'delivery_instructions' => $delivery['delivery_instructions'],
+                'plain_packaging' => $delivery['plain_packaging'],
+                'same_as_billing' => $delivery['same_as_billing'],
+            ]);
+
+            if (isset($data['image'])) {
+                // Save Images
+                foreach ($data['images'] as $img) {
+                    QuoteDocument::create([
+                        'quote_id' => $quote->id,
+                        'path' => $img['path'],
+                        'name' => $img['name'],
+                        'type' => $img['type'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+            session()->forget('cart');
+            return response()->json(['message' => 'Quote saved successfully', 'quote_id' => $quote->quote_number]);
 
 
         } catch (\Exception $e) {

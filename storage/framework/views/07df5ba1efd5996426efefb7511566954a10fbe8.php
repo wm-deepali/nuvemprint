@@ -56,11 +56,39 @@
             <strong><?php echo e($cond->parentValue->value ?? ''); ?></strong>
             </td>
             <td>
+    <?php switch($cond->action):
+        case ('hide_attribute'): ?>
+            Hide the <strong>(<?php echo e($cond->affectedAttribute->name); ?>)</strong> attribute.
+            <?php break; ?>
+        <?php case ('show_attribute'): ?>
+            Always show <strong>(<?php echo e($cond->affectedAttribute->name); ?>)</strong>.
+            <?php break; ?>
+        <?php case ('hide_values'): ?>
+            Hide these <strong>(<?php echo e($cond->affectedAttribute->name); ?>)</strong> values: 
+            <strong>
+               <?php echo e($cond->affectedValues ? implode(', ', $cond->affectedValues->pluck('value')->toArray()) : ''); ?>
+
+            </strong>
+            <?php break; ?>
+        <?php case ('show_values'): ?>
+            Show only these <strong>(<?php echo e($cond->affectedAttribute->name); ?>)</strong> values: 
+            <strong>
+              <?php echo e($cond->affectedValues ? implode(', ', $cond->affectedValues->pluck('value')->toArray()) : ''); ?>
+
+            </strong>
+            <?php break; ?>
+        <?php default: ?>
+            <?php echo e($cond->action); ?>
+
+    <?php endswitch; ?>
+</td>
+
+            <!-- <td>
             <strong><?php echo e($cond->affectedAttribute->name ?? ''); ?></strong>
             <?php if($cond->affected_value_id): ?>
           = <strong><?php echo e($cond->affectedValue->value ?? ''); ?></strong>
         <?php endif; ?>
-            </td>
+            </td> -->
             <td><span class="badge badge-light-info text-capitalize"><?php echo e($cond->action); ?></span></td>
             <td><?php echo e($cond->created_at->format('d M Y')); ?></td>
             <td>

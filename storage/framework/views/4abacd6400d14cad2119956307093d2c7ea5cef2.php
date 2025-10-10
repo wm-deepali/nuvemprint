@@ -21,17 +21,25 @@
               <input type="text" name="price" class="form-control" value="<?php echo e($DeliveryCharge->price); ?>">
               <span class="validation-err price-err text-danger"></span>
             </div>
+          
             <div class="form-group col-md-6">
-              <label>Delivery Title</label>
-              <input type="text" name="title" class="form-control" placeholder="Enter title"
-                value="<?php echo e($DeliveryCharge->title); ?>">
-              <span class="validation-err title-err text-danger"></span>
+              <label>Delivery Country<span class="text-danger">*</span></label>
+              <select name="title" class="form-control" required>
+                <option value="">-- Select Country --</option>
+                <option value="United Kingdom" <?php echo e($DeliveryCharge->title == 'United Kingdom' ? 'selected' : ''); ?>>
+                  United Kingdom</option>
+                <option value="Ireland" <?php echo e($DeliveryCharge->title == 'Ireland' ? 'selected' : ''); ?>>Ireland
+                </option>
+                <option value="Europe" <?php echo e($DeliveryCharge->title == 'Europe' ? 'selected' : ''); ?>>Europe</option>
+              </select>
+
+              <span class="validation-err country-err text-danger"></span>
             </div>
             <div class="form-group col-md-6">
               <label>Image</label>
               <input type="file" name="image" class="form-control" accept="image/*">
               <span class="validation-err image-err text-danger"></span>
-  
+
               <?php if($DeliveryCharge->image): ?>
                 <div class="mt-2">
                   <img src="<?php echo e(asset('storage/' . $DeliveryCharge->image)); ?>" alt="Current Image"

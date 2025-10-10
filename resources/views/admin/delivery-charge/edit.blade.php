@@ -21,17 +21,25 @@
               <input type="text" name="price" class="form-control" value="{{ $DeliveryCharge->price }}">
               <span class="validation-err price-err text-danger"></span>
             </div>
+          
             <div class="form-group col-md-6">
-              <label>Delivery Title</label>
-              <input type="text" name="title" class="form-control" placeholder="Enter title"
-                value="{{ $DeliveryCharge->title }}">
-              <span class="validation-err title-err text-danger"></span>
+              <label>Delivery Country<span class="text-danger">*</span></label>
+              <select name="title" class="form-control" required>
+                <option value="">-- Select Country --</option>
+                <option value="United Kingdom" {{  $DeliveryCharge->title == 'United Kingdom' ? 'selected' : '' }}>
+                  United Kingdom</option>
+                <option value="Ireland" {{  $DeliveryCharge->title == 'Ireland' ? 'selected' : '' }}>Ireland
+                </option>
+                <option value="Europe" {{  $DeliveryCharge->title == 'Europe' ? 'selected' : '' }}>Europe</option>
+              </select>
+
+              <span class="validation-err country-err text-danger"></span>
             </div>
             <div class="form-group col-md-6">
               <label>Image</label>
               <input type="file" name="image" class="form-control" accept="image/*">
               <span class="validation-err image-err text-danger"></span>
-  
+
               @if($DeliveryCharge->image)
                 <div class="mt-2">
                   <img src="{{ asset('storage/' . $DeliveryCharge->image) }}" alt="Current Image"

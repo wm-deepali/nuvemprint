@@ -26,7 +26,7 @@ class SiteController extends Controller
             ->get();
 
         $faqs = Faq::where('status', 'published')->take(6)->get();
-        return view('front.index', compact( 'blogs', 'faqs'));
+        return view('front.index', compact('blogs', 'faqs'));
     }
 
 
@@ -91,11 +91,22 @@ class SiteController extends Controller
             $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
 
             if ($pricingRule) {
-                $quantityDefaults = [
-                    'default' => $pricingRule->default_quantity ?? null,
-                    'min' => $pricingRule->min_quantity ?? null,
-                    'max' => $pricingRule->max_quantity ?? null,
-                ];
+
+                $quantityInputRequired = $pricingRule->quantity_input_required ?? false; // or 'quantity_input_required'
+
+                if ($quantityInputRequired) {
+                    $quantityDefaults = [
+                        'default' => $pricingRule->default_quantity ?? null,
+                        'min' => $pricingRule->min_quantity ?? null,
+                        'max' => $pricingRule->max_quantity ?? null,
+                    ];
+                } else {
+                    $quantityDefaults = [
+                        'default' => null,
+                        'min' => null,
+                        'max' => null,
+                    ];
+                }
 
                 $pagesDraggerRequired = $pricingRule->pages_dragger_required;
 
@@ -259,41 +270,36 @@ class SiteController extends Controller
                 ]);
             }
 
-            $attributeConditions = \App\Models\AttributeCondition::with(['parentAttribute', 'parentValue', 'affectedAttribute', 'affectedValues'])
+            //  Load all attribute conditions for this subcategory
+            $attributeConditions = \App\Models\AttributeCondition::with('affectedValues')
                 ->where('subcategory_id', $subcategoryId)
-                ->get();
+                ->get()
+                ->map(function ($cond) {
+                    return [
+                        'parent_attribute_id' => $cond->parent_attribute_id,
+                        'parent_value_id' => $cond->parent_value_id,
+                        'affected_attribute_id' => $cond->affected_attribute_id,
+                        'action' => $cond->action,
+                        'affected_value_ids' => $cond->affectedValues->pluck('id')->toArray(),
+                    ];
+                });
 
-            $conditionsMap = $attributeConditions->map(function ($cond) use ($subcategoryId) {
-                $affectedValueIds = $cond->affectedValues->pluck('id')->toArray();
-
-                $allValueIds = \App\Models\SubcategoryAttributeValue::where('subcategory_id', $subcategoryId)
-                    ->where('attribute_id', $cond->affected_attribute_id)
-                    ->pluck('attribute_value_id')
-                    ->toArray();
-                return [
-                    'parent_attribute_id' => $cond->parent_attribute_id,
-                    'parent_value_id' => $cond->parent_value_id,
-                    'affected_attribute_id' => $cond->affected_attribute_id,
-                    'affected_value_ids' => $affectedValueIds,
-                    'all_values_affected' => !array_diff($allValueIds, $affectedValueIds),
-                    'action' => $cond->action,
-                ];
-            });
-
+                
             $compositeMap = collect($compositeDraggerValues)->pluck('component_count', 'id');
             $compositeMap = $compositeMap->prepend('-- Select --', '');
         }
-        // dd($attributeGroups->toArray());
+        // dd($attributeConditions->toArray());
         return view('front.subcategory-detail', compact(
             'subcategory',
             'attributeGroups',
-            'conditionsMap',
+            'attributeConditions',
+            'pagesDefaults',
             'pagesDraggerRequired',
             'pagesDraggerAttributeId',
             'compositeDraggerValues',
             'compositeMap',
             'quantityDefaults',
-            'pagesDefaults',
+            'quantityInputRequired',
             'deliveryChargesRequired',
             'deliveryCharges',
             'minDate',
@@ -315,6 +321,7 @@ class SiteController extends Controller
 
     public function calculate(Request $request)
     {
+
         $subcategoryId = $request->input('subcategory_id');
         $componentPages = [];
         $total = 0;
@@ -356,11 +363,48 @@ class SiteController extends Controller
             }
         }
 
-        $quantity = (int) $request->input('quantity', 1);
         $defaultPages = (int) $request->input('pages', 0);
-        $selectedAttributes = $request->input('attributes', []); // [attribute_id => value_id]
+        $selectedAttributes = $request->input('attributes', []); // [attribute_id => value_id or array]
 
-        // Step 5: Expand composite values into individual components
+        $quantityAttribute = Attribute::where('name', 'Quantity')->first();
+        $quantityAttributeId = $quantityAttribute ? $quantityAttribute->id : null;
+        $requiresQuantityInput = $pricingRule->quantity_input_required ?? true;
+
+        // Determine base quantity
+        $quantity = $requiresQuantityInput ?
+            (int) $request->input('quantity', 1) :
+            1;
+
+        if (!$requiresQuantityInput && $quantityAttributeId && isset($selectedAttributes[$quantityAttributeId]) && !empty($selectedAttributes[$quantityAttributeId])) {
+            $value = AttributeValue::find($selectedAttributes[$quantityAttributeId]);
+            $quantity = $value->value ? (int) $value->value : 1;
+        }
+
+        // Override quantity if a number attribute with multiply_by_quantity pricing basis exists
+        foreach ($selectedAttributes as $attrId => $valueData) {
+            $attribute = Attribute::find($attrId);
+
+            if (!$attribute) {
+                continue;
+            }
+
+            if (is_array($valueData)) {
+                $inputType = $valueData['input_type'] ?? null;
+                $attrValue = $valueData['value'] ?? null;
+            } else {
+                $inputType = null;
+                $attrValue = $valueData;
+            }
+
+            if ($attribute->input_type === 'number' && $attribute->pricing_basis === 'multiply_by_quantity') {
+                // Use attribute's numeric value as new quantity
+                $quantity = intval($attrValue) * $quantity;
+                unset($selectedAttributes[$attrId]);
+                break; // Exit after first found overriding attribute
+            }
+        }
+
+        // Now proceed with attribute expansion as before
         $expandedAttributes = [];
         foreach ($selectedAttributes as $attributeId => $valueData) {
             if (is_array($valueData) && isset($valueData['length'], $valueData['width'])) {
@@ -377,6 +421,7 @@ class SiteController extends Controller
                 }
             }
         }
+
 
         // Step 6: Process each expanded value for pricing
         foreach ($expandedAttributes as $attributeId => $valueData) {
@@ -458,7 +503,7 @@ class SiteController extends Controller
                             ->where('value_id', $valueId)
                             ->get();
 
-                            $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
+                        $validAttrs = $attrs->filter(function ($item) use ($selectedAttributes, $expandedAttributes) {
                             foreach ($item->dependencies as $dep) {
                                 $selected = $selectedAttributes[$dep->attribute_id] ?? null;
                                 $matches = $expandedAttributes[$dep->attribute_id] ?? ($selected ? [$selected] : []);
@@ -566,8 +611,7 @@ class SiteController extends Controller
                             }
                         }
 
-                    }
-                    elseif ($useCentralizedCoverWeight && in_array(strtolower($attribute->name), ['cover paper weight'])) {
+                    } elseif ($useCentralizedCoverWeight && in_array(strtolower($attribute->name), ['cover paper weight'])) {
                         // Use Centralized Pricing
                         $attrs = CentralizedAttributePricing::with(['quantityRanges', 'attribute', 'dependencies'])
                             ->where('attribute_id', $attributeId)

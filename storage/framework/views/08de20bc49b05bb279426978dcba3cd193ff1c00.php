@@ -147,4 +147,4 @@
   $('#yourModalId').on('shown.bs.modal', function () {
     initDeliveryModalScripts();
   });
-</script>
+</script><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/delivery-charge/create.blade.php ENDPATH**/ ?>

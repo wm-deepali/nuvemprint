@@ -38,7 +38,7 @@
             <thead>
             <tr>
               <th>#</th>
-              <th>Title</th>
+              <th>Country</th>
               <th>No. of Days</th>
               <th>Price</th>
               <th>Details</th>

@@ -6,20 +6,28 @@
     }
 
     .custom-select {
-    width: 100%;
-    height: 38px;
-    padding: 0px 35px 0px 10px; /* Right side extra space */
-    border: 2px solid #e0e0e0 !important;
-    color: black !important;
-    border-radius: .375rem !important;
-    appearance: none;           /* Default arrow remove */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background: url("data:image/svg+xml;utf8,<svg fill='black' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>")
-        no-repeat right 10px center; /* Custom arrow */
-    background-size: 12px;
-}
+        width: 100%;
+        height: 38px;
+        padding: 0px 35px 0px 10px;
+        /* Right side extra space */
+        border: 2px solid #e0e0e0 !important;
+        color: black !important;
+        border-radius: .375rem !important;
+        appearance: none;
+        /* Default arrow remove */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: url("data:image/svg+xml;utf8,<svg fill='black' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 10px center;
+        /* Custom arrow */
+        background-size: 12px;
+    }
 
+    .custom-select:disabled, .custom-select[disabled] {
+        background-color: #e9ecef !important; /* light gray background */
+        color: #6c757d !important; /* gray text */
+        cursor: not-allowed !important; /* not-allowed cursor */
+        background: none !important; /* remove custom arrow */
+    }
 </style>
 
 
@@ -27,7 +35,9 @@
     $inputType = $attribute['input_type'] ?? 'radio';
     $values = $attribute['values'] ?? [];
     $supportImage = $attribute['has_image'] ?? false;
+    $singleValue = count($values) === 1;
 ?>
+
 
 
 <?php if($inputType === 'radio' && $supportImage): ?>
@@ -44,10 +54,13 @@
                 <div class="paper-type-section">
                     <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <button type="button"
-                            class="btn btn-light print-color text-start <?php echo e($value['is_default'] ? 'active' : ''); ?>"
+                            class="btn btn-light print-color text-start <?php echo e($value['is_default'] || $singleValue ? 'active' : ''); ?>"
                             data-attribute-id="<?php echo e($attribute['id']); ?>" data-value-id="<?php echo e($value['id']); ?>"
                             data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
-                            data-image="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default-preview.png'))); ?>" <?php echo e($value['is_default'] ? 'data-selected=true' : ''); ?>>
+                            data-image="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default-preview.png'))); ?>"
+                            <?php echo e($value['is_default'] || $singleValue ? 'data-selected=true' : ''); ?>
+
+                            <?php if($singleValue): ?> disabled <?php endif; ?>>
                             <?php echo e($value['value']); ?>
 
                         </button>
@@ -55,18 +68,20 @@
                 </div>
             </div>
             <?php
-                $imagePath = asset('storage/' . ($value['image_path'] ?? 'default-preview.png'));
+                $imagePath = asset('storage/' . ($values[0]['image_path'] ?? 'default-preview.png'));
             ?>
+
 
             <div class="col-md-6 d-flex align-items-center justify-content-center">
                 <div class="border rounded overflow-hidden" style="width: 100%; height: 200px; padding: 3px;">
                     <img id="preview-image-<?php echo e($attribute['id']); ?>"
-                        src="<?php echo e(asset('storage/' . ($attribute['values'][0]['image_path'] ?? 'default-preview.png'))); ?>"
+                        src="<?php echo e(asset('storage/' . ($values[0]['image_path'] ?? 'default-preview.png'))); ?>"
                         class="img-fluid h-100 w-100 object-fit-cover" alt="Preview">
+
 
                     <div class="zoom-section">
                         <div class="zoomicon" data-bs-toggle="modal" data-bs-target="#imageZoomModal"
-                            data-image="<?php echo e($imagePath); ?>"  style="cursor: pointer;">
+                            data-image="<?php echo e($imagePath); ?>" style="cursor: pointer;">
                             <i class="fa-solid fa-magnifying-glass-plus"></i>
                         </div>
                     </div>
@@ -76,7 +91,6 @@
     </div>
 
 
-    
 
 <?php elseif($inputType === 'radio'): ?>
     <div class="<?php echo e(in_array($attribute['name'], ['Paper Weight', 'Cover Paper Weight']) ? 'col-md-12 attribute-wrapper' : 'col-md-6 attribute-wrapper'); ?> mb-3"
@@ -89,16 +103,18 @@
         </label>
         <div class="attribute-values <?php echo e(count($values) <= 4 ? 'color-print' : 'color-print1'); ?>">
             <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div class="print-color <?php echo e($value['is_default'] ? 'active' : ''); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
+                <div class="print-color <?php echo e($value['is_default'] || $singleValue ? 'active' : ''); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
                     data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
-                    data-value-id="<?php echo e($value['id']); ?>" data-value="<?php echo e($value['value']); ?>">
+                    data-value-id="<?php echo e($value['id']); ?>" data-value="<?php echo e($value['value']); ?>"
+                    <?php if($singleValue): ?> style="pointer-events: none; opacity: 0.6;" <?php endif; ?>>
                     <p><?php echo e($value['value']); ?></p>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 
-    
+
+
 <?php elseif($inputType === 'select_image'): ?>
     <div class="attribute-wrapper col-md-12 mb-3" data-attribute-id="<?php echo e($attribute['id']); ?>"
         data-is-required="<?php echo e($attribute['is_required']); ?>">
@@ -110,12 +126,13 @@
         </label>
         <div class="attribute-value color-print1">
             <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div class="choose-binding <?php echo e($value['is_default'] ? 'active' : ''); ?>" data-value="<?php echo e($value['value']); ?>"
+                <div class="choose-binding <?php echo e($value['is_default'] || $singleValue ? 'active' : ''); ?>" data-value="<?php echo e($value['value']); ?>"
                     data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
-                    data-attribute-id="<?php echo e($attribute['id']); ?>" data-value-id="<?php echo e($value['id']); ?>">
+                    data-attribute-id="<?php echo e($attribute['id']); ?>" data-value-id="<?php echo e($value['id']); ?>"
+                    <?php if($singleValue): ?> style="pointer-events: none; opacity: 0.6;" <?php endif; ?>>
                     <div>
                         <img src="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default.png'))); ?>" alt="<?php echo e($value['value']); ?>"
-                            style="height:133px;" />
+                            style="height:150px; width:150px;" />
                         <div class="zoom-section1">
                             <div class="zoomicon">
                                 <i class="fa-solid fa-magnifying-glass-plus"></i>
@@ -126,10 +143,10 @@
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-
     </div>
 
-    
+
+
 <?php elseif($inputType === 'dropdown'): ?>
     <div class="attribute-wrapper col-md-6 mb-3" data-attribute-id="<?php echo e($attribute['id']); ?>"
         data-is-required="<?php echo e($attribute['is_required']); ?>">
@@ -140,26 +157,25 @@
                 <span class="help-circle" data-label="<?php echo e($attribute['name']); ?>" data-toggle="modal"
                     data-target="#helpModal">?</span>
             </label>
-            <!--<button type="button" class="btn btn-link p-0">Custom Size</button>-->
         </div>
         <div class="attribute-values">
-            <select class="custom-select" id="dropdown_<?php echo e($attribute['id']); ?>" name="attributes[<?php echo e($attribute['id']); ?>]">
+            <select class="custom-select" id="dropdown_<?php echo e($attribute['id']); ?>" name="attributes[<?php echo e($attribute['id']); ?>]" 
+                <?php if($singleValue): ?> disabled <?php endif; ?>>
                 <option value="">-- Select --</option>
                 <?php $__currentLoopData = $values; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <option value="<?php echo e($value['value']); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
                         data-original-default="<?php echo e($value['original_is_default'] ?? ($value['is_default'] ?? false) ? 'true' : 'false'); ?>"
-                        data-value-id="<?php echo e($value['id']); ?>" <?php echo e($value['is_default'] ? 'selected' : ''); ?>>
+                        data-value-id="<?php echo e($value['id']); ?>" 
+                        <?php echo e($value['is_default'] || $singleValue ? 'selected' : ''); ?>>
                         <?php echo e($value['value']); ?>
 
                     </option>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
-
         </div>
     </div>
 
 
-    
 
 <?php elseif($inputType === 'select_area'): ?>
     <?php
@@ -186,7 +202,7 @@
                     id="length_<?php echo e($attribute['id']); ?>" class="form-control area-input"
                     data-area-unit="<?php echo e($attribute['area_unit']); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
                     <?php if(!empty($attribute['max_height'])): ?> max="<?php echo e($attribute['max_height']); ?>" <?php endif; ?>
-                    placeholder="Enter length">
+                    placeholder="Enter length" <?php if($singleValue): ?> readonly <?php endif; ?>>
                 <small class="text-danger length-warning" style="display: none;">Maximum length is
                     <?php echo e($attribute['max_height'] ?? ''); ?></small>
             </div>
@@ -197,7 +213,7 @@
                     id="width_<?php echo e($attribute['id']); ?>" class="form-control area-input"
                     data-area-unit="<?php echo e($attribute['area_unit']); ?>" data-attribute-id="<?php echo e($attribute['id']); ?>"
                     <?php if(!empty($attribute['max_width'])): ?> max="<?php echo e($attribute['max_width']); ?>" <?php endif; ?>
-                    placeholder="Enter width">
+                    placeholder="Enter width" <?php if($singleValue): ?> readonly <?php endif; ?>>
                 <small class="text-danger width-warning" style="display: none;">Maximum width is
                     <?php echo e($attribute['max_width'] ?? ''); ?></small>
             </div>
@@ -210,8 +226,23 @@
             <small class="text-muted">Unit: <?php echo e($unitLabel); ?></small>
         </div>
     </div>
-<?php endif; ?>
 
+
+<?php elseif($inputType === 'number'): ?>
+    <div class="attribute-wrapper col-md-6 mb-3" data-attribute-id="<?php echo e($attribute['id']); ?>" data-attribute-type="number"
+        data-is-required="<?php echo e($attribute['is_required']); ?>">
+        <label class="form-label d-flex align-items-center" style="gap: 5px;">
+            <?php echo e($attribute['name']); ?>
+
+            <span class="help-circle" data-label="<?php echo e($attribute['name']); ?>" data-toggle="modal"
+                data-target="#helpModal">?</span>
+        </label>
+        <input type="number" class="form-control" id="number_<?php echo e($attribute['id']); ?>"
+            name="attributes[<?php echo e($attribute['id']); ?>]" min="1" max="<?php echo e($quantityDefaults['max'] ?? 10000); ?>" step="1"
+            value="1" <?php if($singleValue): ?> readonly <?php endif; ?>>
+        <small class="text-muted">Enter a valid number</small>
+    </div>
+<?php endif; ?>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -231,4 +262,5 @@
             });
         });
     });
-</script><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/front/attribute-block.blade.php ENDPATH**/ ?>
+</script>
+<?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/front/attribute-block.blade.php ENDPATH**/ ?>

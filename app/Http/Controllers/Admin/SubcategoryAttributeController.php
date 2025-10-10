@@ -61,7 +61,7 @@ class SubcategoryAttributeController extends Controller
             $attribute = Attribute::find($attrId);
             // dd($attribute && $attribute->input_type !== 'select_area');
             // If input_type is NOT 'select_area', then value must be provided
-            if ($attribute && $attribute->input_type !== 'select_area') {
+            if ($attribute && $attribute->input_type !== 'select_area' && $attribute->input_type !== 'number') {
                 $valueIds = $request->attribute_value_ids[$attrId] ?? null;
 
                 if (empty($valueIds) || !is_array($valueIds)) {
@@ -171,7 +171,7 @@ class SubcategoryAttributeController extends Controller
         }
         // dd($attribute);
         // Don't require values for these input types
-        $requiresValues = !in_array($attribute->input_type, ['select_area']);
+        $requiresValues = !in_array($attribute->input_type, ['select_area', 'number']);
 
         // Base validation rules
         $rules = [

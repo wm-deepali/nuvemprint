@@ -685,7 +685,7 @@
     .cal-page {
         width: 100%;
         background: #f9f9f9;
-        padding: 50px 100px;
+        padding: 50px 0px;
     }
 
     .page-slider input[type="range"] {
@@ -751,7 +751,7 @@
 </style>
 
 <div class="cal-page">
-    <div class="row">
+    <div class="row" style="width: 1180px; margin:auto;">
         <div class="col-md-7">
             <div class="reset-card">
                 <h5 class="m-0">Create Your <?php echo e($subcategory->name ?? "Booklets"); ?></h5>
@@ -770,20 +770,23 @@
                     <div class="calculation-card mt-3">
                         
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="quantityInput" class="form-label">
-                                    Quantity
-                                    <span class="help-circle" data-label="Quantity" data-toggle="modal"
-                                        data-target="#helpModal">?</span>
-                                </label>
-                                <input type="number" class="form-control" id="quantityInput" placeholder="100"
-                                    value="<?php echo e($quantityDefaults['default'] ?? 100); ?>"
-                                    min="<?php echo e($quantityDefaults['min'] ?? 1); ?>" max="<?php echo e($quantityDefaults['max'] ?? 10000); ?>">
-                                <div class="invalid-feedback d-none" id="quantityError">
-                                    Quantity must be between <?php echo e($quantityDefaults['min'] ?? 1); ?> and
-                                    <?php echo e($quantityDefaults['max'] ?? 10000); ?>.
+
+                            <?php if(!empty($quantityInputRequired)): ?>
+                                <div class="col-md-6 mb-3">
+                                    <label for="quantityInput" class="form-label">
+                                        Quantity
+                                        <span class="help-circle" data-label="Quantity" data-toggle="modal"
+                                            data-target="#helpModal">?</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="quantityInput" placeholder="100"
+                                        value="<?php echo e($quantityDefaults['default'] ?? 100); ?>"
+                                        min="<?php echo e($quantityDefaults['min'] ?? 1); ?>" max="<?php echo e($quantityDefaults['max'] ?? 10000); ?>">
+                                    <div class="invalid-feedback d-none" id="quantityError">
+                                        Quantity must be between <?php echo e($quantityDefaults['min'] ?? 1); ?> and
+                                        <?php echo e($quantityDefaults['max'] ?? 10000); ?>.
+                                    </div>
                                 </div>
-                            </div>
+                            <?php endif; ?>
 
 
                             
@@ -910,7 +913,8 @@
 
 
                         <div class="estimate-card estimate-option <?php echo e($option['is_default'] ? 'active' : 'mt-3'); ?>"
-                            data-price="<?php echo e($option['price']); ?>" data-date="<?php echo e($formattedDate); ?>" data-id="<?php echo e($option['id']); ?>">
+                            data-title="<?php echo e($title ?? 'Standard Delivery'); ?>" data-price="<?php echo e($option['price']); ?>"
+                            data-date="<?php echo e($formattedDate); ?>" data-id="<?php echo e($option['id']); ?>">
                             <div class="circle-point"></div>
                             <div class="est-card">
 
@@ -927,7 +931,13 @@
                                     <div class="line-y"></div>
                                     <div>
                                         <h4 class="text-black final-price">
-                                            £<?php echo e(number_format($option['price'], 2)); ?></h4>
+                                            <?php if($option['price'] == 0): ?>
+                                                Free
+                                            <?php else: ?>
+                                                    £<?php echo e(number_format($option['price'], 2)); ?>
+
+                                                </h4>
+                                            <?php endif; ?>
                                     </div>
                                 </div>
 
@@ -1033,7 +1043,7 @@
 
 <script>
     const subcategoryId = <?php echo e($subcategory->id); ?>;
-    const attributeConditions = <?php echo json_encode($conditionsMap, 15, 512) ?>;
+    const attributeConditions = <?php echo json_encode($attributeConditions, 15, 512) ?>;
     const debouncedCalculateTotalPrice = debounce(calculateTotalPrice, 300);
     const compositeMap = <?php echo json_encode($compositeMap ?? [], 15, 512) ?>;
     const compositeDraggerValues = <?php echo json_encode($compositeDraggerValues ?? [], 15, 512) ?>;
@@ -1051,22 +1061,26 @@
         $('#zoomedImage').attr('src', imageUrl);
     });
 
-    document.getElementById('quantityInput').addEventListener('input', function () {
-        const input = this;
-        const min = parseInt(input.min);
-        const max = parseInt(input.max);
-        const value = parseInt(input.value);
-        const errorDiv = document.getElementById('quantityError');
+    document.addEventListener('DOMContentLoaded', function () {
+        var quantityInput = document.getElementById('quantityInput');
+        if (quantityInput) {
+            quantityInput.addEventListener('input', function () {
+                const input = this;
+                const min = parseInt(input.min);
+                const max = parseInt(input.max);
+                const value = parseInt(input.value);
+                const errorDiv = document.getElementById('quantityError');
 
-        if (value < min || value > max) {
-            input.classList.add('is-invalid');
-            errorDiv.classList.remove('d-none');
-        } else {
-            input.classList.remove('is-invalid');
-            errorDiv.classList.add('d-none');
+                if (value < min || value > max) {
+                    input.classList.add('is-invalid');
+                    errorDiv.classList.remove('d-none');
+                } else {
+                    input.classList.remove('is-invalid');
+                    errorDiv.classList.add('d-none');
+                }
+            });
         }
     });
-
 
     function forceSliderRedraw() {
         const $slider = $('#pageSlider');
@@ -1139,6 +1153,20 @@
                     $lengthInput.addClass('is-invalid');
                     $widthInput.addClass('is-invalid');
                 }
+            }
+        });
+
+
+        // Add number inputs manually
+        $('.attribute-wrapper[data-attribute-type="number"] input[type="number"]').each(function () {
+            const input = $(this);
+            const attrId = input.closest('.attribute-wrapper').data('attribute-id');
+            const value = input.val();
+            if (attrId && value !== '') {
+                selectedAttributes[attrId] = {
+                    value: value,
+                    input_type: 'number'
+                };
             }
         });
 
@@ -1406,7 +1434,7 @@
                     $(previewImgSelector).attr('src', '<?php echo e(asset("storage/default-preview.png")); ?>');
                 }
 
-                handleAttributeConditions(attrId, null);
+                handleAttributeConditions();
                 renderCompositeFromCurrentSelection();
                 calculateTotalPrice();
 
@@ -1430,7 +1458,7 @@
                 $(previewImgSelector).attr('src', newImage);
             }
 
-            handleAttributeConditions(attrId, valueId);
+            handleAttributeConditions();
             renderCompositeFromCurrentSelection();
             calculateTotalPrice();
         });
@@ -1479,12 +1507,12 @@
                     const $firstReal = $select.find('option[data-value-id]').first();
                     $firstReal.prop('selected', true);
 
-                    handleAttributeConditions(attrId, $firstReal.data('value-id'));
+                    handleAttributeConditions();
                     renderCompositeFromCurrentSelection();
                     calculateTotalPrice();
                 } else {
                     // Optional → treat as no selection
-                    handleAttributeConditions(attrId, null);
+                    handleAttributeConditions();
                     renderCompositeFromCurrentSelection();
                     calculateTotalPrice();
                 }
@@ -1492,13 +1520,17 @@
             }
 
             // If a valid value was selected
-            handleAttributeConditions(attrId, valueId);
+            handleAttributeConditions();
             renderCompositeFromCurrentSelection();
             calculateTotalPrice();
         });
 
 
         $('#quantityInput').on('input', calculateTotalPrice);
+
+        $(document).on('input', '.attribute-wrapper[data-attribute-type="number"] input[type="number"]', function () {
+            calculateTotalPrice();
+        });
 
         $(document).on('change', '.group-toggle', function () {
             const target = $(this).data('target');
@@ -1636,14 +1668,14 @@
         $('.attribute-wrapper .active').each(function () {
             const attrId = $(this).data('attribute-id');
             const valueId = $(this).data('value-id');
-            handleAttributeConditions(attrId, valueId);
+            handleAttributeConditions();
         });
 
         $('select.custom-select').each(function () {
             const selected = $(this).find('option:selected');
             const attrId = selected.data('attribute-id');
             const valueId = selected.data('value-id');
-            handleAttributeConditions(attrId, valueId);
+            handleAttributeConditions();
         });
     });
 
@@ -1678,128 +1710,176 @@
         });
     }
 
+    // =========================
+    //  ATTRIBUTE CONDITION LOGIC
+    // =========================
 
-    function handleAttributeConditions(selectedAttrId, selectedValueId) {
+    function handleAttributeConditions() {
         $('.attribute-condition-note').remove();
 
-        attributeConditions.forEach(condition => {
-            if (condition.action !== 'hide') return;
-            if (+condition.parent_attribute_id !== +selectedAttrId) return;
+        // Reset all attributes first
+        $('.attribute-wrapper').removeClass('disabled').show();
+        $('.attribute-wrapper .attribute-values [data-value-id]').show();
 
-            const parentAttrId = +condition.parent_attribute_id;
-            const parentValueId = +condition.parent_value_id;
-            const affectedAttrId = +condition.affected_attribute_id;
-
-            const $parentWrapper = $(`[data-attribute-id="${parentAttrId}"]`);
-            const $affectedWrapper = $(`[data-attribute-id="${affectedAttrId}"]`);
-
-            const shouldShow = +selectedValueId === parentValueId;
-
-            if (shouldShow) {
-                $affectedWrapper.removeClass('disabled');
-                $affectedWrapper.show();
-                calculatedAttributeRow();
-            } else {
-
-
-                $affectedWrapper.addClass('disabled');
-                $affectedWrapper.hide();
-                calculatedAttributeRow();
-
-                const parentValueLabel =
-                    $parentWrapper.find(`[data-value-id="${parentValueId}"]`).text().trim() ||
-                    $parentWrapper.find(`option[data-value-id="${parentValueId}"]`).text().trim();
-                $affectedWrapper.append(`
-        <p class="attribute-condition-note text-danger mt-2">
-            Only available for ${parentValueLabel}.
-        </p>
-    `);
-            }
-
+        // Collect all active parent selections
+        const activeSelections = {};
+        $('.attribute-wrapper .active[data-value-id]').each(function () {
+            const attrId = $(this).closest('.attribute-wrapper').data('attribute-id');
+            const valueId = $(this).data('value-id');
+            activeSelections[attrId] = valueId;
         });
-    }
 
+        $('select.custom-select').each(function () {
+            const selected = $(this).find('option:selected');
+            const attrId = selected.data('attribute-id');
+            const valueId = selected.data('value-id');
+            if (valueId) activeSelections[attrId] = valueId;
+        });
 
-    function applyInitialHideConditions() {
-        $('.attribute-wrapper').removeClass('d-none');
-        $('.attribute-condition-note').remove();
-        $('.attribute-values').show();
-        $('.attribute-values [data-value-id]').show(); // ensure all values shown initially
+        // Loop through all conditions
+        attributeConditions.forEach(cond => {
+            const { parent_attribute_id, parent_value_id, affected_attribute_id, action, affected_value_ids } = cond;
 
-        attributeConditions.forEach(condition => {
-            if (condition.action === 'hide') {
-                const parentAttrId = +condition.parent_attribute_id;
-                const parentValueId = +condition.parent_value_id;
-                const affectedAttrId = +condition.affected_attribute_id;
+            const $affectedWrapper = $(`[data-attribute-id="${affected_attribute_id}"]`);
 
-                const $parentWrapper = $(`[data-attribute-id="${parentAttrId}"]`);
-                const $affectedWrapper = $(`[data-attribute-id="${affectedAttrId}"]`);
-
-                // Get selected value ID from parent
-                let selectedValueId = null;
-
-                const $active = $parentWrapper.find('.attribute-values .active[data-value-id]');
-                if ($active.length) {
-                    selectedValueId = +$active.data('value-id');
-                } else {
-                    const $select = $parentWrapper.find('select');
-                    if ($select.length && $select.val()) {
-                        selectedValueId = +$select.find('option:selected').data('value-id');
+            switch (action) {
+                case 'hide_attribute':
+                    if (activeSelections[parent_attribute_id] === parent_value_id) {
+                        $affectedWrapper.addClass('disabled').hide();
                     }
-                }
+                    break;
 
-                const shouldShow = selectedValueId === parentValueId;
+                case 'show_attribute':
+                    if (activeSelections[parent_attribute_id] === parent_value_id) {
+                        $affectedWrapper.removeClass('disabled').show();
+                    } else {
+                        $affectedWrapper.addClass('disabled').hide();
+                    }
+                    break;
 
-                if (shouldShow) {
-                    $affectedWrapper.removeClass('disabled');
-                    $affectedWrapper.show();
-                    calculatedAttributeRow();
-                } else {
-                    $affectedWrapper.addClass('disabled');
-                    // $affectedWrapper.find('.attribute-values').hide();
-                    $affectedWrapper.hide();
-                    calculatedAttributeRow();
+                case 'hide_values':
+                    if (activeSelections[parent_attribute_id] === parent_value_id) {
+                        affected_value_ids.forEach(id => {
+                            $affectedWrapper.find(`[data-value-id="${id}"]`).hide().removeClass('active').removeAttr('data-selected');
+                            $affectedWrapper.find(`[data-value-id="${id}"] input[type="radio"], [data-value-id="${id}"] input[type="checkbox"]`).prop('checked', false);
+                        });
 
-                    const parentValueLabel =
-                        $parentWrapper.find(`[data-value-id="${parentValueId}"]`).text().trim() ||
-                        $parentWrapper.find(`option[data-value-id="${parentValueId}"]`).text().trim();
-                    $affectedWrapper.append(`
-                            <p class="attribute-condition-note text-danger mt-2">
-                                Only available for ${parentValueLabel}.
-                            </p>
-                        `);
-                }
+                        // Add dropdown reset logic here
+                        const select = $affectedWrapper.find('select.custom-select');
+                        if (select.length) {
+                            const selectedOption = select.find('option:selected');
+                            if (selectedOption.length && selectedOption.css('display') === 'none') {
+                                // Selected option is hidden, reset value to first visible or blank
+                                const firstVisibleOption = select.find('option').filter(function () {
+                                    return $(this).css('display') !== 'none';
+                                }).first();
+                                if (firstVisibleOption.length) {
+                                    select.val(firstVisibleOption.val());
+                                } else {
+                                    select.val('');
+                                }
+                                select.trigger('change');
+                            }
+                        }
+                    }
+                    break;
+
+                case 'show_values':
+                    if (activeSelections[parent_attribute_id] === parent_value_id) {
+                        // Hide all first
+                        $affectedWrapper.find('[data-value-id]').hide().removeClass('active').removeAttr('data-selected');
+                        // Show only selected
+                        affected_value_ids.forEach(id => $affectedWrapper.find(`[data-value-id="${id}"]`).show());
+                        // Add dropdown reset logic here
+                        const select = $affectedWrapper.find('select.custom-select');
+                        if (select.length) {
+                            const selectedOption = select.find('option:selected');
+                            if (selectedOption.length && selectedOption.css('display') === 'none') {
+                                // Selected option is hidden, reset value to first visible or blank
+                                const firstVisibleOption = select.find('option').filter(function () {
+                                    return $(this).css('display') !== 'none';
+                                }).first();
+                                if (firstVisibleOption.length) {
+                                    select.val(firstVisibleOption.val());
+                                } else {
+                                    select.val('');
+                                }
+                                select.trigger('change');
+                            }
+                        }
+                    }
+                    break;
             }
-
-            if (condition.action === 'change_option' || condition.action === 'change_options') {
-                const affectedAttrId = +condition.affected_attribute_id;
-                const $affected = $(`[data-attribute-id="${affectedAttrId}"]`);
-                const $valuesPart = $affected.find('.attribute-values');
-                const $label = $affected.find('label').first();
-                const attributeLabel = $label.clone().children().remove().end().text().trim();
-
-                // Hide values and disable inputs
-                $valuesPart.hide().find('input, select, button').prop('disabled', true);
-
-                // Only insert checkbox if not already there
-                if (!$affected.find('.change-option-checkbox').length) {
-                    $label.hide(); // Hide original label
-
-                    const checkboxHTML = `
-            <div class="form-check d-flex mb-2">
-                <input class="form-check-input change-option-checkbox" type="checkbox" id="toggle-${affectedAttrId}" data-affected-id="${affectedAttrId}" style="border: 1px solid #212529">
-                <label class="form-label" for="toggle-${affectedAttrId}" style="margin-bottom:0px">
-                    ${attributeLabel}
-                </label>
-            </div>
-        `;
-
-                    $label.before(checkboxHTML);
-                }
-            }
-
         });
+
+        calculatedAttributeRow();
     }
+
+    // function applyInitialHideConditions() {
+    //     $('.attribute-wrapper').removeClass('disabled').show();
+    //     $('.attribute-values [data-value-id]').show();
+    //     $('.attribute-condition-note').remove();
+
+    //     attributeConditions.forEach(condition => {
+    //         const {
+    //             parent_attribute_id,
+    //             parent_value_id,
+    //             affected_attribute_id,
+    //             action,
+    //             affected_value_ids
+    //         } = condition;
+
+    //         const $parentWrapper = $(`[data-attribute-id="${parent_attribute_id}"]`);
+    //         const $affectedWrapper = $(`[data-attribute-id="${affected_attribute_id}"]`);
+
+    //         // Detect selected value from buttons or dropdown
+    //         let selectedValueId = null;
+    //         const $activeBtn = $parentWrapper.find('.attribute-values .active[data-value-id]');
+    //         if ($activeBtn.length) {
+    //             selectedValueId = +$activeBtn.data('value-id');
+    //         } else {
+    //             const $select = $parentWrapper.find('select');
+    //             if ($select.length && $select.val()) {
+    //                 selectedValueId = +$select.find('option:selected').data('value-id');
+    //             }
+    //         }
+
+    //         const isMatch = selectedValueId === +parent_value_id;
+
+    //         switch (action) {
+    //             case 'hide_attribute':
+    //                 if (isMatch) {
+    //                     $affectedWrapper.addClass('disabled').hide();
+    //                 }
+    //                 break;
+
+    //             case 'show_attribute':
+    //                 if (!isMatch) {
+    //                     $affectedWrapper.addClass('disabled').hide();
+    //                 }
+    //                 break;
+
+    //             case 'hide_values':
+    //                 if (isMatch && Array.isArray(affected_value_ids)) {
+    //                     affected_value_ids.forEach(valId => {
+    //                         $affectedWrapper.find(`[data-value-id="${valId}"]`).hide();
+    //                     });
+    //                 }
+    //                 break;
+
+    //             case 'show_values':
+    //                 if (isMatch && Array.isArray(affected_value_ids)) {
+    //                     $affectedWrapper.find('[data-value-id]').hide();
+    //                     affected_value_ids.forEach(valId => {
+    //                         $affectedWrapper.find(`[data-value-id="${valId}"]`).show();
+    //                     });
+    //                 }
+    //                 break;
+    //         }
+    //     });
+
+    //     calculatedAttributeRow();
+    // }
 
 
     $(document).on('change', '.change-option-checkbox', function () {
@@ -1826,32 +1906,35 @@
     // Use debouncedCalculateTotalPrice instead of calculateTotalPrice below
 
     $(document).ready(function () {
-        applyInitialHideConditions();
+        handleAttributeConditions();
         forceSliderRedraw();
         calculatedAttributeRow();
 
         const savedDeliveryCharge = JSON.parse(localStorage.getItem('selectedDeliveryCharge'));
+
         if (savedDeliveryCharge && savedDeliveryCharge.id) {
             const selectedCard = document.querySelector(`.estimate-card[data-id="${savedDeliveryCharge.id}"]`);
+
             if (selectedCard) {
-                document.querySelectorAll('.estimate-card.active').forEach(card => {
-                    card.classList.remove('active');
-                });
+                document.querySelectorAll('.estimate-card.active').forEach(card => card.classList.remove('active'));
                 selectedCard.classList.add('active');
 
                 const selectedDate = $(selectedCard).data('date');
                 $('.estimate-card-static .text-black.mb-1').text(selectedDate);
 
-                const titleDiv = $(selectedCard).find('.title.text-muted.small');
-                const selectedTitle = titleDiv.length && titleDiv.text().trim() !== '' ?
-                    titleDiv.text().trim() : 'Standard Delivery';
+                const selectedTitle = $(selectedCard).data('title') || 'Standard Delivery';
+                $('.estimate-card-static .title-static.text-muted.small').text(selectedTitle);
 
-                const staticTitleDiv = $('.estimate-card-static .title-static.text-muted.small');
-                staticTitleDiv.text(selectedTitle);
+                // ✅ Show only cards with the same title
+                $('.estimate-card').each(function () {
+                    const cardTitle = $(this).data('title') || 'Standard Delivery';
+                    $(this).toggle(cardTitle === selectedTitle);
+                });
 
                 debouncedCalculateTotalPrice();
             }
         } else {
+            $('.estimate-card').show();
             debouncedCalculateTotalPrice();
         }
 
@@ -1967,6 +2050,18 @@
         });
 
 
+        // Add number inputs manually
+        $('.attribute-wrapper[data-attribute-type="number"] input[type="number"]').each(function () {
+            const input = $(this);
+            const attrId = input.closest('.attribute-wrapper').data('attribute-id');
+            const value = input.val();
+            if (attrId && value !== '') {
+                selectedAttributes[attrId] = {
+                    value: value,
+                    input_type: 'number'
+                };
+            }
+        });
 
         // Handle composite pages
         if ($('.composite-slider').length > 0) {

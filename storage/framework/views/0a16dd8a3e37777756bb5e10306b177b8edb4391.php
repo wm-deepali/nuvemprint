@@ -27,9 +27,9 @@
                     <option value="radio">Radio</option>
                     <option value="select_image">Select Image</option>
                     <option value="select_area">Select Area</option>
+                    <option value="number">Number</option>
                     <!-- <option value="checkbox">Checkbox</option> -->
                     <!-- <option value="text">Text</option> -->
-                    <!-- <option value="number">Number</option> -->
                     <!-- <option value="range">Range</option> -->
                     <!-- <option value="select_icon">Select Icon</option> -->
                     <!-- <option value="toggle">Toggle</option> -->
@@ -161,16 +161,16 @@
                   <label>Dependency Parent <span class="text-danger">*</span></label>
                   <div class="border p-1 rounded" style="max-height: 200px; overflow-y: auto;">
                     <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input dependency-checkbox"
-              name="attributes[0][dependency_parent][]" value="<?php echo e($attribute->id); ?>"
-              id="dep-0-<?php echo e($attribute->id); ?>">
-              <label class="form-check-label" for="dep-0-<?php echo e($attribute->id); ?>">
-              <?php echo e($attribute->name); ?>
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input dependency-checkbox"
+                          name="attributes[0][dependency_parent][]" value="<?php echo e($attribute->id); ?>"
+                          id="dep-0-<?php echo e($attribute->id); ?>">
+                        <label class="form-check-label" for="dep-0-<?php echo e($attribute->id); ?>">
+                          <?php echo e($attribute->name); ?>
 
-              </label>
-            </div>
-          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </label>
+                      </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   </div>
                 </div>
               </div>
@@ -230,7 +230,7 @@
       const $pricingSelect = $item.find('select[name$="[pricing_basis]"]');
       const $placeholder = $pricingSelect.find('option[value=""]');
       console.log($placeholder);
-      
+
 
       if ($pricingSelect.find('option[value="per_page"]').length === 0) {
         $placeholder.after('<option value="per_page">Depends Upon No. of Pages</option>');
@@ -318,8 +318,8 @@
           <option value="dropdown">Dropdown</option>
           <option value="radio">Radio</option>
           <option value="select_image">Select Image</option>
-            <option value="select_area">Select Area</option>
-         
+          <option value="select_area">Select Area</option>
+          <option value="number">Number</option>
         </select>
         <small class="text-danger" id="attributes.${attributeIndex}.input_type-err"></small>
       </div>
@@ -436,16 +436,16 @@
                   <label for="parent-${attributeIndex}">Dependency Parent <span class="text-danger">*</span></label>
                   <div class="border p-1 rounded" style="max-height: 200px; overflow-y: auto;">
                     <?php $__currentLoopData = $attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attribute): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input dependency-checkbox"
-              name="attributes[${attributeIndex}][dependency_parent][]" value="<?php echo e($attribute->id); ?>"
-              id="dep-${attributeIndex}-<?php echo e($attribute->id); ?>">
-              <label class="form-check-label" for="dep-${attributeIndex}-<?php echo e($attribute->id); ?>">
-              <?php echo e($attribute->name); ?>
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input dependency-checkbox"
+                        name="attributes[${attributeIndex}][dependency_parent][]" value="<?php echo e($attribute->id); ?>"
+                        id="dep-${attributeIndex}-<?php echo e($attribute->id); ?>">
+                        <label class="form-check-label" for="dep-${attributeIndex}-<?php echo e($attribute->id); ?>">
+                        <?php echo e($attribute->name); ?>
 
-              </label>
-            </div>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </label>
+                      </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   </div>
                 </div>
               </div>

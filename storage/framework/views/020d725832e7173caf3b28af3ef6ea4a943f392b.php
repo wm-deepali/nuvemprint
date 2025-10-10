@@ -1,13 +1,13 @@
 <div class="modal-dialog modal-lg" role="document">
   <div class="modal-content">
-    <form id="edit-attribute-condition-form" data-id="{{ $condition->id }}">
+    <form id="edit-attribute-condition-form" data-id="<?php echo e($condition->id); ?>">
       <div class="modal-header">
         <h5 class="modal-title">Edit Attribute Condition</h5>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
       <div class="modal-body">
-        <input type="hidden" name="subcategory_id" value="{{ $condition->subcategory_id }}">
+        <input type="hidden" name="subcategory_id" value="<?php echo e($condition->subcategory_id); ?>">
 
         <div class="form-group">
           <label><strong>Parent Attribute</strong></label>
@@ -37,13 +37,13 @@
           <label><strong>Action</strong></label>
           <select name="action" class="form-control" id="edit-action">
             <option value="">-- Select Action --</option>
-            <option value="hide_attribute" {{ $condition->action == 'hide_attribute' ? 'selected' : '' }}>Hide the entire
+            <option value="hide_attribute" <?php echo e($condition->action == 'hide_attribute' ? 'selected' : ''); ?>>Hide the entire
               attribute</option>
-            <option value="show_attribute" {{ $condition->action == 'show_attribute' ? 'selected' : '' }}>Always show the
+            <option value="show_attribute" <?php echo e($condition->action == 'show_attribute' ? 'selected' : ''); ?>>Always show the
               entire attribute</option>
-            <option value="hide_values" {{ $condition->action == 'hide_values' ? 'selected' : '' }}>Hide selected options
+            <option value="hide_values" <?php echo e($condition->action == 'hide_values' ? 'selected' : ''); ?>>Hide selected options
               in the attribute</option>
-            <option value="show_values" {{ $condition->action == 'show_values' ? 'selected' : '' }}>Show only selected
+            <option value="show_values" <?php echo e($condition->action == 'show_values' ? 'selected' : ''); ?>>Show only selected
               options in the attribute</option>
           </select>
 
@@ -80,8 +80,8 @@
 
 <script>
   $(document).ready(function () {
-    const attributes = @json($attributes);
-    const condition = @json($condition);
+    const attributes = <?php echo json_encode($attributes, 15, 512) ?>;
+    const condition = <?php echo json_encode($condition, 15, 512) ?>;
     const selectedAffectedValueIds = condition.affected_values.map(v => v.id);
 
     const attrMap = {};
@@ -186,4 +186,4 @@
       });
     });
   });
-</script>
+</script><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/attribute-conditions/edit.blade.php ENDPATH**/ ?>

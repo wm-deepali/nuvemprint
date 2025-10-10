@@ -34,7 +34,7 @@ class AttributeController extends Controller
         $validator = Validator::make($request->all(), [
             'attributes' => 'required|array',
             'attributes.*.name' => 'required|string|max:255|distinct|unique:attributes,name',
-            'attributes.*.input_type' => 'required|in:dropdown,radio,select_image,select_area',
+            'attributes.*.input_type' => 'required|in:dropdown,radio,select_image,select_area,number',
             'attributes.*.custom_input_type' => 'nullable|in:number,text,file,none',
             'attributes.*.has_image' => 'nullable|boolean',
             'attributes.*.has_icon' => 'nullable|boolean',
@@ -42,7 +42,7 @@ class AttributeController extends Controller
             // 'attributes.*.allow_quantity' => 'nullable|boolean',
             'attributes.*.is_composite' => 'nullable|boolean',
             'attributes.*.has_setup_charge' => 'nullable|boolean',
-            'attributes.*.pricing_basis' => 'nullable|string|in:per_page,per_product,per_extra_copy,fixed_per_page',
+            'attributes.*.pricing_basis' => 'nullable|string|in:per_page,per_product,per_extra_copy,fixed_per_page,multiply_by_quantity',
             'attributes.*.detail' => 'nullable|string|max:1000',
             'attributes.*.dependency_parent' => 'nullable|array',
             'attributes.*.dependency_parent.*' => 'exists:attributes,id',
@@ -111,11 +111,11 @@ class AttributeController extends Controller
         $attribute = Attribute::findOrFail($id);
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:attributes,name,' . $attribute->id,
-            'input_type' => 'required|in:dropdown,radio,select_area,select_image',
+            'input_type' => 'required|in:dropdown,radio,select_area,select_image,number',
             'has_image' => 'sometimes|boolean',
             'has_icon' => 'sometimes|boolean',
             'has_dependency' => 'sometimes|boolean',
-            'pricing_basis' => 'nullable|string|in:per_page,per_product,per_extra_copy,fixed_per_page',
+            'pricing_basis' => 'nullable|string|in:per_page,per_product,per_extra_copy,fixed_per_page,multiply_by_quantity',
             'area_unit' => 'nullable|in:sq_inch,sq_feet,sq_meter',
             'detail' => 'nullable|string|max:1000',
             'is_composite' => 'sometimes|boolean',

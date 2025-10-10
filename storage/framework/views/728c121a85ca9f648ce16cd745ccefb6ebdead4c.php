@@ -175,9 +175,9 @@
   </div>
 
   <!--<div class="container ">-->
-  <!-- <?php if($subcategory->calculator_required): ?>
+  <?php if($subcategory->calculator_required): ?>
     <?php echo $__env->make('front.calculator', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-  <?php endif; ?> -->
+  <?php endif; ?>
   <!--</div>-->
 
   <div class="details-page-tab-container">

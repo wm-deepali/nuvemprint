@@ -299,23 +299,29 @@
                                                             @foreach($item->attributes as $attr)
                                                                 <div style="font-size: 14px; margin-left: 10px;">
                                                                     <strong>{{ $attr->attribute->name ?? 'Attribute' }}:</strong>
+
                                                                     @if($attr->attributeValue)
                                                                         {{ $attr->attributeValue->value }}
+
                                                                     @elseif($attr->length && $attr->width)
                                                                         {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
+
                                                                     @elseif($attr->length)
                                                                         {{ $attr->length }} {{ $attr->unit }}
+
+                                                                    @elseif($attr->numeric_value !== null)
+                                                                        {{ number_format($attr->numeric_value, 0) }}
                                                                     @else
                                                                         -
                                                                     @endif
                                                                 </div>
                                                             @endforeach
-                                                          
                                                         @else
                                                             <div class="text-muted" style="font-size: 13px; margin-left: 10px;">
                                                                 No attributes selected.
                                                             </div>
                                                         @endif
+
 
                                                         {{-- Pages --}}
                                                         @if (!is_null($item->pages))

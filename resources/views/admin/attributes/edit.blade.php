@@ -27,9 +27,9 @@
                 </option>
                 <option value="select_area" {{ $attribute->input_type == 'select_area' ? 'selected' : '' }}>Select Area
                 </option>
+                <option value="number" {{ $attribute->input_type == 'number' ? 'selected' : '' }}>Number</option>
                 <!-- <option value="checkbox" {{ $attribute->input_type == 'checkbox' ? 'selected' : '' }}>Checkbox</option> -->
                 <!-- <option value="text" {{ $attribute->input_type == 'text' ? 'selected' : '' }}>Text</option> -->
-                <!-- <option value="number" {{ $attribute->input_type == 'number' ? 'selected' : '' }}>Number</option> -->
                 <!-- <option value="range" {{ $attribute->input_type == 'range' ? 'selected' : '' }}>Range</option> -->
                 <!-- <option value="select_icon" {{ $attribute->input_type == 'select_icon' ? 'selected' : '' }}>Select Icon</option> -->
                 <!-- <option value="toggle" {{ $attribute->input_type == 'toggle' ? 'selected' : '' }}>Toggle</option> -->
@@ -68,6 +68,7 @@
                   Upon Quantity Range</option>
                 <option value="per_extra_copy" {{ $attribute->pricing_basis == 'per_extra_copy' ? 'selected' : '' }}>Per
                   Extra Copy (Multiply by Product Qnty)</option>
+                <option value="multiply_by_quantity" {{ $attribute->pricing_basis == 'multiply_by_quantity' ? 'selected' : '' }}>Multiply by Quantity Price</option>
               </select>
             </div>
           </div>
@@ -163,16 +164,16 @@
               <label>Dependency Parents <span class="text-danger">*</span></label>
               <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
                 @foreach ($attributes as $parentAttr)
-              @if ($parentAttr->id != $attribute->id) {{-- prevent self-reference --}}
-            <div class="form-check">
-            <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
-            value="{{ $parentAttr->id }}" id="edit-dep-{{ $parentAttr->id }}" {{ $attribute->parents->contains('id', $parentAttr->id) ? 'checked' : '' }}>
-            <label class="form-check-label" for="edit-dep-{{ $parentAttr->id }}">
-            {{ $parentAttr->name }}
-            </label>
-            </div>
-          @endif
-        @endforeach
+                  @if ($parentAttr->id != $attribute->id) {{-- prevent self-reference --}}
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input dependency-checkbox" name="dependency_parent[]"
+                        value="{{ $parentAttr->id }}" id="edit-dep-{{ $parentAttr->id }}" {{ $attribute->parents->contains('id', $parentAttr->id) ? 'checked' : '' }}>
+                      <label class="form-check-label" for="edit-dep-{{ $parentAttr->id }}">
+                        {{ $parentAttr->name }}
+                      </label>
+                    </div>
+                  @endif
+                @endforeach
               </div>
             </div>
           </div>

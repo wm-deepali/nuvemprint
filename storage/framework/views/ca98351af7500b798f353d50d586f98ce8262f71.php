@@ -7,19 +7,19 @@
       </div>
 
       <div class="modal-body">
-        {{-- Fixed Subcategory --}}
+        
         <div class="form-group">
           <label><strong>Subcategory <span class="text-danger">*</span></strong></label>
           <select name="subcategory_id" class="form-control" id="subcategory-select">
             <option value="">-- Select Subcategory --</option>
-            @foreach($subcategories as $subcategory)
-        <option value="{{ $subcategory->id }}">{{ $subcategory->name }}</option>
-      @endforeach
+            <?php $__currentLoopData = $subcategories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subcategory): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <option value="<?php echo e($subcategory->id); ?>"><?php echo e($subcategory->name); ?></option>
+      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           </select>
           <span class="text-danger validation-err" id="subcategory_id-err"></span>
         </div>
 
-        {{-- Repeatable Condition Blocks --}}
+        
         <div id="conditions-container">
           <div class="condition-block border rounded p-1 mb-1">
             <div class="row">
@@ -190,4 +190,4 @@
       $(this).closest('.condition-block').remove();
     });
   });
-</script>
+</script><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/attribute-conditions/create.blade.php ENDPATH**/ ?>

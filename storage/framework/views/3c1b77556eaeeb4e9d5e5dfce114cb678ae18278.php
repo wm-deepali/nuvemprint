@@ -1,7 +1,7 @@
 <!-- Top Bar -->
 <div class="desktop-header">
 	<div class="top-bar">
-		<div class="container d-flex justify-content-between align-items-center" style="width:1140px;">
+		<div class="container d-flex justify-content-between align-items-center" style="width:1180px;">
 			<div class="d-flex gap-2">
 				<?php
 					use App\Models\ContactInfo;
@@ -26,21 +26,22 @@
 				<div class="vertical-line"></div>
 				<a href="<?php echo e(Route('contact-us')); ?>">Contact Us</a>
 				<div class="vertical-line"></div>
-				<a href="#">Print Samples</a>
+				<a href="/all-products">Print Samples</a>
 				<div class="vertical-line"></div>
-				<a href="#">Rewards</a>
+				<a href="<?php echo e(route('faq')); ?>">FAQ</a>
 				<div class="vertical-line"></div>
-				<?php
+			<?php
 					use App\Models\DeliveryCharge;
 					$deliveryCharges = DeliveryCharge::all();
+					$uniqueDeliveryCharges = $deliveryCharges->unique('title')->values();
 				?>
 
-				<div class="custom-select1" id="countrySelect">
+			<div class="custom-select1" id="countrySelect">
 					<span>
-						<?php if($deliveryCharges->count() > 0): ?>
+						<?php if($uniqueDeliveryCharges->count() > 0): ?>
 							<img
-								src="<?php echo e($deliveryCharges->first()->image ? asset('storage/' . $deliveryCharges->first()->image) : URL::asset('assets/images/united-kingdom.png')); ?>">
-							<?php echo e($deliveryCharges->first()->title); ?>
+								src="<?php echo e($uniqueDeliveryCharges->first()->image ? asset('storage/' . $uniqueDeliveryCharges->first()->image) : URL::asset('assets/images/united-kingdom.png')); ?>">
+							<?php echo e($uniqueDeliveryCharges->first()->title); ?>
 
 						<?php else: ?>
 							<img src="<?php echo e(URL::asset('assets/images/united-kingdom.png')); ?>">
@@ -49,7 +50,7 @@
 						<i class="fa-solid fa-chevron-down" style="font-size:12px"></i>
 					</span>
 					<div class="options">
-						<?php $__currentLoopData = $deliveryCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+						<?php $__currentLoopData = $uniqueDeliveryCharges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $charge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 							<div class="option" data-id="<?php echo e($charge->id); ?>" data-title="<?php echo e($charge->title); ?>"
 								data-image="<?php echo e($charge->image ? asset('storage/' . $charge->image) : URL::asset('assets/images/default.png')); ?>">
 								<img src="<?php echo e($charge->image ? asset('storage/' . $charge->image) : URL::asset('assets/images/default.png')); ?>"
@@ -61,14 +62,13 @@
 						<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 					</div>
 				</div>
-
 			</div>
 		</div>
 	</div>
 
 	<!-- Main Header -->
 	<header class="border-bottom pt-3">
-		<div class="container d-flex justify-content-between align-items-center" style="width:1140px;">
+		<div class="container d-flex justify-content-between align-items-center" style="width:1180px;">
 			<a href="<?php echo e(route('home')); ?>" class="logo"><img src="<?php echo e(asset('assets')); ?>/images/NuvemPrint.png"></a>
 			<a href="<?php echo e(route('all-products')); ?>">
 				<button class="btn btn-products">All Products</button>
@@ -116,6 +116,7 @@
 
 		<!-- Mega Menu -->
 		<div class="mega-dropdown">
+		    <div class=" " style="width:1180px;display:flex; margin:auto;margin-top:0px;">
 
 			<div class="dropdown-left">
 				<ul>
@@ -178,6 +179,7 @@
 						</div>
 					<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 				<?php endif; ?>
+			</div>
 			</div>
 		</div> <!-- ðŸ”¹ properly closed mega-dropdown -->
 
@@ -280,6 +282,10 @@
 			<i class="fa-brands fa-whatsapp"></i>
 		</div>
 	</div>
+</div>
+<div class="promo-strip">
+    <a href="<?php echo e(route('authentication-signup')); ?>" class="promo-link" style="text-decoration:none;"><span>Sign up</span></a> 
+    for an account and earn <span>Extra</span> Discounts on your first order.
 </div>
 
 <!-- Overlay -->
@@ -385,42 +391,64 @@
 	});
 
 
+	
 	document.addEventListener("DOMContentLoaded", function () {
-		const options = document.querySelectorAll('#countrySelect .option');
-		const dropdownSpan = document.querySelector('#countrySelect > span');
-		const localStorageKey = 'selectedDeliveryCharge';
+    const options = document.querySelectorAll('#countrySelect .option');
+    const dropdownSpan = document.querySelector('#countrySelect > span');
+    const localStorageKey = 'selectedDeliveryCharge';
 
-		// Restore selection from localStorage if exists
-		const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
-		if (savedSelection) {
-			updateDropdownDisplay(savedSelection);
-		}
+    // Load any existing saved selection
+    let savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
 
-		options.forEach(option => {
-			option.addEventListener('click', function () {
-				const selectedData = {
-					id: this.getAttribute('data-id'),
-					title: this.getAttribute('data-title'),
-					image: this.getAttribute('data-image')
-				};
+    // If nothing saved yet, auto-save the first option as default
+    if (!savedSelection && options.length > 0) {
+        const firstOption = options[0];
+        savedSelection = {
+            id: firstOption.getAttribute('data-id'),
+            title: firstOption.getAttribute('data-title'),
+            image: firstOption.getAttribute('data-image')
+        };
+        localStorage.setItem(localStorageKey, JSON.stringify(savedSelection));
+    }
 
-				// Save selection to localStorage
-				localStorage.setItem(localStorageKey, JSON.stringify(selectedData));
+    // Update dropdown display from saved selection
+    if (savedSelection) {
+        updateDropdownDisplay(savedSelection);
+    }
 
-				// Update dropdown display
-				updateDropdownDisplay(selectedData);
+    // Handle option clicks
+    options.forEach(option => {
+        option.addEventListener('click', function () {
+            const selectedData = {
+                id: this.getAttribute('data-id'),
+                title: this.getAttribute('data-title'),
+                image: this.getAttribute('data-image')
+            };
 
-			});
-		});
+            const isDifferent = !savedSelection || savedSelection.id !== selectedData.id;
 
-		function updateDropdownDisplay(selection) {
-			dropdownSpan.innerHTML = `
+            // Save new selection
+            localStorage.setItem(localStorageKey, JSON.stringify(selectedData));
+
+            // Update dropdown UI
+            updateDropdownDisplay(selectedData);
+
+            // Reload page only if different
+            if (isDifferent) {
+                window.location.reload();
+            }
+        });
+    });
+
+    // Helper function to show selected country in top bar
+    function updateDropdownDisplay(selection) {
+        dropdownSpan.innerHTML = `
             <img src="${selection.image}" alt="${selection.title}">
             ${selection.title}
             <i class="fa-solid fa-chevron-down" style="font-size:12px"></i>
         `;
-		}
+    }
+});
 
-	});
 
 </script><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/layouts/includes/header.blade.php ENDPATH**/ ?>

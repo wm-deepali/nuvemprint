@@ -1,6 +1,6 @@
-@extends('layouts.master')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
   <div class="app-content content">
     <div class="content-wrapper">
     <div class="content-header row mb-2">
@@ -13,59 +13,59 @@
       <div class="card">
       <div class="card-body">
 
-        {{-- Company Logo --}}
+        
         <div class="text-center mb-3">
-        <img src="{{ asset('admin_assets/images/logo.png') }}" alt="Company Logo" style="max-width: 200px;">
+        <img src="<?php echo e(asset('admin_assets/images/logo.png')); ?>" alt="Company Logo" style="max-width: 200px;">
         </div>
 
-        {{-- Order ID + Status --}}
+        
         <div class="row mb-4">
         <div class="col-md-6">
-          <h5><strong>Order ID:</strong> #{{ $quote->quote_number }}</h5>
+          <h5><strong>Order ID:</strong> #<?php echo e($quote->quote_number); ?></h5>
           <h5>
           <strong>Payment Status:</strong>
-          @if($quote->payments->isEmpty())
+          <?php if($quote->payments->isEmpty()): ?>
         <span class="badge badge-danger">UnPaid</span>
-      @else
+      <?php else: ?>
         <span class="badge badge-success">Paid</span>
-      @endif
+      <?php endif; ?>
           </h5>
           <h5>
           <strong>Order Status:</strong>
-          @if($quote->status === 'cancelled')
+          <?php if($quote->status === 'cancelled'): ?>
         <span class="badge badge-danger">Cancelled</span>
-      @elseif($quote->status === 'approved')
+      <?php elseif($quote->status === 'approved'): ?>
         <span class="badge badge-success">Approved</span>
-      @else
-        <span class="badge badge-secondary text-capitalize">{{ $quote->status ?? 'Pending' }}</span>
-      @endif
+      <?php else: ?>
+        <span class="badge badge-secondary text-capitalize"><?php echo e($quote->status ?? 'Pending'); ?></span>
+      <?php endif; ?>
           </h5>
 
         </div>
 
         <div class="col-md-6 ">
 
-          @if($quote->status !== 'cancelled')
+          <?php if($quote->status !== 'cancelled'): ?>
         <label><strong>Update Status:</strong></label>
         <select class="form-control" id="statusSelect" onchange="handleStatusChange(this)">
         <option value="">Select Status</option>
 
-        {{-- If not approved yet, allow approval --}}
-        @if($quote->status !== 'approved')
+        
+        <?php if($quote->status !== 'approved'): ?>
         <option value="approved">Approve Order</option>
-      @endif
+      <?php endif; ?>
 
-        {{-- If already approved, allow processing to department --}}
-        @if($quote->status === 'approved')
+        
+        <?php if($quote->status === 'approved'): ?>
         <option value="process">Process to Department</option>
-      @endif
+      <?php endif; ?>
 
-        {{-- Always allow cancel unless already cancelled --}}
-        @if($quote->status !== 'cancelled')
+        
+        <?php if($quote->status !== 'cancelled'): ?>
         <option value="cancelled">Cancel Order</option>
-      @endif
+      <?php endif; ?>
         </select>
-      @endif
+      <?php endif; ?>
 
 
 
@@ -73,11 +73,12 @@
           <label><strong>Select Department:</strong></label>
           <select class="form-control" onchange="showNoteModal(this)">
             <option value="">Select Department</option>
-            @foreach($departments as $department)
-        <option value="{{ $department->id }}" data-name="{{ $department->name }}">
-        {{ $department->name }}
+            <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <option value="<?php echo e($department->id); ?>" data-name="<?php echo e($department->name); ?>">
+        <?php echo e($department->name); ?>
+
         </option>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           </select>
 
 
@@ -85,20 +86,23 @@
         </div>
         </div>
 
-        {{-- Customer & Company Info --}}
+        
         <div class="row border p-3 mb-4">
         <div class="col-md-6">
           <h5><strong>Customer Info</strong></h5>
-          <p><strong>Name:</strong> {{ $quote->customer->first_name ?? 'N/A' }}
-          {{ $quote->customer->last_name ?? '' }}
+          <p><strong>Name:</strong> <?php echo e($quote->customer->first_name ?? 'N/A'); ?>
+
+          <?php echo e($quote->customer->last_name ?? ''); ?>
+
           </p>
-          <p><strong>Contact:</strong> {{ $quote->customer->mobile ?? 'N/A' }}</p>
-          <p><strong>Email:</strong> {{ $quote->customer->email ?? 'N/A' }}</p>
+          <p><strong>Contact:</strong> <?php echo e($quote->customer->mobile ?? 'N/A'); ?></p>
+          <p><strong>Email:</strong> <?php echo e($quote->customer->email ?? 'N/A'); ?></p>
           <p><strong>Expected Delivery:</strong>
-          {{ \Carbon\Carbon::parse($quote->delivery_date)->format('d F Y') ?? 'N/A' }}</p>
-          <p><strong>Date & Time:</strong> {{ $quote->created_at->format('d F Y, h:i A') ?? 'N/A' }}</p>
+          <?php echo e(\Carbon\Carbon::parse($quote->delivery_date)->format('d F Y') ?? 'N/A'); ?></p>
+          <p><strong>Date & Time:</strong> <?php echo e($quote->created_at->format('d F Y, h:i A') ?? 'N/A'); ?></p>
           <p><strong>Delivery Address:</strong>
-          {{ $quote->deliveryAddress->address ?? '' }}
+          <?php echo e($quote->deliveryAddress->address ?? ''); ?>
+
           </p>
 
         </div>
@@ -112,8 +116,8 @@
         </div>
         </div>
 
-        {{-- Quote Items --}}
-        {{-- Quote Items --}}
+        
+        
         <h5 class="mb-2">Quote Items</h5>
         <div class="table-responsive">
         <table class="table table-bordered">
@@ -125,65 +129,71 @@
           </tr>
           </thead>
           <tbody>
-          @forelse($quote->items as $item)
+          <?php $__empty_1 = true; $__currentLoopData = $quote->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
           <tr>
           <td>
-          {{-- Subcategory Name --}}
+          
           <div style="font-weight: 600; margin-bottom: 4px;">
-            {{ $item->subcategory->name ?? 'N/A' }}
-            ({{ optional($item->subcategory->categories->first())->name ?? 'N/A' }})
+            <?php echo e($item->subcategory->name ?? 'N/A'); ?>
+
+            (<?php echo e(optional($item->subcategory->categories->first())->name ?? 'N/A'); ?>)
           </div>
 
-          {{-- Attribute Name-Value List --}}
-          @if($item->attributes && $item->attributes->count())
+          
+          <?php if($item->attributes && $item->attributes->count()): ?>
           <div>
-          @foreach($item->attributes as $attr)
+          <?php $__currentLoopData = $item->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
           <div style="font-size: 14px; margin-left: 10px;">
-          <strong>{{ $attr->attribute->name ?? 'Attribute' }}:</strong>
-          @if($attr->attributeValue)
-          {{ $attr->attributeValue->value }}
-        @elseif($attr->length && $attr->width)
-          {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
-        @elseif($attr->length)
-          {{ $attr->length }} {{ $attr->unit }}
-           @elseif($attr->numeric_value !== null)
-                                                                        {{ number_format($attr->numeric_value, 0) }}
-        @else
+          <strong><?php echo e($attr->attribute->name ?? 'Attribute'); ?>:</strong>
+          <?php if($attr->attributeValue): ?>
+          <?php echo e($attr->attributeValue->value); ?>
+
+        <?php elseif($attr->length && $attr->width): ?>
+          <?php echo e($attr->length); ?> x <?php echo e($attr->width); ?> <?php echo e($attr->unit); ?>
+
+        <?php elseif($attr->length): ?>
+          <?php echo e($attr->length); ?> <?php echo e($attr->unit); ?>
+
+           <?php elseif($attr->numeric_value !== null): ?>
+                                                                        <?php echo e(number_format($attr->numeric_value, 0)); ?>
+
+        <?php else: ?>
           -
-        @endif
+        <?php endif; ?>
           </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
           </div>
-        @else
+        <?php else: ?>
         <div class="text-muted" style="font-size: 13px; margin-left: 10px;">No attributes selected.</div>
-        @endif
+        <?php endif; ?>
 
-          {{-- Pages --}}
-          @if (!is_null($item->pages))
+          
+          <?php if(!is_null($item->pages)): ?>
         <div style="font-size: 14px; margin-left: 10px;">
-          <strong> Pages:</strong> {{ $item->pages }}
+          <strong> Pages:</strong> <?php echo e($item->pages); ?>
+
         </div>
-        @endif
+        <?php endif; ?>
           </td>
 
-          <td>{{ $item->quantity }}</td>
-          <td>{{ number_format($item->sub_total, 2) }}</td>
+          <td><?php echo e($item->quantity); ?></td>
+          <td><?php echo e(number_format($item->sub_total, 2)); ?></td>
           </tr>
-      @empty
+      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <tr>
         <td colspan="3" class="text-center">No quote items found.</td>
         </tr>
-      @endforelse
+      <?php endif; ?>
 
-          {{-- Proofreading price row --}}
-          @if($quote->proof_type && $quote->proof_price)
+          
+          <?php if($quote->proof_type && $quote->proof_price): ?>
         <tr>
-        <td><strong>Proof Type:</strong> {{ ucfirst($quote->proof_type) }}</td>
+        <td><strong>Proof Type:</strong> <?php echo e(ucfirst($quote->proof_type)); ?></td>
         <td>—</td>
-        <td>{{ number_format($quote->proof_price, 2) }}</td>
+        <td><?php echo e(number_format($quote->proof_price, 2)); ?></td>
         </tr>
-      @endif
+      <?php endif; ?>
 
           </tbody>
         </table>
@@ -191,36 +201,36 @@
 
 
 
-        {{-- Summary --}}
+        
         <div class="row justify-content-end mt-4">
         <div class="col-md-5">
           <table class="table table-borderless">
           <tr>
             <th>Subtotal:</th>
             <td class="text-right">
-            £{{ number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2) }}</td>
+            £<?php echo e(number_format($quote->items->sum('sub_total') + ($quote->proof_price ?? 0), 2)); ?></td>
           </tr>
           <tr>
             <th>Delivery Charge:</th>
-            <td class="text-right">£{{ number_format($quote->delivery_price, 2) }}</td>
+            <td class="text-right">£<?php echo e(number_format($quote->delivery_price, 2)); ?></td>
           </tr>
           <tr>
-            <th>VAT ({{ (int) $quote->vat_percentage }}%):</th>
-            <td class="text-right">£{{ number_format($quote->vat_amount, 0) }}</td>
+            <th>VAT (<?php echo e((int) $quote->vat_percentage); ?>%):</th>
+            <td class="text-right">£<?php echo e(number_format($quote->vat_amount, 0)); ?></td>
           </tr>
           <tr class="border-top">
             <th><strong>Grand Total:</strong></th>
-            <td class="text-right"><strong>£{{ number_format($quote->grand_total, 2) }}</strong></td>
+            <td class="text-right"><strong>£<?php echo e(number_format($quote->grand_total, 2)); ?></strong></td>
           </tr>
           </table>
         </div>
         </div>
 
 
-        {{-- Horizontal Line --}}
+        
         <hr>
 
-        {{-- Customer Documents --}}
+        
         <h5>Customer Documents</h5>
         <div class="table-responsive">
         <table class="table table-bordered mt-2">
@@ -232,38 +242,38 @@
           </tr>
           </thead>
           <tbody>
-          @forelse ($quote->documents as $doc)
+          <?php $__empty_1 = true; $__currentLoopData = $quote->documents; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
           <tr>
-          <td>{{ $doc->name ?? 'Untitled' }}</td>
+          <td><?php echo e($doc->name ?? 'Untitled'); ?></td>
           <td>
-          @if(Str::endsWith($doc->path, ['.jpg', '.jpeg', '.png']))
-        <img src="{{ asset('storage/' . $doc->path) }}" width="80" />
-        @elseif(Str::endsWith($doc->path, '.pdf'))
-        <img src="{{ asset('admin_assets/images/pdf.png')}}" width="40" alt="PDF" />
-        @elseif(Str::endsWith($doc->path, ['.doc', '.docx']))
-        <img src="{{ asset('admin_assets/images/google-docs.png') }}" width="40" alt="Word Doc" />
-        @else
+          <?php if(Str::endsWith($doc->path, ['.jpg', '.jpeg', '.png'])): ?>
+        <img src="<?php echo e(asset('storage/' . $doc->path)); ?>" width="80" />
+        <?php elseif(Str::endsWith($doc->path, '.pdf')): ?>
+        <img src="<?php echo e(asset('admin_assets/images/pdf.png')); ?>" width="40" alt="PDF" />
+        <?php elseif(Str::endsWith($doc->path, ['.doc', '.docx'])): ?>
+        <img src="<?php echo e(asset('admin_assets/images/google-docs.png')); ?>" width="40" alt="Word Doc" />
+        <?php else: ?>
         <span class="text-muted">No Preview</span>
-        @endif
+        <?php endif; ?>
           </td>
           <td>
-          <a href="{{ asset('storage/' . $doc->path) }}" target="_blank" class="btn btn-sm btn-info">View</a>
+          <a href="<?php echo e(asset('storage/' . $doc->path)); ?>" target="_blank" class="btn btn-sm btn-info">View</a>
           </td>
           </tr>
-      @empty
+      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <tr>
         <td colspan="3" class="text-center">No documents uploaded.</td>
         </tr>
-      @endforelse
+      <?php endif; ?>
           </tbody>
         </table>
         </div>
 
 
-        {{-- Action Buttons --}}
+        
         <div class="row justify-content-center mt-4">
         <div class="col-md-2">
-          <a href="{{ route('admin.quotes.download.pdf', $quote->id) }}" class="btn btn-primary btn-block"
+          <a href="<?php echo e(route('admin.quotes.download.pdf', $quote->id)); ?>" class="btn btn-primary btn-block"
           target="_blank">
           Download PDF
           </a>
@@ -291,7 +301,7 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
-        <input type="hidden" id="quoteId" value="{{ $quote->id }}">
+        <input type="hidden" id="quoteId" value="<?php echo e($quote->id); ?>">
         <label><strong>Department Name:</strong></label>
         <input type="text" id="selectedDepartment" class="form-control mb-2" readonly>
 
@@ -306,10 +316,10 @@
     </div>
   </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
 <!-- Scripts -->
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
   <script>
 
     $.ajaxSetup({
@@ -320,7 +330,7 @@
 
     function handleStatusChange(select) {
     const status = select.value;
-    const quoteId = {{ $quote->id }};
+    const quoteId = <?php echo e($quote->id); ?>;
     const deptDropdown = document.getElementById('departmentDropdown');
 
     // If status is "process", show department dropdown and exit
@@ -364,13 +374,13 @@
 
     function updateQuoteStatus(quoteId, status, department = null) {
     $.ajax({
-      url: '{{ route('admin.quotes.update.status') }}',
+      url: '<?php echo e(route('admin.quotes.update.status')); ?>',
       type: 'POST',
       data: {
       quote_id: quoteId,
       status: status,
       department: department,
-      _token: '{{ csrf_token() }}'
+      _token: '<?php echo e(csrf_token()); ?>'
       },
       success: function (response) {
       if (response.success) {
@@ -401,10 +411,10 @@
     }
 
     $.ajax({
-      url: '{{ route("admin.quote.update-department") }}',
+      url: '<?php echo e(route("admin.quote.update-department")); ?>',
       type: 'POST',
       data: {
-      _token: '{{ csrf_token() }}',
+      _token: '<?php echo e(csrf_token()); ?>',
       quote_id: quoteId,
       department_id: departmentId,
       notes: notes
@@ -422,4 +432,5 @@
 
 
   </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/admin/quotes/index.blade.php ENDPATH**/ ?>

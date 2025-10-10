@@ -13,6 +13,7 @@ class QuoteItemAttribute extends Model
         'quote_item_id',
         'attribute_id',
         'value_id',
+        'numeric_value',
         'length',
         'width',
         'unit'

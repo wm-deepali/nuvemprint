@@ -95,6 +95,8 @@
       {{ $attr->length }} x {{ $attr->width }} {{ $attr->unit }}
     @elseif ($attr->length)
       {{ $attr->length }} {{ $attr->unit }}
+       @elseif($attr->numeric_value !== null)
+                                                                        {{ number_format($attr->numeric_value, 0) }}
     @else
       -
     @endif
