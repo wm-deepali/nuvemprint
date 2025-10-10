@@ -80,7 +80,7 @@
         }
 
         .btn-custom {
-            background-color: #00aaa5;
+            background-color: #ff4880;
             color: white;
             border: none;
         }
@@ -97,10 +97,16 @@
         }
 
         .btn-info {
-            border: none;
+            background: #fff !important;
+            border: 1px solid #f9f9f9;
             padding: 4px 7px;
             border-radius: 3px;
-            background-color: rgba(128, 128, 128, 0.158);
+            /*background-color: rgba(128, 128, 128, 0.158);*/
+        }
+
+        .btn-info:hover {
+            border: none !important;
+            background: #f9f9f9 !important;
         }
 
         .continue-class {
@@ -155,11 +161,11 @@
         }
 
         .custom-stepper-step.active .custom-stepper-circle {
-            background: #00aaa5;
+            background: #ff4880;
         }
 
         .custom-stepper-step.completed .custom-stepper-circle {
-            background: #00aaa5;
+            background: #ff4880;
         }
 
         .custom-stepper-step.completed .custom-stepper-circle::before {
@@ -173,7 +179,7 @@
 
         .custom-stepper-step.active,
         .custom-stepper-step.completed {
-            color: #00aaa5;
+            color: #ff4880;
         }
 
         .custom-stepper-step:not(:last-child)::after {
@@ -189,12 +195,12 @@
 
         .custom-stepper-step.completed::after,
         .custom-stepper-step.active::after {
-            background: #00aaa5;
+            background: #ff4880;
         }
     </style>
     <style>
         .custom-op {
-            border: 2px solid #6bd3cc !important;
+            border: 1px solid #ff4880 !important;
             color: black !important;
             border-radius: .375rem !important;
         }
@@ -252,11 +258,9 @@
             </div>
 
             <!--start breadcrumb-->
-            <section class="py-3 border-bottom d-none d-md-flex"
-                style="background: #f1f2f7;
-                                                                                                              padding: 40px 0;">
+            <section class="py-3 border-bottom  d-md-flex" style="background: #f1f2f7; padding: 40px 0;">
                 <!--end shop cart-->
-                <div class="container" style="max-width: 900px;">
+                <div class="container" style="max-width: 1180px;">
                     <div class="row g-4">
                         <!-- Left Section -->
                         <div class="col-md-7">
@@ -268,10 +272,12 @@
                                     $formattedDate = isset($cartData['delivery']['date']) ? Carbon::parse($cartData['delivery']['date'])->translatedFormat('l, jS F Y') : '';
                                 ?>
                                 <?php if($cartData): ?>
-                                    <div class="d-flex justify-content-between mb-3">
-                                        <p><strong>Shipping:</strong> <?php echo e($formattedDate); ?></p>
-                                        <h5><strong>Subtotal:</strong> £<?php echo e($cartData['items']['sub_total'] ?? 0); ?> </h5>
+                                    <div class="d-flex justify-content-between ">
+                                        <p style="font-size:1.1rem">Shipping Estimate <?php echo e($formattedDate); ?></p>
+                                        <h5 style="font-size:1.1rem"><span style="font-weight:500;">Subtotal:</span><span
+                                                style="color:#ff4880;"> £<?php echo e($cartData['items']['sub_total'] ?? 0); ?> </span></h5>
                                     </div>
+                                    <hr style="margin-top:0px;">
 
                                     <div class="d-flex align-items-start mb-3">
                                         <?php if($cartData['subcategory_thumbnail']): ?>
@@ -282,11 +288,11 @@
                                                 class="img-thumb me-3 " alt="Product Image">
                                         <?php endif; ?>
                                         <div class="col-9">
-                                            <p class="mb-1"><strong><?php echo e($cartData['items']['quantity']); ?>
+                                            <p class="mb-1"><span style="font-weight:500;"><?php echo e($cartData['items']['quantity']); ?>
 
-                                                    <?php echo e($cartData['subcategory_name']); ?></strong></p>
+                                                    <?php echo e($cartData['subcategory_name']); ?></span></p>
                                             <?php $__currentLoopData = $cartData['attributes_resolved']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <p class="mb-1">
+                                                <p class="mb-0" style="font-weight:400;font-size:1rem;color:#212529;">
                                                     <?php echo e($attr['attribute_name']); ?>: <?php echo e($attr['value_name']); ?>
 
                                                     <?php if(!empty($attr['value_description'])): ?>
@@ -295,34 +301,53 @@
                                                 </p>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <!-- <div class="d-flex justify-content-between mb-3 mt-3 ">
-                                                                                                                                                                        <span>Subtotal:</span>
-                                                                                                                                                              <span>£15.00 <br><span>VAT: £3.00</span></span>
+                                                                                                                                                                                                <span>Subtotal:</span>
+                                                                                                                                                                                      <span>£15.00 <br><span>VAT: £3.00</span></span>
 
 
-                                                                                                                                                                    </div> -->
+                                                                                                                                                                                            </div> -->
                                         </div>
 
                                     </div>
 
 
                                     <hr />
-                                    <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
 
-                                        <!-- <button class="btn-info trash "><i class="fa-solid fa-trash"></i></button>
-                                                                                                                        <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button> -->
-                                        <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
+                                    <div class="d-flex justify-content-between">
+                                        <p><span style="font-weight:500;">Delivery Weight:</span>
+                                            <?php echo e($cartData['paper_total_weight']); ?> kg</p>
+                                        <div class="d-flex gap-2 mb-4" style=" flex-direction: row-reverse;">
+
+                                            <button class="btn-info trash" data-id="<?php echo e($cartData['quote_id'] ?? ''); ?>">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+
+                                            <button class="btn-info "><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                                            <!--<button class="btn-info "><i class="fa-solid fa-copy"></i> Duplicate</button>-->
+                                        </div>
+
+
+
+                                        <!--<p>Enter your Postcode to get delivery rates</p>-->
+
                                     </div>
 
-
-
-                                    <!--<p>Enter your Postcode to get delivery rates</p>-->
-                                    <p><strong>Delivery Weight:</strong> <?php echo e($cartData['paper_total_weight']); ?> kg</p>
 
                                 <?php else: ?>
-                                    <div class="text-center py-5">
-                                        <h4>Your cart is empty</h4>
-                                        <a href="/" class="btn btn-primary mt-3">Add Order</a>
+                                    <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+                                        <div class="card shadow-lg p-4 text-center"
+                                            style="max-width: 400px; border-radius: 15px;">
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <i class="bi bi-cart-x" style="font-size: 3rem; color: #6c757d;"></i>
+                                                </div>
+                                                <h4 class="card-title mb-3">Your cart is empty</h4>
+                                                <p class="text-muted">Looks like you haven’t added anything yet.</p>
+                                                <a href="/" class="btn btn-primary mt-3 px-4">Add Order</a>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -332,16 +357,19 @@
                             <div class="col-md-5">
                                 <div class="quote-box">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5>Quote Number:<strong> #<?php echo e($cartData['quote_id'] ?? ''); ?></strong></h5>
+                                        <h5 style="font-size:1.1rem;font-weight:400;">Quote Number:<span
+                                                style="font-weight:500;"> #<?php echo e($cartData['quote_id'] ?? ''); ?></span></h5>
 
                                     </div>
+                                    <hr>
 
                                     <!--<p class="mb-1"><small>Quote Reference: 1667893</small></p>-->
 
                                     <div class="d-flex justify-content-between">
-                                        <span><strong><?php echo e($cartData['subcategory_name']); ?> x <?php echo e($cartData['items']['quantity']); ?>
+                                        <span><span style="font-weight:500;"><?php echo e($cartData['subcategory_name']); ?> x
+                                                <?php echo e($cartData['items']['quantity']); ?>
 
-                                                Copies</strong></span>
+                                                Copies</span></span>
                                         <span>£<?php echo e($cartData['items']['sub_total'] ?? 0); ?></span>
                                     </div>
 
@@ -357,7 +385,9 @@
 
                                     <hr>
 
-                                    <p><strong>Total Weight:</strong> <?php echo e($cartData['paper_total_weight']); ?> kg</p>
+                                    <p><span style="font-weight:500;">Total Weight:</span> <?php echo e($cartData['paper_total_weight']); ?>
+
+                                        kg</p>
 
 
                                     <div class="mb42">
@@ -383,7 +413,8 @@
 
                                     <div class="input-group mb-2 " style="margin-top:30px;">
                                         <input type="text" class="form-control" placeholder="Enter Postcode" id="postcodeInput">
-                                        <button class="btn btn-custom" id="applyPostcodeBtn">Apply</button>
+                                        <button class="btn btn-custom" id="applyPostcodeBtn"
+                                            style="font-weight:500;">Apply</button>
                                     </div>
                                     <p id="postcodeStatus" class="mt-2"></p>
 
@@ -399,8 +430,9 @@
                                     <!--</div>-->
                                     <hr>
                                     <div class="d-flex justify-content-between">
-                                        <span>Subtotal:</span>
-                                        <span id="subtotal">£<?php echo e($cartData['items']['sub_total'] ?? 0); ?></span>
+                                        <span style="font-weight:500;">Subtotal:</span>
+                                        <span id="subtotal"
+                                            style="font-weight:500;">£<?php echo e($cartData['items']['sub_total'] ?? 0); ?></span>
                                     </div>
 
                                     <div class="d-flex justify-content-between">
@@ -419,13 +451,16 @@
                                     </div>
 
                                     <div class="d-flex justify-content-between  mt-2">
-                                        <span><strong>Grand Total</strong></span>
-                                        <span><strong id="grandTotalAmount">£<?php echo e($cartData['grand_total']); ?></strong></span>
+                                        <span><span style="font-weight:500;">Grand Total</span></span>
+                                        <span><span style="font-weight:500;"
+                                                id="grandTotalAmount">£<?php echo e($cartData['grand_total']); ?></span></span>
                                     </div>
                                     <hr>
-                                    <button class="continue-class" id="continueToCheckout">Continue</button>
+                                    <button class="continue-class" id="continueToCheckout"
+                                        style="font-weight:500;">Continue</button>
 
-                                    <button type="button" class="start-new" data-toggle="modal" data-target="#startQuoteModal">
+                                    <button type="button" class="start-new" data-toggle="modal" data-target="#startQuoteModal"
+                                        style="font-weight:500;">
                                         Start a New Quote
                                     </button>
 
@@ -498,6 +533,75 @@
                 .catch(() => {
                     alert('Error occurred during delivery update.');
                 });
+        });
+
+
+        $('.trash').on('click', function () {
+            const quoteId = $(this).data('id');
+
+            if (!quoteId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Invalid item.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("<?php echo e(route('cart.delete')); ?>", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
+                        },
+                        body: JSON.stringify({ quote_id: quoteId })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'The item has been removed from your cart.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    // Option 1: reload page
+                                    location.reload();
+
+                                    // Option 2: dynamically remove item and update totals (optional)
+                                    // $('#cart-item-' + quoteId).remove();
+                                    // $('#subtotal').text('£' + data.subtotal.toFixed(2));
+                                    // $('#grandTotalAmount').text('£' + data.grand_total.toFixed(2));
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: data.message || 'Failed to delete item.'
+                                });
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong while deleting the item.'
+                            });
+                        });
+                }
+            });
         });
 
     });
@@ -591,5 +695,7 @@
             else if (index === activeIndex) step.classList.add('active');
         });
     });
+
+
 </script>
 <?php echo $__env->make('layouts.new-master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/front/shop-cart.blade.php ENDPATH**/ ?>

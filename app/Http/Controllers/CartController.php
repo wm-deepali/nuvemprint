@@ -666,4 +666,28 @@ class CartController extends Controller
 
     }
 
+    public function delete(Request $request)
+    {
+        $quoteId = $request->input('quote_id');
+
+        $cart = session('cart', null);
+
+        if (!$cart || $cart['quote_id'] != $quoteId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart item not found.'
+            ]);
+        }
+
+        // Remove the cart from session
+        session()->forget('cart');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Item removed from cart.',
+            'subtotal' => 0,      // optional if you want to return updated totals
+            'grand_total' => 0
+        ]);
+    }
+
 }

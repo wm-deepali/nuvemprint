@@ -68,6 +68,9 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/remove-file', [CartController::class, 'removeUploadedFile']);
 
     // cart.clear
+
+    Route::post('/delete', [CartController::class, 'delete'])->name('delete');
+
 });
 
 Route::get('/thank-you', function () {

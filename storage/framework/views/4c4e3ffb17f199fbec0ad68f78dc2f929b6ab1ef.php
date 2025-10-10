@@ -662,6 +662,11 @@
     .modal-content {
         background: #ffffff;
     }
+
+    #addToCartBtn.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 </style>
 <style>
     @media  only screen and (max-width: 600px) {
@@ -1317,6 +1322,17 @@
                         // Remove old percentage info globally if no static card
                         $('.percentage-charge-info').remove();
                     }
+
+                    // 🚫 Prevent add to cart if product total is 0
+                    const $addToCartBtn = $('#addToCartBtn'); // Update ID if your button differs
+                    if (calculatedPrice <= 0) {
+                        $addToCartBtn.prop('disabled', true).addClass('disabled');
+                        $addToCartBtn.attr('title', 'Cannot add to cart — product total is £0');
+                    } else {
+                        $addToCartBtn.prop('disabled', false).removeClass('disabled');
+                        $addToCartBtn.removeAttr('title');
+                    }
+
                 }
             },
 
@@ -1916,14 +1932,14 @@
             const selectedCard = document.querySelector(`.estimate-card[data-id="${savedDeliveryCharge.id}"]`);
 
             if (selectedCard) {
-                document.querySelectorAll('.estimate-card.active').forEach(card => card.classList.remove('active'));
-                selectedCard.classList.add('active');
+                // document.querySelectorAll('.estimate-card.active').forEach(card => card.classList.remove('active'));
+                // selectedCard.classList.add('active');
 
-                const selectedDate = $(selectedCard).data('date');
-                $('.estimate-card-static .text-black.mb-1').text(selectedDate);
+                // const selectedDate = $(selectedCard).data('date');
+                // $('.estimate-card-static .text-black.mb-1').text(selectedDate);
 
                 const selectedTitle = $(selectedCard).data('title') || 'Standard Delivery';
-                $('.estimate-card-static .title-static.text-muted.small').text(selectedTitle);
+                // $('.estimate-card-static .title-static.text-muted.small').text(selectedTitle);
 
                 // ✅ Show only cards with the same title
                 $('.estimate-card').each(function () {
@@ -1938,26 +1954,46 @@
             debouncedCalculateTotalPrice();
         }
 
+
         $('.estimate-card').on('click', function () {
-            $('.estimate-option').removeClass('active');
-            $('.estimate-option .ast-active').removeClass('ast-active');
-            $('.detail-section').addClass('d-none');
-            $('.title').addClass('d-none');
+            if ($(this).hasClass('active')) {
+                // Deselect this card
+                $(this).removeClass('active');
+                $(this).find('.ast-active').removeClass('ast-active');
+                $(this).find('.detail-section').addClass('d-none');
+                $(this).find('.title').addClass('d-none');
 
-            $(this).addClass('active');
-            $(this).find('div').first().addClass('ast-active');
-            $(this).find('.detail-section').removeClass('d-none');
-            $(this).find('.title').removeClass('d-none');
+                // Update static card to defaults if no card is active
+                if ($('.estimate-card.active').length === 0) {
+                    const staticCard = $('.estimate-card-static.active');
+                    staticCard.find('.final-price').text('0.00');
+                    staticCard.find('.title-static.text-muted.small').text('Standard Delivery');
+                    staticCard.find('.text-black.mb-1').text(''); // Clear date
+                    // You may want to clear or reset additional fields as needed
+                }
+            } else {
+                // Remove active from all, then set for this
+                $('.estimate-option').removeClass('active');
+                $('.estimate-option .ast-active').removeClass('ast-active');
+                $('.detail-section').addClass('d-none');
+                $('.title').addClass('d-none');
 
-            const selectedDate = $(this).data('date');
-            $('.estimate-card-static .text-black.mb-1').text(selectedDate);
+                $(this).addClass('active');
+                $(this).find('div').first().addClass('ast-active');
+                $(this).find('.detail-section').removeClass('d-none');
+                $(this).find('.title').removeClass('d-none');
 
-            const titleDiv = $(this).find('.title');
-            const selectedTitle = titleDiv.length && titleDiv.text().trim() !== '' ? titleDiv.text().trim() : 'Standard Delivery';
-            $('.estimate-card-static .title-static.text-muted.small').text(selectedTitle);
+                const selectedDate = $(this).data('date');
+                $('.estimate-card-static .text-black.mb-1').text(selectedDate);
 
+                const titleDiv = $(this).find('.title');
+                const selectedTitle = titleDiv.length && titleDiv.text().trim() !== '' ? titleDiv.text().trim() : 'Standard Delivery';
+                $('.estimate-card-static .title-static.text-muted.small').text(selectedTitle);
+            }
+            // Optionally trigger price recalculation, etc.
             debouncedCalculateTotalPrice();
         });
+
 
         $('.selectable-proof-option').on('click', function () {
             const $this = $(this);
@@ -1997,11 +2033,27 @@
             }
         });
 
-
         if (!isValid) {
-            alert(`Please select the following required options:\n- ${missingFields.join('\n- ')}`);
+            Swal.fire({
+                title: "Missing Required Options",
+                text: `Please select the following required options:\n- ${missingFields.join('\n- ')}`,
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
             return;
         }
+
+        if ($('.estimate-card.active').length === 0) {
+            Swal.fire({
+                title: "Delivery Option Required",
+                text: "Please select a delivery option before adding to cart.",
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+
 
         const route = $(this).data('route');
         // return
