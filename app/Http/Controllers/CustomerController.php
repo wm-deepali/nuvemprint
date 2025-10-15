@@ -41,50 +41,53 @@ class CustomerController extends Controller
 
     public function authenticate(Request $request)
     {
-        // dd('ger');
+        // If already logged in
         if (Auth::guard('customer')->check()) {
             return redirect()->route('account-dashboard');
-        } else {
-            $credentials = $request->validate([
-                'email' => 'required|email',
-                'password' => 'required'
-            ]);
-
-
-            $credentials = $request->only('email', 'password');
-            $customer = Customer::where('email', $request->email)->first();
-            if (!empty($customer)) {
-                if ($customer->email_verified_at == NULL) {
-                    $token = Str::random(64);
-                    CustomerVerify::create([
-                        'customer_id' => $customer->id,
-                        'token' => $token
-                    ]);
-                    $mailData = ['token' => $token];
-                    $mailContent = Mail::to($request->email)->send(new EmailVerificationEmail($mailData));
-                    return redirect()->route('authentication-signin')
-                        ->withErrors('Your email has not been verified yet, Verification Email sent, Please check your email in inbox, spam and junk folder.');
-                } else if ($customer->status != 'Active') {
-                    return redirect()->route('authentication-signin')
-                        ->withErrors('Your account has been blocked please contact to Admin.');
-                } else {
-                    if (Auth::guard('customer')->attempt($credentials)) {
-                        // dd(Auth::guard('customer')->user());
-                        return redirect()->route('account-dashboard')
-                            ->withSuccess('You have successfully logged in!');
-                    }
-
-
-                }
-
-            } else {
-                return back()->withErrors(['email' => 'Invalid email'])->onlyInput('email');
-            }
-            // return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
-
         }
 
+        // Validate input
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $credentials = $request->only('email', 'password');
+        $customer = Customer::where('email', $request->email)->first();
+
+        if ($customer) {
+            // Email not verified
+            if ($customer->email_verified_at == null) {
+                $token = Str::random(64);
+                CustomerVerify::create([
+                    'customer_id' => $customer->id,
+                    'token' => $token
+                ]);
+                Mail::to($request->email)->send(new EmailVerificationEmail(['token' => $token]));
+
+                return redirect()->route('authentication-signin', ['redirect' => $request->input('redirect')])
+                    ->withErrors('Your email has not been verified yet. Verification Email sent, Please check your inbox, spam, and junk folder.');
+            }
+
+            // Account not active
+            if ($customer->status != 'Active') {
+                return redirect()->route('authentication-signin', ['redirect' => $request->input('redirect')])
+                    ->withErrors('Your account has been blocked. Please contact the Admin.');
+            }
+
+            // Attempt login
+            if (Auth::guard('customer')->attempt($credentials)) {
+                $redirectUrl = $request->input('redirect', route('account-dashboard'));
+                return redirect($redirectUrl)
+                    ->withSuccess('You have successfully logged in!');
+            }
+
+            return back()->withErrors(['email' => 'Invalid email or password.'])->onlyInput('email');
+        }
+
+        return back()->withErrors(['email' => 'Invalid email'])->onlyInput('email');
     }
+
 
 
     public function register(Request $request)
@@ -130,7 +133,9 @@ class CustomerController extends Controller
         $mailData = ['token' => $token];
         $mailContent = Mail::to($request->email)->send(new EmailVerificationEmail($mailData));
 
-        return redirect()->route('authentication-signin')
+        $redirectParam = $request->input('redirect', route('account-dashboard'));
+
+        return redirect()->route('authentication-signin', ['redirect' => $redirectParam])
             ->withSuccess('Verification Email sent, Please check your email in inbox, spam and junk folder.');
     }
 

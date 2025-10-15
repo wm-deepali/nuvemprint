@@ -68,19 +68,24 @@
     background: #ffffff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; text-align: center;">
 
-    <p style="font-size: 16px; margin-bottom: 24px; line-height: 1.4;">
-        Please 
-        <a href="<?php echo e(route('authentication-signin')); ?>" 
-           style="color: #007bff; font-weight: 600; text-decoration: none;">
-           sign in
-        </a>
-        or 
-        <a href="<?php echo e(route('authentication-signup')); ?>" 
-           style="color: #007bff; font-weight: 600; text-decoration: none;">
-           create an account
-        </a> 
-        to continue.
-    </p>
+<?php
+    $currentUrl = urlencode(url()->current());
+?>
+
+   <p style="font-size: 16px; margin-bottom: 24px; line-height: 1.4;">
+    Please 
+    <a href="<?php echo e(route('authentication-signin')); ?>?redirect=<?php echo e($currentUrl); ?>" 
+       style="color: #007bff; font-weight: 600; text-decoration: none;">
+       sign in
+    </a>
+    or 
+    <a href="<?php echo e(route('authentication-signup')); ?>?redirect=<?php echo e($currentUrl); ?>" 
+       style="color: #007bff; font-weight: 600; text-decoration: none;">
+       create an account
+    </a> 
+    to continue.
+</p>
+
 
     <!-- Optional: Add some icons for user/fingerprint -->
     <div style="font-size: 48px; color: #007bff; margin-bottom: 16px;">
@@ -330,6 +335,16 @@
                     document.querySelector('.custom-tab[data-tab="payment"]').classList.add('active');
                     document.getElementById('payment').classList.add('active');
 
+                     // 🧭 Update URL parameter to reflect new tab
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('tab', 'payment');
+        window.history.replaceState({}, '', currentUrl);
+
+  // 2️⃣ Scroll to top of the page
+        window.scrollTo({
+            top: -10,
+            behavior: 'smooth' // smooth scrolling
+        });
                 },
                 error: function (xhr) {
                     alert('Error saving details. Please try again.');

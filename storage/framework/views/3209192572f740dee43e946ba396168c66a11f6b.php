@@ -30,7 +30,7 @@
     .thank-you-message {
         font-size: 18px;
         color: #555;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
 
     .quote-id {
@@ -53,14 +53,23 @@
         <i class="fas fa-check-circle"></i>
     </div>
     <div class="thank-you-heading">Congratulations!</div>
-    <div class="thank-you-message">
-        Your order request has been saved successfully.<br>
-        Our team will review your order and update you soon.
-    </div>
-  <div class="quote-id">
-    Your Quote ID: #<?php echo e(request('quote_id') ?? 'XXXXXX'); ?>
 
-</div>
+    <?php if(session('success')): ?>
+        <div class="thank-you-message">
+            <?php echo e(session('success')); ?>
+
+        </div>
+    <?php else: ?>
+        <div class="thank-you-message">
+            Your order request has been saved successfully.<br>
+            Our team will review your order and update you soon.
+        </div>
+    <?php endif; ?>
+
+    <div class="quote-id">
+        Your Quote ID: #<?php echo e(session('last_quote_id') ?? request('quote_id') ?? 'XXXXXX'); ?>
+
+    </div>
 
     <a href="<?php echo e(url('/')); ?>" class="btn btn-primary btn-return-home mt-4">Return to Home</a>
 </div>

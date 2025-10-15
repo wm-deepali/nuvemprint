@@ -1,10 +1,10 @@
-@extends('layouts.new-master')
 
-@section('title')
+
+<?php $__env->startSection('title'); ?>
     Nuvem Prints - About Us
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <style>
         .btn-login-page {
             display: inline-block;
@@ -131,7 +131,7 @@
                         <div class="ms-auto">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb mb-0 p-0">
-                                    <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="bx bx-home-alt"></i>
+                                    <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>"><i class="bx bx-home-alt"></i>
                                             Home</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Sign Up</li>
                                 </ol>
@@ -142,25 +142,25 @@
             </section>
 
             <!-- Flash Messages -->
-            @if (session('success'))
-                <h5 class="alert alert-success text-center">{{ session('success') }}</h5><br>
+            <?php if(session('success')): ?>
+                <h5 class="alert alert-success text-center"><?php echo e(session('success')); ?></h5><br>
                 <?php    Session::forget('success'); ?>
-            @endif
-            @if (session('error'))
-                <h5 class="alert alert-danger text-center">{{ session('error') }}</h5><br>
+            <?php endif; ?>
+            <?php if(session('error')): ?>
+                <h5 class="alert alert-danger text-center"><?php echo e(session('error')); ?></h5><br>
                 <?php    Session::forget('error'); ?>
-            @endif
+            <?php endif; ?>
 
             <!-- Validation Errors -->
-            @if ($errors->any())
+            <?php if($errors->any()): ?>
                 <div class="alert alert-danger">
                     <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            @endif
+            <?php endif; ?>
 
             <!-- Sign-Up Section -->
             <section class="py-0 py-lg-5 " style="margin-top:80px;">
@@ -176,7 +176,7 @@
                                                 <h3 class="">Sign Up</h3>
                                                 <p>
                                                     Already have an account?
-                                                    <a href="{{ route('authentication-signin', ['redirect' => request('redirect')]) }}"
+                                                    <a href="<?php echo e(route('authentication-signin', ['redirect' => request('redirect')])); ?>"
                                                         style="color:#ff4880; margin-left:6px;">
                                                         Sign in here
                                                     </a>
@@ -184,7 +184,7 @@
                                             </div>
 
                                             <div class="d-grid">
-                                                <a class="btn-login-page my-2 " href="{{ route('google.redirect') }}">
+                                                <a class="btn-login-page my-2 " href="<?php echo e(route('google.redirect')); ?>">
                                                     <span class="d-flex justify-content-center align-items-center">
                                                         <img class="me-2" src="assets/images/icons/search.svg" width="16"
                                                             alt="Image Description">
@@ -198,54 +198,110 @@
                                             <hr>
                                             <div class="form-body">
                                                 <form class="row g-3" id="registerForm" method="post"
-                                                    action="{{ route('customer-register') }}" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+                                                    action="<?php echo e(route('customer-register')); ?>" enctype="multipart/form-data">
+                                                    <?php echo csrf_field(); ?>
+                                                    <input type="hidden" name="redirect" value="<?php echo e(request('redirect')); ?>">
 
                                                     <div class="col-sm-6">
                                                         <label for="inputFirstName" class="form-label">First Name</label>
                                                         <input type="text" name="first_name"
-                                                            class="form-control @error('first_name') is-invalid @enderror"
-                                                            id="inputFirstName" value="{{ old('first_name') }}"
+                                                            class="form-control <?php $__errorArgs = ['first_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                            id="inputFirstName" value="<?php echo e(old('first_name')); ?>"
                                                             placeholder="John" required>
-                                                        @error('first_name')
-                                                            <span class="text-danger">{{ $message }}</span>
-                                                        @enderror
+                                                        <?php $__errorArgs = ['first_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <label for="inputLastName" class="form-label">Last Name</label>
                                                         <input type="text" name="last_name"
-                                                            class="form-control @error('last_name') is-invalid @enderror"
-                                                            id="inputLastName" value="{{ old('last_name') }}"
+                                                            class="form-control <?php $__errorArgs = ['last_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                            id="inputLastName" value="<?php echo e(old('last_name')); ?>"
                                                             placeholder="Doe" required>
-                                                        @error('last_name')
-                                                            <span class="text-danger">{{ $message }}</span>
-                                                        @enderror
+                                                        <?php $__errorArgs = ['last_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                     </div>
                                                     <div class="col-12">
                                                         <label for="inputEmailAddress" class="form-label">Email
                                                             Address</label>
                                                         <input type="email" name="email"
-                                                            class="form-control @error('email') is-invalid @enderror"
-                                                            id="inputEmailAddress" value="{{ old('email') }}"
+                                                            class="form-control <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                            id="inputEmailAddress" value="<?php echo e(old('email')); ?>"
                                                             placeholder="example@user.com" required>
                                                         <span id="email_feedback" style="display:none; color:red;">Email
                                                             already exists</span>
-                                                        @error('email')
-                                                            <span class="text-danger">{{ $message }}</span>
-                                                        @enderror
+                                                        <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                     </div>
                                                     <div class="col-12">
                                                         <label for="inputMobile" class="form-label">Mobile</label>
                                                         <input type="tel" onkeypress="return isNumber(event)"
                                                             autocomplete="off"
-                                                            class="form-control @error('mobile') is-invalid @enderror"
+                                                            class="form-control <?php $__errorArgs = ['mobile'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                                             name="mobile" minlength="10" maxlength="10"
                                                             placeholder="Mobile number" id="inputMobile"
-                                                            value="{{ old('mobile') }}" required>
-                                                        @error('mobile')
-                                                            <span class="text-danger">{{ $message }}</span>
-                                                        @enderror
+                                                            value="<?php echo e(old('mobile')); ?>" required>
+                                                        <?php $__errorArgs = ['mobile'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                     </div>
                                                     <!--<div class="col-12">-->
                                                     <!--    <label for="inputChoosePassword" class="form-label">Password</label>-->
@@ -259,29 +315,57 @@
                                                             Password</label>
                                                         <div class="position-relative">
                                                             <input type="password" name="password"
-                                                                class="form-control @error('password') is-invalid @enderror"
+                                                                class="form-control <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                                                 id="inputChoosePassword" placeholder="Enter Password"
                                                                 required>
                                                             <i class="fa-solid fa-eye position-absolute top-50 end-0 translate-middle-y me-3 cursor-pointer"
                                                                 id="togglePassword"></i>
                                                         </div>
-                                                        @error('password')
-                                                            <span class="text-danger">{{ $message }}</span>
-                                                        @enderror
+                                                        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                     </div>
                                                     <div class="col-12">
                                                         <label for="inputSelectCountry" class="form-label">Country</label>
-                                                        <select class="form-select @error('country') is-invalid @enderror"
+                                                        <select class="form-select <?php $__errorArgs = ['country'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                                             name="country" id="inputSelectCountry" required>
                                                             <option value="">Select Country</option>
-                                                            @php $countries = countrylist(); @endphp
-                                                            @foreach($countries as $country)
-                                                                <option value="{{$country->id}}" {{ old('country') == $country->id ? 'selected' : '' }}>{{$country->name}}</option>
-                                                            @endforeach
+                                                            <?php $countries = countrylist(); ?>
+                                                            <?php $__currentLoopData = $countries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $country): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <option value="<?php echo e($country->id); ?>" <?php echo e(old('country') == $country->id ? 'selected' : ''); ?>><?php echo e($country->name); ?></option>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </select>
-                                                        @error('country')
-                                                            <span class="text-danger">{{ $message }}</span>
-                                                        @enderror
+                                                        <?php $__errorArgs = ['country'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="text-danger"><?php echo e($message); ?></span>
+                                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="form-check form-switch">
@@ -310,9 +394,9 @@
             <!--end section-->
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('after-scripts')
+<?php $__env->startPush('after-scripts'); ?>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const togglePassword = document.querySelector("#togglePassword");
@@ -347,11 +431,11 @@
 
             if (emailPattern.test(email)) {
                 $.ajax({
-                    url: '{{ route("check-email") }}',
+                    url: '<?php echo e(route("check-email")); ?>',
                     method: 'POST',
                     data: {
                         email: email,
-                        _token: '{{ csrf_token() }}'
+                        _token: '<?php echo e(csrf_token()); ?>'
                     },
                     success: function (data) {
                         if (data.exists) {
@@ -375,4 +459,5 @@
             return !(charCode > 31 && (charCode < 48 || charCode > 57));
         }
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.new-master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\web-mingo-project\nuvem_prints\resources\views/front/authentication-signup.blade.php ENDPATH**/ ?>

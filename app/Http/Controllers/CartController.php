@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Attribute;
 use App\Models\Customer;
 use App\Models\DeliveryCharge;
+use App\Models\Invoice;
 use App\Models\PostalCode;
 use App\Models\Quote;
 use App\Models\QuoteBillingAddress;
@@ -20,6 +21,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Stripe\Stripe;
+use Stripe\Checkout\Session as StripeSession;
 
 class CartController extends Controller
 {
@@ -533,7 +536,32 @@ class CartController extends Controller
     }
 
 
-    public function PayLater(Request $request)
+    public function delete(Request $request)
+    {
+        $quoteId = $request->input('quote_id');
+
+        $cart = session('cart', null);
+
+        if (!$cart || $cart['quote_id'] != $quoteId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart item not found.'
+            ]);
+        }
+
+        // Remove the cart from session
+        session()->forget('cart');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Item removed from cart.',
+            'subtotal' => 0,      // optional if you want to return updated totals
+            'grand_total' => 0
+        ]);
+    }
+
+
+    public function PayLater(Request $request, $paymentReference = null)
     {
         $data = session()->get('cart', []);
         // dd($data);
@@ -572,6 +600,8 @@ class CartController extends Controller
                 'delivery_date' => $formattedDate ?? null,
                 'notes' => $data['details'] ?? null,
             ]);
+
+            session(['last_quote_id' => $quote->quote_number]);
 
             // Create QuoteItem
             $itemData = $data['items'];
@@ -654,6 +684,25 @@ class CartController extends Controller
                 }
             }
 
+            if ($paymentReference) {
+                $invoice = $quote->invoice ?? $this->generateInvoiceForQuote($quote);
+
+                $quote->payments()->create([
+                    'invoice_id' => $invoice->id,
+                    'amount_received' => $data['grand_total'],
+                    'payment_method' => 'stripe',
+                    'payment_date' => now()->toDateString(),
+                    'reference_number' => $paymentReference,
+                    'remarks' => 'Paid via Stripe Checkout',
+                    'payment_type' => 'online',
+                ]);
+
+                // Mark invoice as paid
+                $invoice->is_paid = true;
+                $invoice->save();
+            }
+
+
             DB::commit();
             session()->forget('cart');
             return response()->json(['message' => 'Quote saved successfully', 'quote_id' => $quote->quote_number]);
@@ -666,28 +715,110 @@ class CartController extends Controller
 
     }
 
-    public function delete(Request $request)
+    public function payNow(Request $request)
     {
-        $quoteId = $request->input('quote_id');
+        $data = session()->get('cart', []);
 
-        $cart = session('cart', null);
-
-        if (!$cart || $cart['quote_id'] != $quoteId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cart item not found.'
-            ]);
+        if (empty($data) || empty($data['billing'])) {
+            return response()->json(['error' => 'Cart or billing info missing.'], 400);
         }
 
-        // Remove the cart from session
-        session()->forget('cart');
+        try {
+            Stripe::setApiKey(config('services.stripe.secret'));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item removed from cart.',
-            'subtotal' => 0,      // optional if you want to return updated totals
-            'grand_total' => 0
-        ]);
+            $lineItems = [
+                [
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => 'Print Order #' . $data['quote_id'],
+                        ],
+                        'unit_amount' => intval($data['grand_total'] * 100), // Stripe uses cents
+                    ],
+                    'quantity' => 1,
+                ]
+            ];
+
+            $checkoutSession = StripeSession::create([
+                'payment_method_types' => ['card'],
+                'line_items' => $lineItems,
+                'mode' => 'payment',
+                'success_url' => url('/payment/success?session_id={CHECKOUT_SESSION_ID}'),
+                'cancel_url' => url('/payment/cancel'),
+                'customer_email' => $data['billing']['email'] ?? null,
+            ]);
+
+            return response()->json(['url' => $checkoutSession->url]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function paymentSuccess(Request $request)
+    {
+        $sessionId = $request->get('session_id');
+
+        if (!$sessionId) {
+            return redirect()->route('cart.show')->with('error', 'Payment session not found.');
+        }
+
+        try {
+            // Set Stripe API key
+            Stripe::setApiKey(config('services.stripe.secret'));
+
+            // Retrieve Stripe session
+            $session = StripeSession::retrieve($sessionId);
+
+            // Check payment status
+            if ($session->payment_status !== 'paid') {
+                return redirect()->route('cart.show')->with('error', 'Payment not completed.');
+            }
+
+            // Call your existing PayLater() logic to save the quote
+            // But pass an extra flag to indicate "paid"
+            $this->PayLater($request, $session->payment_intent ?? null);
+
+            return redirect('/thank-you?quote_id=' . session('last_quote_id'))
+                ->with('success', 'Payment successful! Your quote has been saved.');
+
+
+        } catch (\Exception $e) {
+            return redirect()->route('cart.show')->with('error', 'Payment verification failed: ' . $e->getMessage());
+        }
+    }
+
+    public function paymentCancel()
+    {
+        return redirect()->route('cart.show')->with('error', 'Payment canceled.');
+    }
+
+
+    /**
+     * Generate invoice for given quote
+     */
+    protected function generateInvoiceForQuote(Quote $quote)
+    {
+        $invoice = new Invoice();
+        $invoice->quote_id = $quote->id;
+        $invoice->total_amount = $quote->grand_total;
+        $invoice->invoice_date = now();
+        $invoice->invoice_number = $this->generateUniqueInvoiceNumber();
+        $invoice->is_paid = false;
+
+        $invoice->save();
+
+        return $invoice;
+    }
+
+
+    protected function generateUniqueInvoiceNumber()
+    {
+        do {
+            $number = 'INV-' . mt_rand(100000, 999999); // e.g. INV-123456
+        } while (Invoice::where('invoice_number', $number)->exists());
+
+        return $number;
     }
 
 }
+

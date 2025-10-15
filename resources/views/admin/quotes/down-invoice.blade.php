@@ -147,7 +147,7 @@
                                     <td class="text-right">£{{ number_format($quote->delivery_price, 2) }}</td>
                                 </tr>
                                  <tr>
-                                    <th>Proof Reading:</th>
+                                    <th>File Check:</th>
                                     <td class="text-right">£{{ number_format($quote->proof_price, 2) }}</td>
                                 </tr>
                                 <tr>

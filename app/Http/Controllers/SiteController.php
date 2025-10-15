@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Attribute;
 use App\Models\Blog;
 use App\Models\CentralizedAttributePricing;
+use App\Models\ContactMessage;
 use App\Models\DeliveryCharge;
 use App\Models\Faq;
 use App\Models\PricingRule;
@@ -14,6 +15,7 @@ use App\Models\Vat;
 use Illuminate\Http\Request;
 use App\Models\PricingRuleAttribute;
 use App\Models\AttributeValue;
+use Illuminate\Support\Facades\Mail;
 
 class SiteController extends Controller
 {
@@ -86,6 +88,7 @@ class SiteController extends Controller
         $minDate = null;
         $maxDate = null;
         $defaultDate = null;
+        $quantityInputRequired = true;
 
         if ($calculatorRequired) {
             $pricingRule = PricingRule::where('subcategory_id', $subcategoryId)->first();
@@ -284,7 +287,7 @@ class SiteController extends Controller
                     ];
                 });
 
-                
+
             $compositeMap = collect($compositeDraggerValues)->pluck('component_count', 'id');
             $compositeMap = $compositeMap->prepend('-- Select --', '');
         }
@@ -925,5 +928,41 @@ class SiteController extends Controller
     //         'formatted_price' => '£' . number_format($total, 2),
     //     ]);
     // }
+
+    public function contactSubmit(Request $request)
+    {
+        // 1. Validate input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        // 2. Save to database
+        $contact = ContactMessage::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'subject' => $request->subject,
+            'message' => $request->message,
+        ]);
+
+        // 3. Send email notification (optional)
+        try {
+            Mail::send('emails.contact', ['contact' => $contact], function ($m) use ($contact) {
+                $m->to('admin@nuvemprint.com', 'Admin')
+                    ->subject('New Contact Us Message: ' . $contact->subject)
+                    ->replyTo($contact->email, $contact->name);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Contact email failed: ' . $e->getMessage());
+        }
+
+        // 4. Return JSON response for AJAX
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you for submitting your enquiry, our team will get back to you soon.'
+        ]);
+    }
 
 }

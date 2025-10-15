@@ -126,7 +126,7 @@
                     data-attribute-id="{{ $attribute['id'] }}" data-value-id="{{ $value['id'] }}"
                     @if($singleValue) style="pointer-events: none; opacity: 0.6;" @endif>
                     <div>
-                        <img src="{{ asset('storage/' . ($value['image_path'] ?? 'default.png')) }}" alt="{{ $value['value'] }}"
+                        <img src="{{ asset('storage/' . ($value['image_path'] ?? 'default-preview.png')) }}" alt="{{ $value['value'] }}"
                             style="height:150px; width:150px;" />
                         <div class="zoom-section1">
                             <div class="zoomicon">

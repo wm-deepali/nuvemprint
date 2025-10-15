@@ -46,7 +46,7 @@ class ProofReadingController extends Controller
             ProofReading::create($data);
         }
 
-        return $this->respondSuccess($request, 'Proof Readings created successfully.');
+        return $this->respondSuccess($request, 'File Checks created successfully.');
     }
 
 
@@ -83,7 +83,7 @@ class ProofReadingController extends Controller
 
         $ProofReading->update($data);
 
-        return $this->respondSuccess($request, 'Proof Reading updated successfully.');
+        return $this->respondSuccess($request, 'File Check updated successfully.');
     }
 
 
@@ -93,7 +93,7 @@ class ProofReadingController extends Controller
         $proofReading->delete();
 
         return request()->ajax()
-            ? response()->json(['success' => true, 'message' => 'Proof reading deleted.'])
+            ? response()->json(['success' => true, 'message' => 'File Check deleted.'])
             : redirect()->route('admin.proof-reading.index')->with('success', 'Value deleted.');
     }
 

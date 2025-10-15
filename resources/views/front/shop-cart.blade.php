@@ -376,7 +376,7 @@
                                     </div>
 
                                     <div class="d-flex justify-content-between">
-                                        <span>Proof Reading Cost</span>
+                                        <span>File Check Cost</span>
                                         <span>£{{ $cartData['proof']['price'] ?? 0 }}</span>
                                     </div>
 
@@ -436,7 +436,7 @@
                                     </div>
 
                                     <div class="d-flex justify-content-between">
-                                        <span>Total Proof Reading Cost:</span>
+                                        <span>Total File Check Cost:</span>
                                         <span>£{{ $cartData['proof']['price'] ?? 0}}</span>
                                     </div>
 

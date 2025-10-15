@@ -12,7 +12,7 @@
         <div class="breadcrumb-wrapper">
           <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-          <li class="breadcrumb-item active">Proof Readings</li>
+          <li class="breadcrumb-item active">File Checks</li>
           </ol>
         </div>
         </div>
@@ -30,7 +30,7 @@
       <div class="col-md-12">
         <div class="card">
         <div class="card-header">
-          <h4 class="card-title">Proof Readings</h4>
+          <h4 class="card-title">File Checks</h4>
         </div>
         <div class="card-body">
           <div class="table-responsive">
@@ -64,7 +64,7 @@
         </tr>
         @empty
         <tr>
-          <td colspan="5" class="text-center">No proof reading entries found.</td>
+          <td colspan="5" class="text-center">No File Check entries found.</td>
         </tr>
         @endforelse
             </tbody>
@@ -92,7 +92,7 @@
     });
 
     $(document).ready(function () {
-    // Add Proof Reading
+    // Add File Check
     $(document).on('click', '#add-proof-reading', function () {
       $.get("{{ route('admin.proof-reading.create') }}", function (result) {
       if (result.success) {
@@ -108,7 +108,7 @@
       });
     });
 
-    // Edit Proof Reading
+    // Edit File Check
     $(document).on('click', '.edit-proof-reading', function () {
       const id = $(this).data('id');
       $.get(`{{ url('admin/proof-reading') }}/${id}/edit`, function (result) {
@@ -165,7 +165,7 @@
     });
     });
 
-    // Update Proof Reading
+    // Update File Check
     $(document).on('click', '#update-proof-reading-btn', function () {
     $(this).prop('disabled', true);
     $('.validation-err').text('');
@@ -203,7 +203,7 @@
     });
 
 
-    // Delete Proof Reading
+    // Delete File Check
     function deleteValue(id) {
     Swal.fire({
       title: "Are you sure?",

@@ -97,9 +97,17 @@ class AttributeGroupController extends Controller
     public function destroy($id)
     {
         $group = AttributeGroup::findOrFail($id);
+
+        // Detach attributes from pivot table
         $group->attributes()->detach();
+
+        // Delete related subcategory assignments
+        $group->subcategoryAssignments()->delete();
+
+        // Delete the attribute group itself
         $group->delete();
 
         return response()->json(['success' => true]);
     }
+
 }

@@ -16,7 +16,7 @@ use App\Http\Controllers\GoogleController;
 |
 | Here is where you can register site routes for your application. These
 | routes are loaded by the RouteServiceProvider within a group which
-| not contains the middleware group. Now create something great!
+| not contains the middleware group. Now create something great!p
 |
 */
 
@@ -63,7 +63,11 @@ Route::prefix('cart')->name('cart.')->group(function () {
         return response()->json(['success' => true]);
     });
 
+
     Route::post('/pay-later', [CartController::class, 'PayLater']);
+    
+     Route::post('/pay-now', [CartController::class, 'payNow'])->name('payNow');
+
     // In web.php
     Route::post('/remove-file', [CartController::class, 'removeUploadedFile']);
 
@@ -72,6 +76,9 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/delete', [CartController::class, 'delete'])->name('delete');
 
 });
+
+Route::get('/payment/success', [CartController::class, 'paymentSuccess'])->name('paymentSuccess');
+Route::get('/payment/cancel', [CartController::class, 'paymentCancel'])->name('paymentCancel');
 
 Route::get('/thank-you', function () {
     return view('front.thank-you');
@@ -116,6 +123,7 @@ Route::get('/category/{slug}', function ($slug) {
 Route::get('contact-us', function () {
     return view('front.contact-us');
 })->name('contact-us');
+Route::post('/contact-submit', [SiteController::class, 'contactSubmit'])->name('contact.submit');
 
 
 Route::get('blogs', [BlogController::class, 'publicIndex'])->name('blogs');

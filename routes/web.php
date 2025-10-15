@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AttributeGroupSubcategoryAssignmentController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CentralizedPaperPricingController;
 use App\Http\Controllers\Admin\ContactInfoController;
+use App\Http\Controllers\Admin\ContactSubmissionController;
 use App\Http\Controllers\Admin\CustomerEstimateController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\FaqController;
@@ -429,6 +430,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('postal-codes', PostalCodeController::class);
         Route::resource('manage-vat', VatController::class);
 
+        Route::get('/contact-submissions', [ContactSubmissionController::class, 'index'])
+            ->name('contact-submissions.index');
+        Route::get('/contact-submissions/{id}', [ContactSubmissionController::class, 'show'])
+            ->name('contact-submissions.show');
+        Route::delete('/contact-submissions/{id}', [ContactSubmissionController::class, 'destroy'])
+            ->name('contact-submissions.destroy');
 
         // ===== Quote Pricing ===== //
         Route::resource('quote-pricing', QuotePricingController::class);

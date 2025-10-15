@@ -295,7 +295,7 @@
                                 <h6 style="font-size:14px; font-weight:400;">£{{ $delivery['price'] }}</h6>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <h6 style="font-size:14px; font-weight:400;">Proof Reading Cost</h6>
+                                <h6 style="font-size:14px; font-weight:400;">File Check Cost</h6>
                                 <h6 style="font-size:14px; font-weight:400;">£{{ $proof['price'] }}</h6>
                             </div>
                             <div class="d-flex justify-content-between">

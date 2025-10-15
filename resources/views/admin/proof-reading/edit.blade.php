@@ -2,7 +2,7 @@
   <div class="modal-content">
     <form id="proof-reading-form" enctype="multipart/form-data">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Proof Reading</h5>
+        <h5 class="modal-title">Edit File Check</h5>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 

@@ -250,6 +250,45 @@ class QuoteController extends Controller
     }
 
 
+    protected function generateUniqueOrderNumber()
+    {
+        do {
+            $number = mt_rand(1000000, 9999999); // Generate 7-digit number
+            $orderNumber = $number;
+        } while (Quote::where('order_number', $orderNumber)->exists());
+
+        return $orderNumber;
+    }
+
+
+
+    /**
+     * Generate invoice for given quote
+     */
+    protected function generateInvoiceForQuote(Quote $quote)
+    {
+        $invoice = new Invoice();
+        $invoice->quote_id = $quote->id;
+        $invoice->total_amount = $quote->grand_total;
+        $invoice->invoice_date = now();
+        $invoice->invoice_number = $this->generateUniqueInvoiceNumber();
+        $invoice->is_paid = false;
+
+        $invoice->save();
+
+        return $invoice;
+    }
+
+
+    protected function generateUniqueInvoiceNumber()
+    {
+        do {
+            $number = 'INV-' . mt_rand(100000, 999999); // e.g. INV-123456
+        } while (Invoice::where('invoice_number', $number)->exists());
+
+        return $number;
+    }
+
     public function viewInvoice($quoteId)
     {
         $quote = Quote::with([
@@ -295,44 +334,7 @@ class QuoteController extends Controller
         return $pdf->download('invoice-' . $quote->invoice->invoice_number . '.pdf');
     }
 
-    protected function generateUniqueOrderNumber()
-    {
-        do {
-            $number = mt_rand(1000000, 9999999); // Generate 7-digit number
-            $orderNumber = $number;
-        } while (Quote::where('order_number', $orderNumber)->exists());
 
-        return $orderNumber;
-    }
-
-
-
-    /**
-     * Generate invoice for given quote
-     */
-    protected function generateInvoiceForQuote(Quote $quote)
-    {
-        $invoice = new Invoice();
-        $invoice->quote_id = $quote->id;
-        $invoice->total_amount = $quote->grand_total;
-        $invoice->invoice_date = now();
-        $invoice->invoice_number = $this->generateUniqueInvoiceNumber();
-        $invoice->is_paid = false;
-
-        $invoice->save();
-
-        return $invoice;
-    }
-
-
-    protected function generateUniqueInvoiceNumber()
-    {
-        do {
-            $number = 'INV-' . mt_rand(100000, 999999); // e.g. INV-123456
-        } while (Invoice::where('invoice_number', $number)->exists());
-
-        return $number;
-    }
 
 
 }

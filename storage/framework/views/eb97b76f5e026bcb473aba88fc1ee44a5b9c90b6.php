@@ -131,7 +131,7 @@
                     data-attribute-id="<?php echo e($attribute['id']); ?>" data-value-id="<?php echo e($value['id']); ?>"
                     <?php if($singleValue): ?> style="pointer-events: none; opacity: 0.6;" <?php endif; ?>>
                     <div>
-                        <img src="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default.png'))); ?>" alt="<?php echo e($value['value']); ?>"
+                        <img src="<?php echo e(asset('storage/' . ($value['image_path'] ?? 'default-preview.png'))); ?>" alt="<?php echo e($value['value']); ?>"
                             style="height:150px; width:150px;" />
                         <div class="zoom-section1">
                             <div class="zoomicon">

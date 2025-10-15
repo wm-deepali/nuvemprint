@@ -133,18 +133,42 @@
 
 <script>
 
-  $(document).ready(function () {
-      $('#detailsTab').on('click', function () {
-         
-         document.querySelectorAll('.custom-tab').forEach(tab => tab.classList.remove('active'));
-         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+$(document).ready(function () {
+    $('#detailsTab').on('click', function () {
+        const uploadedContainer = document.getElementById('uploaded-main-files');
 
-         // Activate the "details" tab
-         document.querySelector('.custom-tab[data-tab="details"]').classList.add('active');
-         document.getElementById('details').classList.add('active');
-
+        // 🚨 Validation: Require at least one main file
+        if (
+            !uploadedContainer ||
+            uploadedContainer.style.display === 'none' ||
+            uploadedContainer.children.length === 0
+        ) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'File Required',
+                text: 'Please upload at least one print file before proceeding.',
+            });
+            return; // Stop further execution
         }
-  )});
+
+        // ✅ Proceed to next tab if validation passes
+        document.querySelectorAll('.custom-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+        document.querySelector('.custom-tab[data-tab="details"]').classList.add('active');
+        document.getElementById('details').classList.add('active');
+
+        // 🧭 Update URL parameter to reflect new tab
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('tab', 'details');
+        window.history.replaceState({}, '', currentUrl);
+
+        // Scroll to top for better UX
+        window.scrollTo({ top: -10, behavior: 'smooth' });
+    });
+});
+
+
 
    document.addEventListener("DOMContentLoaded", function () {
     const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));

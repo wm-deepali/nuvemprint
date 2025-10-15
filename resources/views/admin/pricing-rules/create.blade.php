@@ -84,7 +84,7 @@
               <div class="form-row d-flex align-items-end" style="display: flex;">
 
                 <div class="form-group col-md-2">
-                  <label for="proof_reading_required">Proof Reading Required</label>
+                  <label for="proof_reading_required">File Check Required</label>
                   <select class="form-control" name="proof_reading_required" id="proof_reading_required" required>
                     <option value="">-- Select --</option>
                     <option value="1">Yes</option>

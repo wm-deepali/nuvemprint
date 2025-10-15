@@ -6,10 +6,10 @@
         <a class="navbar-brand" href="<?php echo e(url('admin/home')); ?>">
           <span class="brand-logo">
             <?php if(\Auth::user()->logo_img): ?>
-        <img src="<?php echo e(asset('images/logo/' . \Auth::user()->logo_img)); ?>" alt="">
-      <?php else: ?>
-        <img src="<?php echo e(asset('admin_assets')); ?>/images/logo.png" alt="">
-      <?php endif; ?>
+              <img src="<?php echo e(asset('images/logo/' . \Auth::user()->logo_img)); ?>" alt="">
+            <?php else: ?>
+              <img src="<?php echo e(asset('admin_assets')); ?>/images/logo.png" alt="">
+            <?php endif; ?>
           </span>
         </a>
       </li>
@@ -44,12 +44,12 @@
           </div>
           <span class="avatar">
             <?php if(\Auth::user()->profile_img): ?>
-        <img class="round" src="<?php echo e(asset('images/profiles/' . \Auth::user()->profile_img)); ?>" alt="Robert Downey"
-          height="40" width="40">
-      <?php else: ?>
-        <img class="round" src="<?php echo e(asset('admin_assets')); ?>/images/admin-profile.png" alt="Robert Downey"
-          height="40" width="40">
-      <?php endif; ?>
+              <img class="round" src="<?php echo e(asset('images/profiles/' . \Auth::user()->profile_img)); ?>" alt="Robert Downey"
+                height="40" width="40">
+            <?php else: ?>
+              <img class="round" src="<?php echo e(asset('admin_assets')); ?>/images/admin-profile.png" alt="Robert Downey"
+                height="40" width="40">
+            <?php endif; ?>
             <span class="avatar-status-online"></span>
           </span>
         </a>
@@ -129,6 +129,20 @@
 
           </ul>
         </li>
+
+        <li class="dropdown nav-item" data-menu="dropdown">
+          <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
+            <span>Enquiries</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="<?php echo e(route('admin.contact-submissions.index')); ?>">
+                <span>Contact Messages</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
 
         <li class="dropdown nav-item" data-menu="dropdown">
           <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">

@@ -428,6 +428,35 @@
         justify-content: space-between;
     }
 
+    .estimate-div-static {
+        width: 90%;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        /* ensures spacing around the divider */
+    }
+
+    .estimate-div-static>div:first-child {
+        flex: 1;
+        min-width: 160px;
+    }
+
+    .estimate-div-static .line-y {
+        flex: 0 0 1px;
+        /* don't let flex sizing hide it */
+        height: 50px;
+        background-color: gray;
+    }
+
+    .estimate-div-static>div:last-child {
+        flex: 1.5;
+        /* allow more width for price + extra text */
+        /* text-align: right; */
+        min-width: 200px;
+        word-break: break-word;
+    }
+
+
     .line-y {
         width: 1px;
         height: 50px;
@@ -882,7 +911,7 @@
             <div class="right-side-section">
                 <div class="estimate-card-static active estimate-option-static mb-3" data-date="<?php echo e($defaultDate); ?>">
                     <div class="est-card">
-                        <div class="estimate-div">
+                        <div class="estimate-div-static">
                             <div class="ast-active-static">
                                 <p class="m-0 text-black">Estimated Price:</p>
                                 <h4 class="text-black mb-1"><?php echo e($defaultDate); ?></h4>
@@ -966,7 +995,7 @@
                 <?php if($proofReadingRequired && !empty($proofReadings)): ?>
                     <div class="form-row-section1 mt-3">
                         <div class="s-row mb-3">
-                            <label for="proof-reading" style="    font-size: 1.25rem;">Proof Reading</label>
+                            <label for="proof-reading" style="    font-size: 1.25rem;">File Check</label>
                             <div class="d-flex flex-wrap gap-3">
                                 <?php $__currentLoopData = $proofReadings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <?php if(!empty($option['proof_type']) && isset($option['price'])): ?>
@@ -1139,7 +1168,8 @@
 
 
         // Include select_area attributes (length and width)
-        $('.attribute-wrapper').each(function () {
+        $('.attribute-wrapper:visible').each(function () {
+
             const attrId = $(this).data('attribute-id');
             const isRequired = $(this).data('is-required');
 
@@ -1178,27 +1208,29 @@
 
 
         document.querySelectorAll('.attribute-wrapper').forEach(wrapper => {
+            if (window.getComputedStyle(wrapper).display === 'none') return; // skip hidden wrappers
+
             const attrId = wrapper.getAttribute('data-attribute-id');
-            const inputType = wrapper.getAttribute('data-input-type'); // You may need to add this if missing
+            const inputType = wrapper.getAttribute('data-input-type');
             const isRequired = wrapper.getAttribute('data-is-required') === '1';
 
             if (wrapper.querySelector('.area-input')) {
-                // It's a select_area type
                 const lengthInput = wrapper.querySelector(`[id^="length_"]`);
                 const widthInput = wrapper.querySelector(`[id^="width_"]`);
-                const area = parseFloat(lengthInput.value || 0) * parseFloat(widthInput.value || 0);
+
+                const length = parseFloat(lengthInput?.value || 0);
+                const width = parseFloat(widthInput?.value || 0);
+                const area = length * width;
 
                 selectedAttributes[attrId] = {
                     type: 'select_area',
-                    length: parseFloat(lengthInput.value || 0),
-                    width: parseFloat(widthInput.value || 0),
+                    length,
+                    width,
                     area: parseFloat(area.toFixed(2))
                 };
-
-            } else {
-                // Handle other input types...
             }
         });
+
 
         // console.log("selectedAttributes", selectedAttributes);
 
@@ -1348,6 +1380,15 @@
         const compositeMap = <?php echo json_encode($compositeMap ?? [], 15, 512) ?>;
         const compositeDraggerValues = <?php echo json_encode($compositeDraggerValues ?? [], 15, 512) ?>;
 
+        document.querySelectorAll('.btn-light').forEach(btn => {
+            btn.addEventListener('mouseleave', () => {
+                if (document.activeElement === btn) {
+                    btn.blur();
+                }
+            });
+        });
+
+
         function renderCompositeDraggers(valueId) {
             const count = compositeMap[valueId] ?? 0;
             const valueObj = compositeDraggerValues.find(val => val.id === valueId);
@@ -1439,7 +1480,7 @@
             const wasActive = $this.hasClass('active');
 
             // If already selected and NOT required → unselect
-            if (wasActive && !isRequired) {
+            if (wasActive) {
                 $this.removeClass('active').removeAttr('data-selected');
 
                 const attrId = $wrapper.data('attribute-id');
@@ -2081,7 +2122,7 @@
 
 
         // Add select_area attribute values
-        $('.attribute-wrapper[data-attribute-type="select_area"]').each(function () {
+        $('.attribute-wrapper[data-attribute-type="select_area"]:visible').each(function () {
             const $wrapper = $(this);
             const attrId = $wrapper.data('attribute-id');
 
@@ -2096,10 +2137,11 @@
                     length: length,
                     width: width,
                     area: area,
-                    unit: unit    // 👈 Add this
+                    unit: unit
                 };
             }
         });
+
 
 
         // Add number inputs manually
@@ -2155,7 +2197,7 @@
         const deliveryPrice = parseFloat(selectedDelivery.data('price')) || 0;
         const deliveryId = parseInt(selectedDelivery.data('id')) || null;
 
-        // Get selected proof reading option
+        // Get selected File Check option
         const proofOption = $('.selectable-proof-option.active');
         const proofType = proofOption.data('value') || null;
         const proofPrice = parseFloat(proofOption.data('price')) || 0;

@@ -6,10 +6,10 @@
         <a class="navbar-brand" href="{{ url('admin/home') }}">
           <span class="brand-logo">
             @if(\Auth::user()->logo_img)
-        <img src="{{ asset('images/logo/' . \Auth::user()->logo_img) }}" alt="">
-      @else
-        <img src="{{ asset('admin_assets') }}/images/logo.png" alt="">
-      @endif
+              <img src="{{ asset('images/logo/' . \Auth::user()->logo_img) }}" alt="">
+            @else
+              <img src="{{ asset('admin_assets') }}/images/logo.png" alt="">
+            @endif
           </span>
         </a>
       </li>
@@ -44,12 +44,12 @@
           </div>
           <span class="avatar">
             @if(\Auth::user()->profile_img)
-        <img class="round" src="{{ asset('images/profiles/' . \Auth::user()->profile_img) }}" alt="Robert Downey"
-          height="40" width="40">
-      @else
-        <img class="round" src="{{ asset('admin_assets') }}/images/admin-profile.png" alt="Robert Downey"
-          height="40" width="40">
-      @endif
+              <img class="round" src="{{ asset('images/profiles/' . \Auth::user()->profile_img) }}" alt="Robert Downey"
+                height="40" width="40">
+            @else
+              <img class="round" src="{{ asset('admin_assets') }}/images/admin-profile.png" alt="Robert Downey"
+                height="40" width="40">
+            @endif
             <span class="avatar-status-online"></span>
           </span>
         </a>
@@ -128,6 +128,20 @@
 
           </ul>
         </li>
+
+        <li class="dropdown nav-item" data-menu="dropdown">
+          <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
+            <span>Enquiries</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.contact-submissions.index') }}">
+                <span>Contact Messages</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
 
         <li class="dropdown nav-item" data-menu="dropdown">
           <a class="dropdown-toggle nav-link d-flex align-items-center" href="#" data-toggle="dropdown">
